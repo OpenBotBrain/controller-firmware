@@ -69,12 +69,12 @@ asm_source_files := startup_stm32l496xx.s
 board_include_paths := \
 	-I$(root_folder_path)/ \
 	-I$(application_path)/ \
-	-I$(application_path)/system \
 	-I$(config_path)/
 
 all_source_path := \
 	$(application_path) \
 	$(application_path)/system \
+	$(application_path)/task \
 	$(config_path) \
 	$(stm_hal_library_path)
 
@@ -83,7 +83,11 @@ CXXSRC:=main.cpp
 CSRC:=assert.c
 
 # System Folder
+CXXSRC+=system-freertos.cpp
 CXXSRC+=system-version.cpp
+
+# Task
+CXXSRC+=task-blinky.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
