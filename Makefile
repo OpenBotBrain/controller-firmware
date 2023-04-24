@@ -69,7 +69,7 @@ asm_source_files := startup_stm32l496xx.s
 board_include_paths := \
 	-I$(root_folder_path)/ \
 	-I$(application_path)/ \
-	-I$(config_path)/
+	-I$(config_path)/ \
 
 all_source_path := \
 	$(application_path) \
@@ -88,6 +88,7 @@ CXXSRC+=system-version.cpp
 
 # Task
 CXXSRC+=task-blinky.cpp
+CXXSRC+=task-gscope.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
@@ -173,6 +174,12 @@ CSRC+=tasks.c
 CSRC+=timers.c
 CSRC+=port.c
 
+# -------------------------------------------------------------------------
+# Library - Submodule Files - Source and Include
+gscope_path := $(library_path)/gscope
+board_include_paths += -I$(gscope_path)/include/
+custom_libs := -L$(gscope_path) -lgscope_mcu_cortex_m4_fpv4
+
 # ------------------------------------------------------------------------------------------
 
 # add extra....
@@ -197,7 +204,7 @@ c_compiler_options := $(cdefs) $(common_flags) $(board_include_paths)
 cpp_compiler_options := $(cdefs) $(common_flags) $(board_include_paths) -fno-rtti -std=c++14 -fno-threadsafe-statics
 linker_options := -Wl,-static $(common_flags) -Wl,--gc-sections,-T$(linker_source_file) -Wl,--print-memory-usage
 dependency_options = -MT $@ -MMD -MP -MF $(dependency_dir)/$*.Td
-ld_lib := -lc -lnosys -lm
+ld_lib := -lc -lnosys -lm $(custom_libs)
 
 # ------------------------------------------------------------------------------------------
 TIME_DIFF_MS := $$(($$(date +%s) - $(TIME_START)))

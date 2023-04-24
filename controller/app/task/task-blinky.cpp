@@ -2,13 +2,11 @@
 #include <system/system-freertos.hpp>
 #include <stm-hal/hal-gpio.hpp>
 
-static TaskHandle_t s_handler;
+static TaskHandle_t s_task_handler;
 static bool s_enabled = false;
 
-static void s_blinky_thread(void* arg)
+static void s_blinky_thread(void*)
 {
-    (void) arg;
-
     while(1)
     {
         s_enabled = !s_enabled;
@@ -26,12 +24,15 @@ static void s_blinky_thread(void* arg)
     }
 }
 
+// ------------------------------------------------------------------------------------
+//                                      PUBLIC API
+// ------------------------------------------------------------------------------------
 void task_blinky_init()
 {
     // Create task for Blinky App
     static StaticTask_t s_task_buffer;
     static StackType_t s_stack[SIZE_BLINKY];
 
-    s_handler = xTaskCreateStatic(s_blinky_thread, "Blinky", SIZE_BLINKY,
+    s_task_handler = xTaskCreateStatic(s_blinky_thread, "Blinky", SIZE_BLINKY,
         0, PRI_BLINKY, s_stack, &s_task_buffer);
 }
