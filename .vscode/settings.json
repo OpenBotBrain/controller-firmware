@@ -3,6 +3,9 @@
         "stm32l4xx.h": "c",
         "stm32l4xx_hal.h": "c",
         "stdint.h": "c",
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp"
     }
 }

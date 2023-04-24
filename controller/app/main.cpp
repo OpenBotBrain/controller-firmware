@@ -3,12 +3,15 @@
 #include <stm-hal/hal-board-init.h>
 #include <system/system-freertos.hpp>
 #include <task/task-blinky.hpp>
+#include <task/task-gscope.hpp>
 
 int main(void)
 {
     board_rev_init();               // Init board revision, IOs and clock configuration
 
     task_blinky_init();             // Init main blinky task.
+
+    task_gscope_init();             // Init gscope debug app
 
     vTaskStartScheduler();          // Start RTOS
 

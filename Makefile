@@ -103,6 +103,7 @@ CSRC+=hal-board-init.c
 CXXSRC+=hal-gpio.cpp
 CSRC+=hal-sys-irq.c
 CSRC+=hal-sys-init.c
+CXXSRC+=hal-uart.cpp
 
 # ------------------------------------------------------------------------------------------
 # ST Driver Files - Source and Include
@@ -179,6 +180,8 @@ CSRC+=port.c
 gscope_path := $(library_path)/gscope
 board_include_paths += -I$(gscope_path)/include/
 custom_libs := -L$(gscope_path) -lgscope_mcu_cortex_m4_fpv4
+
+board_include_paths += -I$(library_path)/serial_reception/include/
 
 # ------------------------------------------------------------------------------------------
 

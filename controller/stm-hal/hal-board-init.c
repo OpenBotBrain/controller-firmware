@@ -61,4 +61,9 @@ void hal_board_init(void)
     __HAL_RCC_RTC_ENABLE();
     __HAL_RCC_SYSCFG_CLK_ENABLE();
     __HAL_RCC_PWR_CLK_ENABLE();
+
+    __HAL_RCC_DMA1_CLK_ENABLE();
+    __HAL_RCC_DMA2_CLK_ENABLE();
+
+    // todo add uart common
 }
