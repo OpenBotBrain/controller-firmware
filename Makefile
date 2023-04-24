@@ -241,15 +241,15 @@ all: $(OBJ)
 
 	@echo "[INFO] Generating application binary: $(board_name).hex and $(board_name).bin"
 	@$(OBJCOPY) -O ihex $(bin_dir)/$(board_name).elf $(bin_dir)/$(board_name).hex
-	@$(OBJCOPY) -O binary $(bin_dir)/$(board_name).elf $(bin_dir)/$(board_name).bin --remove-section=.ccm
+	@$(OBJCOPY) -O binary $(bin_dir)/$(board_name).elf $(bin_dir)/$(board_name).bin
 
 	@echo "-------------------------------------------------------------------------------------"
 	@echo "[SIZE] Total binary size:"
 	@$(SIZE) $(bin_dir)/$(board_name).elf
 
 	@echo "-------------------------------------------------------------------------------------"
-	@echo "Build Success by  $(BUILD_DEVELOPER) - $(BUILD_DATE)
-	@echo "[Git Hash]: $(GIT_HASH) [Git Branch]:$(GIT_BRANCH) [Build Version]: $(BUILD_VERSION)""
+	@echo "Build Success by  $(BUILD_DEVELOPER) - $(BUILD_DATE)"
+	@echo "[Git Hash]: $(GIT_HASH) [Git Branch]:$(GIT_BRANCH) [Build Version]: $(BUILD_VERSION)"
 	@echo "Build took: $(TIME_DIFF_MS) seconds"
 	@echo "-------------------------------------------------------------------------------------"
 

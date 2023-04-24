@@ -16,9 +16,9 @@ struct GPIOInitConfig
     uint16_t id;
     GPIO_TypeDef* port;
     uint16_t pin;
-    uint16_t mode;
+    uint8_t mode;
+    uint8_t pull;
     uint16_t alternate;
-    uint16_t pull;
     uint16_t speed;
     port_state_t state;
 };

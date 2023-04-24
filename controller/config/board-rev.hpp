@@ -6,7 +6,7 @@ enum BoardRevision
 {                           // ID:0   ID:1     REV
     BOARD_REV_A = 0x00,     //  0      0       0x00
 
-    BOARD_REV_SIZE,
+    BOARD_REV_SIZE
 };
 
 struct BoardSpecificConfig

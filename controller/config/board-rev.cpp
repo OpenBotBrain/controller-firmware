@@ -9,8 +9,8 @@
 // These pins can not change from board version
 static constexpr GPIOInitConfig s_gpio_board_rev_id[2] =
 {
-    { 0, GPIOC, GPIO_PIN_13, GPIO_MODE_INPUT, 0, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, DONT_CARE },
-    { 1, GPIOC, GPIO_PIN_14, GPIO_MODE_INPUT, 0, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, DONT_CARE },
+    { 0, GPIOC, GPIO_PIN_13, GPIO_MODE_INPUT, GPIO_NOPULL, 0, GPIO_SPEED_FREQ_LOW, DONT_CARE },
+    { 1, GPIOC, GPIO_PIN_14, GPIO_MODE_INPUT, GPIO_NOPULL, 0, GPIO_SPEED_FREQ_LOW, DONT_CARE },
 };
 
 static uint8_t s_board_rev = BOARD_REV_SIZE;

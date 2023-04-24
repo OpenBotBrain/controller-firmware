@@ -4,8 +4,8 @@
 
 static constexpr GPIOInitConfig s_gpio_init_rev_a[TOTAL_GPIO] =
 {
-    //       Name              Port       Pin            Mode                AFSel            PuPd             Speed         initialValue
-    { USER_LED1_IO,           GPIOD, GPIO_PIN_7,  GPIO_MODE_OUTPUT_PP, 0,                   GPIO_NOPULL, GPIO_SPEED_FREQ_LOW, SET_LOW },
+    //       Name              Port       Pin            Mode             PuPd            AFSel                Speed         initialValue
+    { USER_LED1_IO,           GPIOD, GPIO_PIN_7,  GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0,                   GPIO_SPEED_FREQ_LOW, SET_LOW },
 };
 
 static constexpr BoardSpecificConfig s_rev_a_specific_config =
