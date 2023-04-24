@@ -85,13 +85,17 @@ CSRC:=assert.c
 # System Folder
 CXXSRC+=system-version.cpp
 
+# Config Folder
+CXXSRC+=board-rev.cpp
+CXXSRC+=board-rev-a.cpp
+
 # ------------------------------------------------------------------------------------------
 # stm-hal low level config files APP - Source and Include
 all_source_path += $(stm_hal_libraty_path)
 
 # CSRC+=hal-adc.c
 CSRC+=hal-board-init.c
-# CSRC+=hal-gpio.c
+CXXSRC+=hal-gpio.cpp
 CSRC+=hal-sys-irq.c
 CSRC+=hal-sys-init.c
 
