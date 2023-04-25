@@ -63,7 +63,7 @@ void board_rev_init(void)
     hal_gpio_init_initialize(board_gpio_config, TOTAL_GPIO);
 
     // Initialize the rest of the board, clock and hal library
-    hal_board_init();
+    hal_board_init(s_board_rev);
 }
 
 const BoardSpecificConfig* board_rev_get_specific_configuration()

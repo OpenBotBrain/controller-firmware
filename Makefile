@@ -98,11 +98,13 @@ CXXSRC+=board-rev-a.cpp
 # stm-hal low level config files APP - Source and Include
 all_source_path += $(stm_hal_libraty_path)
 
-# CSRC+=hal-adc.c
+CXXSRC+=hal-adc.cpp
 CXXSRC+=hal-board-init.cpp
 CXXSRC+=hal-gpio.cpp
+CXXSRC+=hal-i2c.cpp
 CSRC+=hal-sys-irq.c
 CSRC+=hal-sys-init.c
+CXXSRC+=hal-tim.cpp
 CXXSRC+=hal-uart.cpp
 
 # ------------------------------------------------------------------------------------------
