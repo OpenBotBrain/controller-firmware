@@ -1,5 +1,6 @@
 #include <app/assert.h>
 #include <stm32l4xx_hal.h>
+#include <stm-hal/hal-uart.hpp>
 
 static void s_sysclock_config(void)
 {
@@ -49,7 +50,7 @@ static void s_sysclock_config(void)
     assert(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) == HAL_OK);
 }
 
-void hal_board_init(void)
+void hal_board_init()
 {
     // Reset of all peripherals, Initializes the Flash interface and the Systick.
     HAL_Init();
@@ -67,5 +68,5 @@ void hal_board_init(void)
     __HAL_RCC_DMA1_CLK_ENABLE();
     __HAL_RCC_DMA2_CLK_ENABLE();
 
-    // todo add uart common
+    hal_uart_init_default();
 }

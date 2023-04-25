@@ -2,7 +2,7 @@
 #include <config/board-gpio.h>
 #include <config/board-rev.hpp>
 #include <config/board-rev-a.hpp>
-#include <stm-hal/hal-board-init.h>
+#include <stm-hal/hal-board-init.hpp>
 
 #define lengthof(a) (sizeof(a) / sizeof(a[0]))
 

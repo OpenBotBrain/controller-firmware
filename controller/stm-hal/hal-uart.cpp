@@ -4,7 +4,7 @@
 #include <serial_reception/serial_reception.hpp>
 #include <optional>
 
-static constexpr uint16_t SERIAL_RX_BUFFER_SIZE = 512;
+static constexpr uint16_t SERIAL_RX_BUFFER_SIZE = 256;
 
 struct UartConfig
 {
@@ -22,7 +22,12 @@ struct UartConfig
 // STM32L496ZGTx
 static constexpr UartConfig s_uart_config[UART_TYPE_TOTAL] =
 {
-    { LPUART1, 921600, DMA2_Channel6, DMA_REQUEST_4, DMA2_Channel6_IRQn, DMA2_Channel7, DMA_REQUEST_4, DMA2_Channel7_IRQn, PRI_HARD_LPUART1 },    // UART_TYPE_DEBUG_SERIAL
+    { LPUART1, 921600, DMA2_Channel6, DMA_REQUEST_4, DMA2_Channel6_IRQn, DMA2_Channel7, DMA_REQUEST_4, DMA2_Channel7_IRQn, PRI_HARD_LPUART1   }, // UART_TYPE_DEBUG_SERIAL
+    { USART3,  115200, DMA1_Channel2, DMA_REQUEST_2, DMA1_Channel2_IRQn, DMA1_Channel3, DMA_REQUEST_2, DMA1_Channel3_IRQn, PRI_HARD_PORT_UART }, // UART_TYPE_INPUT_1
+    { UART4,   115200, DMA2_Channel3, DMA_REQUEST_2, DMA2_Channel3_IRQn, nullptr,       0,             UART4_IRQn,         PRI_HARD_PORT_UART }, // UART_TYPE_INPUT_2
+    { USART2,  115200, DMA1_Channel7, DMA_REQUEST_2, DMA1_Channel7_IRQn, DMA1_Channel6, DMA_REQUEST_2, DMA1_Channel6_IRQn, PRI_HARD_PORT_UART }, // UART_TYPE_INPUT_3
+    { USART1,  115200, DMA1_Channel4, DMA_REQUEST_2, DMA1_Channel4_IRQn, DMA1_Channel5, DMA_REQUEST_2, DMA1_Channel5_IRQn, PRI_HARD_PORT_UART }, // UART_TYPE_INPUT_4
+    { UART5,   921600, DMA2_Channel1, DMA_REQUEST_2, DMA2_Channel1_IRQn, DMA2_Channel2, DMA_REQUEST_2, DMA2_Channel2_IRQn, PRI_HARD_RPI_UART  }, // UART_TYPE_INPUT_RPI
 };
 
 struct UartData
@@ -41,12 +46,16 @@ static uint32_t get_dma_couter_debug_uart(void* param)
 {
     UART_HandleTypeDef* uart = static_cast<UART_HandleTypeDef*>(param);
     return __HAL_DMA_GET_COUNTER(uart->hdmarx);
+
+    // TODO: SPECIAL CASE UART 4
 }
 
 static void dma_read_debug_uart(uint8_t* data, uint32_t size, void* param)
 {
     UART_HandleTypeDef* uart = static_cast<UART_HandleTypeDef*>(param);
     HAL_UART_Receive_DMA(uart, data, size);
+
+    // TODO: SPECIAL CASE UART 4
 }
 
 static constexpr SerialReceptionConfig s_serial_reception_config =
@@ -110,9 +119,10 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
 
         __HAL_DMA_ENABLE_IT(tx_dma, DMA_IT_TC);
 
-        HAL_NVIC_SetPriority(config->tx_irq_type, config->irq_priority, 0);
-        HAL_NVIC_EnableIRQ(config->tx_irq_type);
     }
+
+    HAL_NVIC_SetPriority(config->tx_irq_type, config->irq_priority, 0);
+    HAL_NVIC_EnableIRQ(config->tx_irq_type);
 
     // Configure RX DMA
     if (config->rx_channel != nullptr)
@@ -131,10 +141,10 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
         assert(HAL_DMA_Init(rx_dma) == HAL_OK);
 
         __HAL_LINKDMA(uart, hdmarx, *rx_dma);
-
-        HAL_NVIC_SetPriority(config->rx_irq_type, config->irq_priority, 0);
-        HAL_NVIC_EnableIRQ(config->rx_irq_type);
     }
+
+    HAL_NVIC_SetPriority(config->rx_irq_type, config->irq_priority, 0);
+    HAL_NVIC_EnableIRQ(config->rx_irq_type);
 
     // Call object constructor
     serial->rx.emplace(s_serial_reception_config, uart);

@@ -1,6 +1,6 @@
 #include <app/assert.h>
 #include <config/board-rev.hpp>
-#include <stm-hal/hal-board-init.h>
+#include <stm-hal/hal-board-init.hpp>
 #include <system/system-freertos.hpp>
 #include <task/task-blinky.hpp>
 #include <task/task-gscope.hpp>

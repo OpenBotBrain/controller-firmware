@@ -99,7 +99,7 @@ CXXSRC+=board-rev-a.cpp
 all_source_path += $(stm_hal_libraty_path)
 
 # CSRC+=hal-adc.c
-CSRC+=hal-board-init.c
+CXXSRC+=hal-board-init.cpp
 CXXSRC+=hal-gpio.cpp
 CSRC+=hal-sys-irq.c
 CSRC+=hal-sys-init.c
