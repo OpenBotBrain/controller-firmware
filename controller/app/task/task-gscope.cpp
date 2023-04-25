@@ -1,13 +1,15 @@
 #include <config/appconfig.h>
+#include <gscope/gscope.hpp>
 #include <system/system-freertos.hpp>
 #include <system/system-version.hpp>
-#include <gscope/gscope.hpp>
+#include <stm-hal/hal-uart.hpp>
 
 static TaskHandle_t s_task_handler;
 static SemaphoreHandle_t s_add_buffer_mutex = NULL;
 static SemaphoreHandle_t s_wait_tx_finish;
 static bool s_rtos_on = false;
 static uint8_t s_local_rx_buffer[128];
+static uint8_t s_fragmented_rx_buffer[128];
 
 static bool s_buffer_lock(void)
 {
@@ -24,9 +26,8 @@ static void s_buffer_unlock(void)
 
 static bool s_send_data(const uint8_t* data, uint32_t size)
 {
-    (void) data;
-    (void) size;
-    // hal_debug_uart_transmitte(data, size);
+    hal_uart_write(UART_TYPE_DEBUG_SERIAL, data, size);
+
     return system_freertos_semaphore_take(s_wait_tx_finish, 200);
 }
 
@@ -43,10 +44,10 @@ static constexpr GScopeSerialBuffer::SerialConfig s_serial_config =
 
 static GScope s_gscope(s_serial_config, system_version_get_version);
 
-// static void s_finish_sending_data()
-// {
-//     system_freertos_semaphore_give(s_wait_tx_finish);
-// }
+static void s_finish_sending_data(void*)
+{
+    system_freertos_semaphore_give(s_wait_tx_finish);
+}
 
 static void s_gscope_thread(void*)
 {
@@ -55,11 +56,11 @@ static void s_gscope_thread(void*)
     while(1)
     {
         // We do the serial decoding inside the thread
-        uint32_t read_size = 0;// hal_debug_uart_read(s_local_rx_buffer, sizeof(s_local_rx_buffer));
+        uint32_t read_size = hal_uart_read(UART_TYPE_DEBUG_SERIAL, s_local_rx_buffer, sizeof(s_local_rx_buffer));
 
         if (read_size != 0)
         {
-            s_gscope.incoming(s_local_rx_buffer, read_size);
+            s_gscope.incoming_fragmented(s_local_rx_buffer, read_size, s_fragmented_rx_buffer, sizeof(s_fragmented_rx_buffer));
         }
 
         // Update main routine, if return true, we should keep updating information
@@ -88,7 +89,7 @@ void task_gscope_init()
     static StaticSemaphore_t s_wait_ts_sem;
     s_wait_tx_finish = xSemaphoreCreateBinaryStatic(&s_wait_ts_sem);
 
-    // hal_debug_uart_init(s_finish_sending_data);
+    hal_uart_init(UART_TYPE_DEBUG_SERIAL, s_finish_sending_data, nullptr);
 
     s_gscope.enable_transmission(true);
 }

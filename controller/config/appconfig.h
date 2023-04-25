@@ -13,3 +13,6 @@
 
 #define PRI_GSCOPE                          2
 #define SIZE_GSCOPE                         256
+
+// -------------------------- Hardware Interruptions -----------------------
+#define PRI_HARD_LPUART1                    8  // lpuart 1 for debug

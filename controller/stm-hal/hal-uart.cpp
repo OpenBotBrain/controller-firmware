@@ -2,6 +2,7 @@
 #include <stm32l4xx_hal.h>
 #include <stm-hal/hal-uart.hpp>
 #include <serial_reception/serial_reception.hpp>
+#include <optional>
 
 static constexpr uint16_t SERIAL_RX_BUFFER_SIZE = 512;
 
@@ -11,26 +12,49 @@ struct UartConfig
     uint32_t speed;
     DMA_Channel_TypeDef* tx_channel;
     uint8_t tx_request;
+    IRQn_Type tx_irq_type;
     DMA_Channel_TypeDef* rx_channel;
     uint8_t rx_request;
+    IRQn_Type rx_irq_type;
+    uint8_t irq_priority;
 };
 
+// STM32L496ZGTx
 static constexpr UartConfig s_uart_config[UART_TYPE_TOTAL] =
 {
-    { LPUART1, 921600, DMA1_Channel2, DMA_REQUEST_LPUART1_TX, DMA1_Channel3, DMA_REQUEST_LPUART1_RX },    // UART_TYPE_DEBUG_SERIAL
-}
+    { LPUART1, 921600, DMA2_Channel6, DMA_REQUEST_4, DMA2_Channel6_IRQn, DMA2_Channel7, DMA_REQUEST_4, DMA2_Channel7_IRQn, PRI_HARD_LPUART1 },    // UART_TYPE_DEBUG_SERIAL
+};
 
 struct UartData
 {
     UART_HandleTypeDef uart;
     DMA_HandleTypeDef tx_dma;
     DMA_HandleTypeDef rx_dma;
-    SerialReception<SERIAL_RX_BUFFER_SIZE> rx;
+    std::optional<SerialReception<SERIAL_RX_BUFFER_SIZE>> rx;
     FinishCb tx_end_cb;
     void* param;
 };
 
 static UartData s_uart_data[UART_TYPE_TOTAL];
+
+static uint32_t get_dma_couter_debug_uart(void* param)
+{
+    UART_HandleTypeDef* uart = static_cast<UART_HandleTypeDef*>(param);
+    return __HAL_DMA_GET_COUNTER(uart->hdmarx);
+}
+
+static void dma_read_debug_uart(uint8_t* data, uint32_t size, void* param)
+{
+    UART_HandleTypeDef* uart = static_cast<UART_HandleTypeDef*>(param);
+    HAL_UART_Receive_DMA(uart, data, size);
+}
+
+static constexpr SerialReceptionConfig s_serial_reception_config =
+{
+    get_dma_couter_debug_uart,
+    dma_read_debug_uart,
+    false
+};
 
 void hal_uart_init_default()
 {
@@ -44,13 +68,14 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
     assert(type >= 0 && type < UART_TYPE_TOTAL);
 
     const UartConfig* config = &s_uart_config[type];
+    UartData* serial = &s_uart_data[type];
 
     // Safe finish transmite callback function and parameter
-    s_uart_data[type].tx_end_cb = finish_tx_cb;
-    s_uart_data[type].param = param,
+    serial->tx_end_cb = finish_tx_cb;
+    serial->param = param;
 
     // Configure UART
-    USART_TypeDef* uart = s_uart_data[type].uart;
+    UART_HandleTypeDef* uart = &serial->uart;
 
     uart->Instance = config->uart;
     uart->Init.BaudRate = config->speed;
@@ -61,13 +86,9 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
     uart->Init.HwFlowCtl = UART_HWCONTROL_NONE;
     uart->Init.OverSampling = UART_OVERSAMPLING_16;
     uart->Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-    uart->Init.ClockPrescaler = UART_PRESCALER_DIV1;
     uart->AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
-    assert(HAL_UART_Init(uart) == HAL_OK &&
-        HAL_UARTEx_SetTxFifoThreshold(uart, UART_TXFIFO_THRESHOLD_1_8) == HAL_OK &&
-        HAL_UARTEx_SetRxFifoThreshold(uart, UART_RXFIFO_THRESHOLD_1_8) == HAL_OK &&
-        HAL_UARTEx_DisableFifoMode(uart) == HAL_OK);
+    assert(HAL_UART_Init(uart) == HAL_OK);
 
     // Configure TX DMA
     if (config->tx_channel != nullptr)
@@ -85,7 +106,12 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
         tx_dma->Init.Priority = DMA_PRIORITY_LOW;
         assert(HAL_DMA_Init(tx_dma) == HAL_OK);
 
-        __HAL_LINKDMA(uart, hdmatx, &tx_dma);
+        __HAL_LINKDMA(uart, hdmatx, *tx_dma);
+
+        __HAL_DMA_ENABLE_IT(tx_dma, DMA_IT_TC);
+
+        HAL_NVIC_SetPriority(config->tx_irq_type, config->irq_priority, 0);
+        HAL_NVIC_EnableIRQ(config->tx_irq_type);
     }
 
     // Configure RX DMA
@@ -104,24 +130,27 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
         rx_dma->Init.Priority = DMA_PRIORITY_LOW;
         assert(HAL_DMA_Init(rx_dma) == HAL_OK);
 
-        __HAL_LINKDMA(uart, hdmarx, &rx_dma);
+        __HAL_LINKDMA(uart, hdmarx, *rx_dma);
+
+        HAL_NVIC_SetPriority(config->rx_irq_type, config->irq_priority, 0);
+        HAL_NVIC_EnableIRQ(config->rx_irq_type);
     }
 
-    // TODO: INIT RX
+    // Call object constructor
+    serial->rx.emplace(s_serial_reception_config, uart);
+    serial->rx->init();
 }
 
-void hal_uart_write(const UartTypes type, const uint8_t* data, uint32_t size)
+void hal_uart_write(const uint8_t type, const uint8_t* data, uint32_t size)
 {
     assert(type >= 0 && type < UART_TYPE_TOTAL);
-    USART_TypeDef* uart = s_uart_data[type].uart;
-
-    HAL_UART_Transmit_DMA(uart, data, size);
+    HAL_UART_Transmit_DMA(&s_uart_data[type].uart, data, size);
 }
 
-uint32_t hal_uart_read(const UartTypes type, uint8_t* data, uint32_t size)
+uint32_t hal_uart_read(const uint8_t type, uint8_t* data, uint32_t size)
 {
     assert(type >= 0 && type < UART_TYPE_TOTAL);
-    return s_uart_data[type].rx.read(data, size);
+    return s_uart_data[type].rx->read(data, size);
 }
 
 extern "C" {
@@ -131,7 +160,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart)
     {
         UartData* data = &s_uart_data[i];
 
-        if (huart->Instance == data->uart)
+        if (huart == &data->uart)
         {
             if (data->tx_end_cb != nullptr)
             {
@@ -148,9 +177,9 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart)
     {
         UartData* data = &s_uart_data[i];
 
-        if (huart->Instance == data->uart)
+        if (huart == &data->uart)
         {
-            data->rx.error();
+            data->rx->error();
         }
         return;
     }

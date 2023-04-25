@@ -6,6 +6,8 @@
         "cstdint": "cpp",
         "array": "cpp",
         "string": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "optional": "cpp",
+        "*.tcc": "cpp"
     }
 }

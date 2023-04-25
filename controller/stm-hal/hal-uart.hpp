@@ -4,7 +4,7 @@
 
 enum UartTypes
 {
-    UART_TYPE_DEBUG_SERIAL,
+    UART_TYPE_DEBUG_SERIAL = 0,
     UART_TYPE_TOTAL
 };
 

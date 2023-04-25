@@ -204,7 +204,7 @@ common_flags += -O$(DEBUG_OPTLVL)
 
 assembler_options := -O$(REGULAR_PTLVL)
 c_compiler_options := $(cdefs) $(common_flags) $(board_include_paths)
-cpp_compiler_options := $(cdefs) $(common_flags) $(board_include_paths) -fno-rtti -std=c++14 -fno-threadsafe-statics
+cpp_compiler_options := $(cdefs) $(common_flags) $(board_include_paths) -fno-rtti -std=c++17 -fno-threadsafe-statics
 linker_options := -Wl,-static $(common_flags) -Wl,--gc-sections,-T$(linker_source_file) -Wl,--print-memory-usage
 dependency_options = -MT $@ -MMD -MP -MF $(dependency_dir)/$*.Td
 ld_lib := -lc -lnosys -lm $(custom_libs)

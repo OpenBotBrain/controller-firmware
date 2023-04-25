@@ -7,8 +7,8 @@
 
 struct SerialReceptionConfig
 {
-    using get_counter_cb = uint32_t(*)(void);
-    using dma_read_cb = void(*)(uint8_t*, uint32_t);
+    using get_counter_cb = uint32_t(*)(void*);
+    using dma_read_cb = void(*)(uint8_t*, uint32_t, void*);
     get_counter_cb get_dma_counter;
     dma_read_cb dma_read;
     bool use_idle;
@@ -20,8 +20,8 @@ class SerialReception
     public:
         using incoming_data_callback = bool(*)(const uint8_t*, uint32_t);
 
-        SerialReception(const SerialReceptionConfig& config) :
-            m_serial_config(config) { }
+        SerialReception(const SerialReceptionConfig& config, void* param) :
+            m_serial_config(config), m_param(param) { }
 
        void init()
        {
@@ -52,7 +52,7 @@ class SerialReception
 
             m_idle_detected = false;
             uint32_t total_byte_read = 0;
-            uint32_t dma_write_position = INCOMING_DATA_SIZE - m_serial_config.get_dma_counter();
+            uint32_t dma_write_position = INCOMING_DATA_SIZE - m_serial_config.get_dma_counter(m_param);
 
             if (m_last_dma_write_pos != dma_write_position)
             {
@@ -92,6 +92,7 @@ class SerialReception
 
     private:
         const SerialReceptionConfig& m_serial_config;
+        void* m_param;
         uint8_t m_incoming_data[INCOMING_DATA_SIZE];
         uint32_t m_last_dma_write_pos;
         bool m_idle_detected;
@@ -100,6 +101,6 @@ class SerialReception
         {
             m_last_dma_write_pos = 0;
             m_idle_detected = false;
-            m_serial_config.dma_read(m_incoming_data, INCOMING_DATA_SIZE);
+            m_serial_config.dma_read(m_incoming_data, INCOMING_DATA_SIZE, m_param);
         }
 };
