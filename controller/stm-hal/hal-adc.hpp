@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-enum ADCChannelType
+enum ADCChannelType : uint8_t
 {
     // Input PORT
     ADC_CHANNEL_TYPE_PORT_INPUT1_PIN1 = 0,
@@ -26,8 +26,13 @@ enum ADCChannelType
     ADC_CHANNEL_TYPE_3V3_SENSE,
     ADC_CHANNEL_TYPE_5V_SENSE,
     ADC_CHANNEL_TYPE_9V_SENSE,
+    ADC_CHANNEL_TYPE_VBUS_SENSE,
+    ADC_CHANNEL_TYPE_VBAT_SENSE,
 
     ADC_CHANNEL_TOTAL
 };
 
+using FinishAdcCb = void(*)(uint16_t, void*);
+
 void hal_adc_init_default(uint8_t board_rev);
+void hal_adc_init_channel(const uint8_t channel, FinishAdcCb cb, void* param);

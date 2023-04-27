@@ -76,7 +76,7 @@ void hal_uart_init_default(uint8_t board_rev)
 
 void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
 {
-    assert(type >= 0 && type < UART_TYPE_TOTAL);
+    assert(type < UART_TYPE_TOTAL);
 
     const UartConfig* config = &s_uart_config[type];
     UartData* serial = &s_uart_data[type];
