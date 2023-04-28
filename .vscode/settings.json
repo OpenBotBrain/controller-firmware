@@ -8,6 +8,13 @@
         "string": "cpp",
         "string_view": "cpp",
         "optional": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "functional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "memory": "cpp"
     }
 }

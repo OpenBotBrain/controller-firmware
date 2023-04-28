@@ -17,6 +17,13 @@ struct AdcChannelConfig
     uint32_t adc_channel;
 };
 
+struct AdcData
+{
+    FinishAdcCb cb;
+    void* param;
+    uint8_t sample_offset;
+};
+
 static constexpr AdcChannelConfig s_adc_config[ADC_CHANNEL_TOTAL] =
 {
     { ADC_CHANNEL_TYPE_PORT_OUTPUT3_PIN6, AdcType::TypeADC1, ADC_CHANNEL_3  },  //
@@ -55,21 +62,13 @@ static constexpr uint8_t get_total_channels(AdcType type)
     return total;
 }
 
-static uint16_t s_adc_sample[ADC_CHANNEL_TOTAL] = {0};
 static ADC_HandleTypeDef s_adc1;
 static ADC_HandleTypeDef s_adc3;
 static DMA_HandleTypeDef s_hdma_adc1;
 static DMA_HandleTypeDef s_hdma_adc3;
 static uint8_t s_total_channel_adc1 = get_total_channels(AdcType::TypeADC1);
 static uint8_t s_total_channel_adc3 = get_total_channels(AdcType::TypeADC3);
-
-struct AdcData
-{
-    FinishAdcCb cb;
-    void* param;
-    uint8_t sample_offset;  // position where the sample is on the main ADC buffer
-};
-
+static uint16_t s_adc_sample[ADC_CHANNEL_TOTAL] = {0};
 static AdcData s_adc_data[ADC_CHANNEL_TOTAL] = {0};
 
 static void finish_sample_callback_update(AdcType type)
@@ -128,11 +127,11 @@ void hal_adc_init_default(uint8_t board_rev)
     s_adc1.Init.DMAContinuousRequests = ENABLE;
     s_adc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
     s_adc1.Init.OversamplingMode = DISABLE;
+    assert (HAL_ADC_Init(&s_adc1) == HAL_OK);
 
     s_adc3 = s_adc1;
     s_adc3.Instance = ADC3;
     s_adc3.Init.NbrOfConversion = s_total_channel_adc3;
-    assert (HAL_ADC_Init(&s_adc1) == HAL_OK);
     assert (HAL_ADC_Init(&s_adc3) == HAL_OK);
 
     // Configure DMA
@@ -187,6 +186,21 @@ void hal_adc_init_default(uint8_t board_rev)
         assert (HAL_ADC_ConfigChannel(adc, &sConfig) == HAL_OK);
     }
 
+    HAL_ADCEx_Calibration_Start(&s_adc1, ADC_SINGLE_ENDED);
+    HAL_ADCEx_Calibration_Start(&s_adc3, ADC_SINGLE_ENDED);
+
+    HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, PRI_HARD_ADC, 0);
+    HAL_NVIC_SetPriority(DMA2_Channel5_IRQn, PRI_HARD_ADC, 0);
+
+    HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+    HAL_NVIC_EnableIRQ(DMA2_Channel5_IRQn);
+
+    __HAL_DMA_ENABLE_IT(&s_hdma_adc1, DMA_IT_TC );
+    __HAL_DMA_ENABLE_IT(&s_hdma_adc3, DMA_IT_TC );
+
+    // Start ADC with DMA
+    HAL_ADC_Start_DMA(&s_adc1, (uint32_t*)s_adc_sample, s_total_channel_adc1);
+    HAL_ADC_Start_DMA(&s_adc3, (uint32_t*)&s_adc_sample[s_total_channel_adc1], s_total_channel_adc3);
 }
 
 extern "C" {

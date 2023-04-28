@@ -41,8 +41,6 @@ class SerialReception
             configure_read_from_serial();
         }
 
-        // This is the case where m_incoming_data_callback is not used, and instead we read the serial
-        // periodically
         uint32_t read(uint8_t* rx_data, uint32_t max_rx_size)
         {
             if (m_serial_config.use_idle && m_idle_detected == false)
@@ -88,6 +86,23 @@ class SerialReception
             }
 
             return total_byte_read;
+        }
+
+        uint8_t* next()
+        {
+            uint32_t pos = m_last_dma_write_pos + 1;
+            if (pos >= INCOMING_DATA_SIZE)
+            {
+                pos = 0;
+            }
+            m_last_dma_write_pos = pos;
+
+            return m_incoming_data + m_last_dma_write_pos;
+        }
+
+        uint16_t get_counter()
+        {
+            return m_last_dma_write_pos;
         }
 
     private:

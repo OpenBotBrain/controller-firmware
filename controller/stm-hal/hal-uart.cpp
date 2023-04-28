@@ -38,30 +38,43 @@ struct UartData
     std::optional<SerialReception<SERIAL_RX_BUFFER_SIZE>> rx;
     FinishCb tx_end_cb;
     void* param;
+    const UartConfig* config;
 };
 
 static UartData s_uart_data[UART_TYPE_TOTAL];
 
-static uint32_t get_dma_couter_debug_uart(void* param)
+static uint32_t serial_get_rx_couter(void* param)
 {
-    UART_HandleTypeDef* uart = static_cast<UART_HandleTypeDef*>(param);
-    return __HAL_DMA_GET_COUNTER(uart->hdmarx);
+    UartData* serial = static_cast<UartData*>(param);
 
-    // TODO: SPECIAL CASE UART 4
+    if (serial->config->rx_channel == nullptr)
+    {
+        return serial->rx->get_counter();               // no DMA is in use
+    }
+    else
+    {
+        return __HAL_DMA_GET_COUNTER(&serial->rx_dma);  // dma is in use
+    }
 }
 
-static void dma_read_debug_uart(uint8_t* data, uint32_t size, void* param)
+static void serial_start_reception(uint8_t* data, uint32_t size, void* param)
 {
-    UART_HandleTypeDef* uart = static_cast<UART_HandleTypeDef*>(param);
-    HAL_UART_Receive_DMA(uart, data, size);
+    UartData* serial = static_cast<UartData*>(param);
 
-    // TODO: SPECIAL CASE UART 4
+    if (serial->config->rx_channel == nullptr)
+    {
+        HAL_UART_Receive_IT(&serial->uart, data, 1);        // no DMA is in use
+    }
+    else
+    {
+        HAL_UART_Receive_DMA(&serial->uart, data, size);    // dma is in use
+    }
 }
 
 static constexpr SerialReceptionConfig s_serial_reception_config =
 {
-    get_dma_couter_debug_uart,
-    dma_read_debug_uart,
+    serial_get_rx_couter,
+    serial_start_reception,
     false
 };
 
@@ -84,6 +97,7 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
     // Safe finish transmite callback function and parameter
     serial->tx_end_cb = finish_tx_cb;
     serial->param = param;
+    serial->config = config;
 
     // Configure UART
     UART_HandleTypeDef* uart = &serial->uart;
@@ -149,19 +163,19 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
     HAL_NVIC_EnableIRQ(config->rx_irq_type);
 
     // Call object constructor
-    serial->rx.emplace(s_serial_reception_config, uart);
-    serial->rx->init();
+    serial->rx.emplace(s_serial_reception_config, serial);
+    serial->rx->init(); // start reading usign DMA or IRQ
 }
 
 void hal_uart_write(const uint8_t type, const uint8_t* data, uint32_t size)
 {
-    assert(type >= 0 && type < UART_TYPE_TOTAL);
+    assert(type < UART_TYPE_TOTAL);
     HAL_UART_Transmit_DMA(&s_uart_data[type].uart, data, size);
 }
 
 uint32_t hal_uart_read(const uint8_t type, uint8_t* data, uint32_t size)
 {
-    assert(type >= 0 && type < UART_TYPE_TOTAL);
+    assert(type < UART_TYPE_TOTAL);
     return s_uart_data[type].rx->read(data, size);
 }
 
@@ -195,6 +209,80 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart)
         }
         return;
     }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    for (int i = 0; i < UART_TYPE_TOTAL; i++)
+    {
+        UartData* serial = &s_uart_data[i];
+
+        if (huart == &serial->uart)
+        {
+            HAL_UART_Receive_IT(huart, serial->rx->next(), 1);
+            return;
+        }
+    }
+}
+
+void DMA1_Channel2_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_1].tx_dma);    // uart3 tx
+}
+
+void DMA1_Channel3_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_1].rx_dma);    // uart3 rx
+}
+
+void DMA1_Channel4_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_4].tx_dma);    // uart1 tx
+}
+
+void DMA1_Channel5_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_4].rx_dma);    // uart1 rx
+}
+
+void DMA1_Channel6_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_3].rx_dma);    // uart 2 rx
+}
+
+void DMA1_Channel7_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_3].tx_dma);    // uart2 tx
+}
+
+void DMA2_Channel1_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_RPI].tx_dma);        // uart5 tx
+}
+
+void DMA2_Channel2_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_RPI].rx_dma);        // uart5 rx
+}
+
+void DMA2_Channel3_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_2].tx_dma);    // uart4 tx
+}
+
+void DMA2_Channel6_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_DEBUG_SERIAL].tx_dma);    // lpuart tx
+}
+
+void DMA2_Channel7_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_DEBUG_SERIAL].rx_dma);    // lpuart rx
+}
+
+void UART4_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_2].uart);
 }
 
 }
