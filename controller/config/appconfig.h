@@ -15,7 +15,9 @@
 #define SIZE_GSCOPE                         256
 
 // -------------------------- Hardware Interruptions -----------------------
-#define PRI_HARD_LPUART1                    8  // lpuart 1 for debug
-#define PRI_HARD_PORT_UART                  9  // PORT 1 TO 4 uart interruption level
-#define PRI_HARD_RPI_UART                   7  // RPI uart com
-#define PRI_HARD_ADC                        10 // ADC Dma Priority
+#define PRI_HARD_LPUART1                    8   // lpuart 1 for debug
+#define PRI_HARD_PORT_UART                  9   // PORT 1 TO 4 uart interruption level
+#define PRI_HARD_RPI_UART                   7   // RPI uart com
+#define PRI_HARD_ADC                        10  // ADC Dma Priority
+#define PRI_HARD_PORT_I2C                   9   // I2C PORT 1 TO 4 interruption level
+#define PRI_HARD_SYS_I2C                    11  // System I2C IRQ (LCD, POWER DRIVER)

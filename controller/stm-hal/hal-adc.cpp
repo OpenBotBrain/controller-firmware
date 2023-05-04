@@ -195,8 +195,8 @@ void hal_adc_init_default(uint8_t board_rev)
     HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
     HAL_NVIC_EnableIRQ(DMA2_Channel5_IRQn);
 
-    __HAL_DMA_ENABLE_IT(&s_hdma_adc1, DMA_IT_TC );
-    __HAL_DMA_ENABLE_IT(&s_hdma_adc3, DMA_IT_TC );
+    __HAL_DMA_ENABLE_IT(&s_hdma_adc1, DMA_IT_TC);
+    __HAL_DMA_ENABLE_IT(&s_hdma_adc3, DMA_IT_TC);
 
     // Start ADC with DMA
     HAL_ADC_Start_DMA(&s_adc1, (uint32_t*)s_adc_sample, s_total_channel_adc1);

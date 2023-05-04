@@ -32,7 +32,7 @@ static constexpr UartConfig s_uart_config[UART_TYPE_TOTAL] =
 
 struct UartData
 {
-    UART_HandleTypeDef uart;
+    UART_HandleTypeDef handler;
     DMA_HandleTypeDef tx_dma;
     DMA_HandleTypeDef rx_dma;
     std::optional<SerialReception<SERIAL_RX_BUFFER_SIZE>> rx;
@@ -63,11 +63,11 @@ static void serial_start_reception(uint8_t* data, uint32_t size, void* param)
 
     if (serial->config->rx_channel == nullptr)
     {
-        HAL_UART_Receive_IT(&serial->uart, data, 1);        // no DMA is in use
+        HAL_UART_Receive_IT(&serial->handler, data, 1);        // no DMA is in use
     }
     else
     {
-        HAL_UART_Receive_DMA(&serial->uart, data, size);    // dma is in use
+        HAL_UART_Receive_DMA(&serial->handler, data, size);    // dma is in use
     }
 }
 
@@ -85,6 +85,9 @@ void hal_uart_init_default(uint8_t board_rev)
     __HAL_RCC_LPUART1_CLK_ENABLE();
     __HAL_RCC_USART1_CLK_ENABLE();
     __HAL_RCC_USART2_CLK_ENABLE();
+    __HAL_RCC_USART3_CLK_ENABLE();
+    __HAL_RCC_UART4_CLK_ENABLE();
+    __HAL_RCC_UART5_CLK_ENABLE();
 }
 
 void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
@@ -100,7 +103,7 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
     serial->config = config;
 
     // Configure UART
-    UART_HandleTypeDef* uart = &serial->uart;
+    UART_HandleTypeDef* uart = &serial->handler;
 
     uart->Instance = config->uart;
     uart->Init.BaudRate = config->speed;
@@ -170,7 +173,7 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
 void hal_uart_write(const uint8_t type, const uint8_t* data, uint32_t size)
 {
     assert(type < UART_TYPE_TOTAL);
-    HAL_UART_Transmit_DMA(&s_uart_data[type].uart, data, size);
+    HAL_UART_Transmit_DMA(&s_uart_data[type].handler, data, size);
 }
 
 uint32_t hal_uart_read(const uint8_t type, uint8_t* data, uint32_t size)
@@ -186,7 +189,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart)
     {
         UartData* data = &s_uart_data[i];
 
-        if (huart == &data->uart)
+        if (huart == &data->handler)
         {
             if (data->tx_end_cb != nullptr)
             {
@@ -203,7 +206,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart)
     {
         UartData* data = &s_uart_data[i];
 
-        if (huart == &data->uart)
+        if (huart == &data->handler)
         {
             data->rx->error();
         }
@@ -217,7 +220,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
         UartData* serial = &s_uart_data[i];
 
-        if (huart == &serial->uart)
+        if (huart == &serial->handler)
         {
             HAL_UART_Receive_IT(huart, serial->rx->next(), 1);
             return;
@@ -282,7 +285,7 @@ void DMA2_Channel7_IRQHandler(void)
 
 void UART4_IRQHandler(void)
 {
-    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_2].uart);
+    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_2].handler);
 }
 
 }

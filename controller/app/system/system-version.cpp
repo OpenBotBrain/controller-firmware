@@ -1,5 +1,6 @@
 #include <config/board-rev.hpp>
 #include <system/system-version.hpp>
+#include <gscope/gscope.hpp>
 
 const char* system_version_get_internal(InfoType type)
 {
@@ -28,11 +29,10 @@ const char* system_version_get_internal(InfoType type)
 
 void system_version_get_version()
 {
-    // const BoardSpecificConfig* spec_config = board_rev_get_specific_configuration();
+    const BoardSpecificConfig* spec_config = board_rev_get_specific_configuration();
 
-    // TODO: ENABLE PRINT TO DEBUG INTERFACE
-    // GSDebug("Board Version: %s", spec_config->board_name);
-    // GSDebug("Build: %s", BUILD_VERSION);
-    // GSDebug("Developer: %s", BUILD_DEVELOPER);
-    // GSDebug("Date: %s", BUILD_DATE);
+    GSDebug("Board Version: %s", spec_config->board_name);
+    GSDebug("Build: %s", BUILD_VERSION);
+    GSDebug("Developer: %s", BUILD_DEVELOPER);
+    GSDebug("Date: %s", BUILD_DATE);
 }
