@@ -1,9 +1,20 @@
+#include <assert.h>
 #include <stm-hal/hal-gpio.hpp>
 
 static const GPIOInitConfig* s_board_gpio[TOTAL_GPIO];
+static const GPIOInitConfig* s_gpio_config = nullptr;
 
 #define GPIO_PIN(io) (s_board_gpio[io]->pin)
 #define GPIO_PORT(io) (s_board_gpio[io]->port)
+
+// This is used only when multiple configuration of file is used
+static void hal_gpio_init_config(const GPIOInitConfig* gpios, int num_gpios)
+{
+    for (int i = 0; i < num_gpios; i++)
+    {
+        s_board_gpio[gpios[i].id] = &gpios[i];
+    }
+}
 
 void hal_gpio_init_initialize(const GPIOInitConfig* gpios_arr, int num_gpios)
 {
@@ -44,13 +55,16 @@ void hal_gpio_init_initialize(const GPIOInitConfig* gpios_arr, int num_gpios)
     }
 }
 
-// This is used only when multiple configuration of file is used
-void hal_gpio_init_config(const GPIOInitConfig* gpios, int num_gpios)
+void hal_gpio_init_default(const BoardSpecificConfig* board_config)
 {
-    for (int i = 0; i < num_gpios; i++)
-    {
-        s_board_gpio[gpios[i].id] = &gpios[i];
-    }
+    s_gpio_config = board_config->gpio_config;
+    assert(s_gpio_config);
+
+    // Initialize ID table
+    hal_gpio_init_config(s_gpio_config, TOTAL_GPIO);
+
+    // Initialize GPIOS
+    hal_gpio_init_initialize(s_gpio_config, TOTAL_GPIO);
 }
 
 bool hal_gpio_read_pin_default(GPIO_TypeDef* port, uint16_t pin)

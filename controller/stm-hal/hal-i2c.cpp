@@ -15,14 +15,6 @@ enum class I2CState : uint8_t
     ERROR,
 };
 
-struct I2CChannelConfig
-{
-    I2C_TypeDef* i2c_instance;
-    uint32_t timing;
-    IRQn_Type irq_type;
-    uint8_t irq_priority;
-};
-
 struct I2CData
 {
     I2C_HandleTypeDef handler;
@@ -34,19 +26,13 @@ struct I2CData
     I2CState state;
 };
 
-static constexpr I2CChannelConfig s_i2c_config[I2C_TYPE_TOTAL] =
-{
-    { I2C4, 0x10909CEC, I2C1_EV_IRQn, PRI_HARD_PORT_I2C }, // I2C_TYPE_PORT_INPUT_1
-    { I2C1, 0x10909CEC, I2C2_EV_IRQn, PRI_HARD_PORT_I2C }, // I2C_TYPE_PORT_INPUT_2
-    { I2C2, 0x10909CEC, I2C3_EV_IRQn, PRI_HARD_PORT_I2C }, // I2C_TYPE_PORT_INPUT_3
-    { I2C3, 0x10909CEC, I2C4_EV_IRQn, PRI_HARD_SYS_I2C  }, // I2C_TYPE_SYSTEM
-};
-
+static const I2CChannelConfig* s_i2c_config;
 static I2CData s_i2c_data[I2C_TYPE_TOTAL];
 
-void hal_i2c_init_default(uint8_t board_rev)
+void hal_i2c_init_default(const BoardSpecificConfig* board_config)
 {
-    (void) board_rev;
+    s_i2c_config = board_config->i2c_config;
+    assert(s_i2c_config);
 
     __HAL_RCC_I2C1_CLK_ENABLE();
     __HAL_RCC_I2C2_CLK_ENABLE();

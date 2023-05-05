@@ -4,34 +4,13 @@
 #include <stm-hal/hal-adc.hpp>
 #include <stm-hal/hal-tim.hpp>
 
-struct TimerConfig
-{
-    uint8_t id;
-    TIM_TypeDef* tim;
-    uint8_t channel_pri;
-    uint8_t channel_sec;
-    uint32_t frequency;
-};
-
 struct TimerData
 {
     TIM_HandleTypeDef handler;
     uint16_t period;
 };
 
-static constexpr TimerConfig s_timer_config[TIMER_TYPE_TOTAL] =
-{
-    { TIMER_TYPE_MOTOR_A_PWM,     TIM8,  TIM_CHANNEL_3, TIM_CHANNEL_4, 10000 },
-    { TIMER_TYPE_MOTOR_B_PWM,     TIM8,  TIM_CHANNEL_1, TIM_CHANNEL_2, 10000 },
-    { TIMER_TYPE_MOTOR_C_PWM,     TIM1,  TIM_CHANNEL_3, TIM_CHANNEL_4, 10000 },
-    { TIMER_TYPE_MOTOR_D_PWM,     TIM1,  TIM_CHANNEL_1, TIM_CHANNEL_2, 10000 },
-    { TIMER_TYPE_MOTOR_A_ENCODER, TIM4,  TIM_CHANNEL_1, TIM_CHANNEL_2, 0     },
-    { TIMER_TYPE_MOTOR_B_ENCODER, TIM3,  TIM_CHANNEL_1, TIM_CHANNEL_2, 0     },
-    { TIMER_TYPE_MOTOR_C_ENCODER, TIM2,  TIM_CHANNEL_1, TIM_CHANNEL_2, 0     },
-    { TIMER_TYPE_MOTOR_D_ENCODER, TIM15, TIM_CHANNEL_1, TIM_CHANNEL_2, 0     },
-    { TIMER_TYPE_PIEZO_PWM,       TIM16, TIM_CHANNEL_1, 0            , 10000 },
-};
-
+static const TimerChannelConfig* s_timer_config;
 static TimerData s_timer_data[TIMER_TYPE_TOTAL];
 static uint32_t s_timer_us_cnt = 0;
 static uint32_t s_timer_ms_cnt = 0;
@@ -80,9 +59,10 @@ static void us_timer_init()
     __HAL_TIM_ENABLE_IT(&s_tim7, TIM_IT_UPDATE);
 }
 
-void hal_tim_init_default(uint8_t board_rev)
+void hal_tim_init_default(const BoardSpecificConfig* board_config)
 {
-    (void) board_rev;
+    s_timer_config = board_config->timer_config;
+    assert(s_timer_config);
 
     __HAL_RCC_TIM1_CLK_ENABLE();
     __HAL_RCC_TIM2_CLK_ENABLE();
@@ -101,7 +81,7 @@ void hal_tim_pwm_init(uint8_t type)
 {
     assert(type < TIMER_TYPE_TOTAL);
 
-    const TimerConfig* config = &s_timer_config[type];
+    const TimerChannelConfig* config = &s_timer_config[type];
     TimerData* data = &s_timer_data[type];
     TIM_HandleTypeDef* handler = &data->handler;
 
@@ -175,7 +155,7 @@ void hal_tim_encoder_init(uint8_t type)
 {
     assert(type < TIMER_TYPE_TOTAL);
 
-    const TimerConfig* config = &s_timer_config[type];
+    const TimerChannelConfig* config = &s_timer_config[type];
     TimerData* data = &s_timer_data[type];
     TIM_HandleTypeDef* handler = &data->handler;
 

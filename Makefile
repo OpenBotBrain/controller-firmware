@@ -100,10 +100,12 @@ all_source_path += $(stm_hal_libraty_path)
 
 CXXSRC+=hal-adc.cpp
 CXXSRC+=hal-board-init.cpp
+CXXSRC+=hal-exti.cpp
 CXXSRC+=hal-gpio.cpp
 CXXSRC+=hal-i2c.cpp
 CSRC+=hal-sys-irq.c
 CSRC+=hal-sys-init.c
+CXXSRC+=hal-spi.cpp
 CXXSRC+=hal-tim.cpp
 CXXSRC+=hal-uart.cpp
 

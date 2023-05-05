@@ -1,9 +1,14 @@
 #include <app/assert.h>
-#include <stm32l4xx_hal.h>
 #include <stm-hal/hal-adc.hpp>
+#include <stm-hal/hal-board-init.hpp>
+#include <stm-hal/hal-exti.hpp>
+#include <stm-hal/hal-gpio.hpp>
 #include <stm-hal/hal-i2c.hpp>
+#include <stm-hal/hal-spi.hpp>
 #include <stm-hal/hal-tim.hpp>
 #include <stm-hal/hal-uart.hpp>
+
+static const BoardSpecificConfig* s_board_specific_config = nullptr;
 
 static void s_sysclock_config(void)
 {
@@ -34,12 +39,9 @@ static void s_sysclock_config(void)
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
     assert(HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) == HAL_OK);
 
-
     // Initializes the peripherals clock
-
     PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB|RCC_PERIPHCLK_RNG;
     PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLLSAI1;
     PeriphClkInit.RngClockSelection = RCC_RNGCLKSOURCE_PLLSAI1;
@@ -53,27 +55,43 @@ static void s_sysclock_config(void)
     assert(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) == HAL_OK);
 }
 
-void hal_board_init(uint8_t board_rev)
+static void hal_clock_init_default()
 {
-    // Reset of all peripherals, Initializes the Flash interface and the Systick.
-    HAL_Init();
-
     // Configure all Micro PLL and clocks
     s_sysclock_config();
 
-    // Start RTC clock
     __HAL_RCC_RTC_ENABLE();
     __HAL_RCC_SYSCFG_CLK_ENABLE();
     __HAL_RCC_PWR_CLK_ENABLE();
-
-    HAL_PWREx_EnableVddIO2();
-
     __HAL_RCC_DMA1_CLK_ENABLE();
     __HAL_RCC_DMA2_CLK_ENABLE();
 
+    HAL_PWREx_EnableVddIO2();
+}
+
+void hal_board_init(const BoardSpecificConfig* board_config)
+{
+    assert(board_config);
+
+    s_board_specific_config = board_config;
+
+    // Reset of all peripherals, Initializes the Flash interface and the Systick.
+    HAL_Init();
+
     // General common periferals
-    hal_uart_init_default(board_rev);
-    hal_tim_init_default(board_rev);
-    hal_adc_init_default(board_rev);
-    hal_i2c_init_default(board_rev);
+    hal_clock_init_default();
+    hal_gpio_init_default(board_config);
+    hal_uart_init_default(board_config);
+    hal_tim_init_default(board_config);
+    hal_adc_init_default(board_config);
+    hal_i2c_init_default(board_config);
+    hal_exti_init_default(board_config);
+    hal_spi_init_default(board_config);
+}
+
+const BoardSpecificConfig* board_get_specific_configuration()
+{
+    assert(s_board_specific_config);
+
+    return s_board_specific_config;
 }

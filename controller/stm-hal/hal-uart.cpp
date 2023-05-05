@@ -1,34 +1,9 @@
 #include <config/appconfig.h>
-#include <stm32l4xx_hal.h>
 #include <stm-hal/hal-uart.hpp>
 #include <serial_reception/serial_reception.hpp>
 #include <optional>
 
 static constexpr uint16_t SERIAL_RX_BUFFER_SIZE = 256;
-
-struct UartConfig
-{
-    USART_TypeDef* uart;
-    uint32_t speed;
-    DMA_Channel_TypeDef* tx_channel;
-    uint8_t tx_request;
-    IRQn_Type tx_irq_type;
-    DMA_Channel_TypeDef* rx_channel;
-    uint8_t rx_request;
-    IRQn_Type rx_irq_type;
-    uint8_t irq_priority;
-};
-
-// STM32L496ZGTx
-static constexpr UartConfig s_uart_config[UART_TYPE_TOTAL] =
-{
-    { LPUART1, 921600, DMA2_Channel6, DMA_REQUEST_4, DMA2_Channel6_IRQn, DMA2_Channel7, DMA_REQUEST_4, DMA2_Channel7_IRQn, PRI_HARD_LPUART1   }, // UART_TYPE_DEBUG_SERIAL
-    { USART3,  115200, DMA1_Channel2, DMA_REQUEST_2, DMA1_Channel2_IRQn, DMA1_Channel3, DMA_REQUEST_2, DMA1_Channel3_IRQn, PRI_HARD_PORT_UART }, // UART_TYPE_PORT_INPUT_1
-    { UART4,   115200, DMA2_Channel3, DMA_REQUEST_2, DMA2_Channel3_IRQn, nullptr,       0,             UART4_IRQn,         PRI_HARD_PORT_UART }, // UART_TYPE_PORT_INPUT_2
-    { USART2,  115200, DMA1_Channel7, DMA_REQUEST_2, DMA1_Channel7_IRQn, DMA1_Channel6, DMA_REQUEST_2, DMA1_Channel6_IRQn, PRI_HARD_PORT_UART }, // UART_TYPE_PORT_INPUT_3
-    { USART1,  115200, DMA1_Channel4, DMA_REQUEST_2, DMA1_Channel4_IRQn, DMA1_Channel5, DMA_REQUEST_2, DMA1_Channel5_IRQn, PRI_HARD_PORT_UART }, // UART_TYPE_PORT_INPUT_4
-    { UART5,   921600, DMA2_Channel1, DMA_REQUEST_2, DMA2_Channel1_IRQn, DMA2_Channel2, DMA_REQUEST_2, DMA2_Channel2_IRQn, PRI_HARD_RPI_UART  }, // UART_TYPE_PORT_RPI
-};
 
 struct UartData
 {
@@ -38,9 +13,10 @@ struct UartData
     std::optional<SerialReception<SERIAL_RX_BUFFER_SIZE>> rx;
     FinishCb tx_end_cb;
     void* param;
-    const UartConfig* config;
+    const UartChannelConfig* config;
 };
 
+static const UartChannelConfig* s_uart_config = nullptr;
 static UartData s_uart_data[UART_TYPE_TOTAL];
 
 static uint32_t serial_get_rx_couter(void* param)
@@ -78,9 +54,10 @@ static constexpr SerialReceptionConfig s_serial_reception_config =
     false
 };
 
-void hal_uart_init_default(uint8_t board_rev)
+void hal_uart_init_default(const BoardSpecificConfig* board_config)
 {
-    (void) board_rev;
+    s_uart_config = board_config->uart_config;
+    assert(s_uart_config);
 
     __HAL_RCC_LPUART1_CLK_ENABLE();
     __HAL_RCC_USART1_CLK_ENABLE();
@@ -94,7 +71,7 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
 {
     assert(type < UART_TYPE_TOTAL);
 
-    const UartConfig* config = &s_uart_config[type];
+    const UartChannelConfig* config = &s_uart_config[type];
     UartData* serial = &s_uart_data[type];
 
     // Safe finish transmite callback function and parameter

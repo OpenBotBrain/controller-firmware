@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cstdint>
+#include <stm32l4xx_hal.h>
+#include <stm-hal/hal-board-init.hpp>
 
 enum TimerType
 {
@@ -17,7 +18,8 @@ enum TimerType
     TIMER_TYPE_TOTAL
 };
 
-void hal_tim_init_default(uint8_t board_rev);
+
+void hal_tim_init_default(const BoardSpecificConfig* board_config);
 void hal_tim_pwm_init(uint8_t type);
 void hal_tim_pwm_set_pwm(uint8_t type, float duty);
 void hal_tim_encoder_init(uint8_t type);

@@ -2,6 +2,7 @@
 #include <config/board-rev.hpp>
 #include <config/board-rev-a.hpp>
 #include <stm-hal/hal-board-init.hpp>
+#include <stm-hal/hal-gpio.hpp>
 
 #define lengthof(a) (sizeof(a) / sizeof(a[0]))
 
@@ -13,7 +14,6 @@ static constexpr GPIOInitConfig s_gpio_board_rev_id[2] =
 };
 
 static uint8_t s_board_rev = BOARD_REV_SIZE;
-static const BoardSpecificConfig* s_board_specific_config = nullptr;
 
 static void board_rev_id_initialize(void)
 {
@@ -35,7 +35,7 @@ static uint8_t board_rev_id_get_raw()
 
 void board_rev_init(void)
 {
-    const GPIOInitConfig* board_gpio_config;
+    const BoardSpecificConfig* board_config;
 
     // Initialize first board IDs
     board_rev_id_initialize();
@@ -46,8 +46,7 @@ void board_rev_init(void)
     switch (s_board_rev)
     {
         case BOARD_REV_A:
-            board_gpio_config = board_rev_a_get_gpio_config();
-            s_board_specific_config = board_rev_a_get_specific_config();
+            board_config = board_rev_a_get_specific_config();
             break;
 
         default:
@@ -55,26 +54,6 @@ void board_rev_init(void)
             break;
     }
 
-    // Initialize ID table
-    hal_gpio_init_config(board_gpio_config, TOTAL_GPIO);
-
-    // Initialize GPIOS
-    hal_gpio_init_initialize(board_gpio_config, TOTAL_GPIO);
-
     // Initialize the rest of the board, clock and hal library
-    hal_board_init(s_board_rev);
-}
-
-const BoardSpecificConfig* board_rev_get_specific_configuration()
-{
-    assert(s_board_specific_config);
-
-    return s_board_specific_config;
-}
-
-uint8_t board_rev_get_revision(void)
-{
-    assert(s_board_rev != BOARD_REV_SIZE);
-
-    return s_board_rev;
+    hal_board_init(board_config);
 }

@@ -9,12 +9,4 @@ enum BoardRevision
     BOARD_REV_SIZE
 };
 
-struct BoardSpecificConfig
-{
-    const char* board_name;
-};
-
 void board_rev_init();
-const BoardSpecificConfig* board_rev_get_specific_configuration();
-uint8_t board_rev_get_revision();
-

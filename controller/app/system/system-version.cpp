@@ -1,6 +1,6 @@
-#include <config/board-rev.hpp>
-#include <system/system-version.hpp>
 #include <gscope/gscope.hpp>
+#include <stm-hal/hal-board-init.hpp>
+#include <system/system-version.hpp>
 
 const char* system_version_get_internal(InfoType type)
 {
@@ -29,9 +29,10 @@ const char* system_version_get_internal(InfoType type)
 
 void system_version_get_version()
 {
-    const BoardSpecificConfig* spec_config = board_rev_get_specific_configuration();
+    const BoardSpecificConfig* spec_config = board_get_specific_configuration();
 
     GSDebug("Board Version: %s", spec_config->board_name);
+    GSDebug("Board REV ID: %d", spec_config->board_rev);
     GSDebug("Build: %s", BUILD_VERSION);
     GSDebug("Developer: %s", BUILD_DEVELOPER);
     GSDebug("Date: %s", BUILD_DATE);

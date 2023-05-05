@@ -1,21 +1,7 @@
 #include <assert.h>
 #include <config/appconfig.h>
 #include <cstring>
-#include <stm32l4xx_hal.h>
 #include <stm-hal/hal-adc.hpp>
-
-enum class AdcType : uint8_t
-{
-    TypeADC1 = 0,
-    TypeADC3
-};
-
-struct AdcChannelConfig
-{
-    uint8_t id;
-    AdcType adc;
-    uint32_t adc_channel;
-};
 
 struct AdcData
 {
@@ -24,50 +10,11 @@ struct AdcData
     uint8_t sample_offset;
 };
 
-static constexpr AdcChannelConfig s_adc_config[ADC_CHANNEL_TOTAL] =
-{
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT3_PIN6, AdcType::TypeADC1, ADC_CHANNEL_3  },  //
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT4_PIN6, AdcType::TypeADC1, ADC_CHANNEL_4  },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT2_PIN6,  AdcType::TypeADC1, ADC_CHANNEL_5  },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT2_PIN1,  AdcType::TypeADC1, ADC_CHANNEL_6  },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT3_PIN1,  AdcType::TypeADC1, ADC_CHANNEL_7  },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT4_PIN1,  AdcType::TypeADC1, ADC_CHANNEL_8  },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT3_PIN6,  AdcType::TypeADC1, ADC_CHANNEL_9  },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT4_PIN6,  AdcType::TypeADC1, ADC_CHANNEL_10 },  //
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT4_PIN5, AdcType::TypeADC1, ADC_CHANNEL_11 },  //
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT3_PIN5, AdcType::TypeADC1, ADC_CHANNEL_12 },  //
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT2_PIN6, AdcType::TypeADC1, ADC_CHANNEL_13 },  //
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT1_PIN6, AdcType::TypeADC1, ADC_CHANNEL_14 },  //
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT1_PIN5, AdcType::TypeADC1, ADC_CHANNEL_15 },  //
-    { ADC_CHANNEL_TYPE_PORT_OUTPUT2_PIN5, AdcType::TypeADC1, ADC_CHANNEL_16 },  //
-    { ADC_CHANNEL_TYPE_3V3_SENSE,         AdcType::TypeADC3, ADC_CHANNEL_6  },  //
-    { ADC_CHANNEL_TYPE_9V_SENSE,          AdcType::TypeADC3, ADC_CHANNEL_7  },  //
-    { ADC_CHANNEL_TYPE_5V_SENSE,          AdcType::TypeADC3, ADC_CHANNEL_8  },  //
-    { ADC_CHANNEL_TYPE_VBAT_SENSE,        AdcType::TypeADC3, ADC_CHANNEL_9  },  //
-    { ADC_CHANNEL_TYPE_VBUS_SENSE,        AdcType::TypeADC3, ADC_CHANNEL_10 },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT1_PIN1,  AdcType::TypeADC3, ADC_CHANNEL_12 },  //
-    { ADC_CHANNEL_TYPE_PORT_INPUT1_PIN6,  AdcType::TypeADC3, ADC_CHANNEL_13 },  //
-};
-
-static constexpr uint8_t get_total_channels(AdcType type)
-{
-    uint8_t total = 0;
-    for (int i = 0; i < ADC_CHANNEL_TOTAL; i++)
-    {
-        if (s_adc_config[i].adc == type)
-        {
-            total++;
-        }
-    }
-    return total;
-}
-
+static const ADCChannelConfig* s_adc_config = nullptr;
 static ADC_HandleTypeDef s_adc1;
 static ADC_HandleTypeDef s_adc3;
 static DMA_HandleTypeDef s_hdma_adc1;
 static DMA_HandleTypeDef s_hdma_adc3;
-static uint8_t s_total_channel_adc1 = get_total_channels(AdcType::TypeADC1);
-static uint8_t s_total_channel_adc3 = get_total_channels(AdcType::TypeADC3);
 static uint16_t s_adc_sample[ADC_CHANNEL_TOTAL] = {0};
 static AdcData s_adc_data[ADC_CHANNEL_TOTAL] = {0};
 
@@ -96,18 +43,10 @@ static uint8_t get_adc_sample_offset_from_type(const uint8_t id)
     return 0;
 }
 
-void hal_adc_init_channel(const uint8_t id, FinishAdcCb cb, void* param)
+void hal_adc_init_default(const BoardSpecificConfig* board_config)
 {
-    assert(id < ADC_CHANNEL_TOTAL);
-
-    s_adc_data[id].cb = cb;
-    s_adc_data[id].param = param;
-    s_adc_data[id].sample_offset = get_adc_sample_offset_from_type(id);
-}
-
-void hal_adc_init_default(uint8_t board_rev)
-{
-    (void) board_rev;
+    s_adc_config = board_config->adc_config;
+    assert(s_adc_config);
 
     std::memset(static_cast<void*>(&s_adc_data[0]), 0, sizeof(s_adc_data));
 
@@ -120,7 +59,7 @@ void hal_adc_init_default(uint8_t board_rev)
     s_adc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
     s_adc1.Init.LowPowerAutoWait = DISABLE;
     s_adc1.Init.ContinuousConvMode = DISABLE;
-    s_adc1.Init.NbrOfConversion = s_total_channel_adc1;
+    s_adc1.Init.NbrOfConversion = board_config->total_adc1;
     s_adc1.Init.DiscontinuousConvMode = DISABLE;
     s_adc1.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T6_TRGO;
     s_adc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
@@ -131,7 +70,7 @@ void hal_adc_init_default(uint8_t board_rev)
 
     s_adc3 = s_adc1;
     s_adc3.Instance = ADC3;
-    s_adc3.Init.NbrOfConversion = s_total_channel_adc3;
+    s_adc3.Init.NbrOfConversion = board_config->total_adc3;
     assert (HAL_ADC_Init(&s_adc3) == HAL_OK);
 
     // Configure DMA
@@ -199,8 +138,17 @@ void hal_adc_init_default(uint8_t board_rev)
     __HAL_DMA_ENABLE_IT(&s_hdma_adc3, DMA_IT_TC);
 
     // Start ADC with DMA
-    HAL_ADC_Start_DMA(&s_adc1, (uint32_t*)s_adc_sample, s_total_channel_adc1);
-    HAL_ADC_Start_DMA(&s_adc3, (uint32_t*)&s_adc_sample[s_total_channel_adc1], s_total_channel_adc3);
+    HAL_ADC_Start_DMA(&s_adc1, (uint32_t*)s_adc_sample, board_config->total_adc1);
+    HAL_ADC_Start_DMA(&s_adc3, (uint32_t*)&s_adc_sample[board_config->total_adc1], board_config->total_adc3);
+}
+
+void hal_adc_init_channel(const uint8_t id, FinishAdcCb cb, void* param)
+{
+    assert(id < ADC_CHANNEL_TOTAL);
+
+    s_adc_data[id].cb = cb;
+    s_adc_data[id].param = param;
+    s_adc_data[id].sample_offset = get_adc_sample_offset_from_type(id);
 }
 
 extern "C" {

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cstdint>
+#include <stm32l4xx_hal.h>
+#include <stm-hal/hal-board-init.hpp>
 
 enum UartTypes
 {
@@ -15,7 +16,7 @@ enum UartTypes
 
 using FinishCb = void(*)(void*);
 
-void hal_uart_init_default(uint8_t board_rev);
+void hal_uart_init_default(const BoardSpecificConfig* board_config);
 void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param);
 void hal_uart_write(const uint8_t type, const uint8_t* data, uint32_t size);
 uint32_t hal_uart_read(const uint8_t type, uint8_t* data, uint32_t size);
