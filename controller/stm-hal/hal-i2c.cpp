@@ -1,8 +1,9 @@
 #include <assert.h>
 #include <config/appconfig.h>
+#include <cstring>
 #include <stm32l4xx_hal.h>
 #include <stm-hal/hal-i2c.hpp>
-#include <cstring>
+#include <stm-hal/hal-datatype.hpp>
 
 static constexpr uint16_t I2C_BUFFER_SIZE = 64;
 

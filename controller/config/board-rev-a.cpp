@@ -72,14 +72,9 @@ static constexpr I2CChannelConfig s_i2c_config[I2C_TYPE_TOTAL] =
     { I2C_TYPE_SYSTEM,       I2C3, 0x10909CEC, I2C4_EV_IRQn, PRI_HARD_SYS_I2C  },
 };
 
-static constexpr EXTIChannelConfig s_exti_config[] =
+static constexpr SPIChannelConfig s_spi_config[SPI_TOTAL] =
 {
-    {0}
-};
-
-static constexpr SPIChannelConfig s_spi_config[] =
-{
-    {0}
+    { SPI_TYPE_IMU_FLASH },
 };
 
 static constexpr BoardSpecificConfig s_rev_a_specific_config =
@@ -91,7 +86,6 @@ static constexpr BoardSpecificConfig s_rev_a_specific_config =
     .uart_config = s_uart_config,
     .timer_config = s_timer_config,
     .i2c_config = s_i2c_config,
-    .exti_config = s_exti_config,
     .spi_config = s_spi_config,
     .total_adc1 = get_total_channels(s_adc_config, AdcType::TypeADC1, ADC_CHANNEL_TOTAL),
     .total_adc3 = get_total_channels(s_adc_config, AdcType::TypeADC3, ADC_CHANNEL_TOTAL),

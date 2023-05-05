@@ -14,6 +14,8 @@ static constexpr GPIOInitConfig s_gpio_board_rev_id[2] =
 };
 
 static uint8_t s_board_rev = BOARD_REV_SIZE;
+void hal_gpio_init_initialize(const GPIOInitConfig* gpios_arr, int num_gpios);
+bool hal_gpio_read_pin_default(GPIO_TypeDef* port, uint16_t pin);
 
 static void board_rev_id_initialize(void)
 {

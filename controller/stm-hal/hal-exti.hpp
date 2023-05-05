@@ -1,5 +1,14 @@
 #pragma once
 
-#include <stm-hal/hal-board-init.hpp>
+#include <cstdint>
 
-void hal_exti_init_default(const BoardSpecificConfig* board_config);
+enum class TriggerType : uint8_t
+{
+    RISSING = 0,
+    FALLING,
+    RISSING_FALLING,
+};
+
+using FinishEXTICb = void(*)(void*);
+
+void hal_exti_init(uint16_t gpio_id, TriggerType trigger, FinishEXTICb cb, void* param);

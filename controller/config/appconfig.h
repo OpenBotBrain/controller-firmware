@@ -21,3 +21,4 @@
 #define PRI_HARD_ADC                        10  // ADC Dma Priority
 #define PRI_HARD_PORT_I2C                   9   // I2C PORT 1 TO 4 interruption level
 #define PRI_HARD_SYS_I2C                    11  // System I2C IRQ (LCD, POWER DRIVER)
+#define PRI_HARD_EXTI                       12

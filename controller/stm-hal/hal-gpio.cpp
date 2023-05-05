@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stm-hal/hal-datatype.hpp>
 #include <stm-hal/hal-gpio.hpp>
 
 static const GPIOInitConfig* s_board_gpio[TOTAL_GPIO];
@@ -72,17 +73,27 @@ bool hal_gpio_read_pin_default(GPIO_TypeDef* port, uint16_t pin)
     return HAL_GPIO_ReadPin(port, pin);
 }
 
-bool hal_gpio_read_pin(uint16_t pin)
+bool hal_gpio_read_pin(uint16_t io)
 {
-    return HAL_GPIO_ReadPin(GPIO_PORT(pin), GPIO_PIN(pin));
+    return HAL_GPIO_ReadPin(GPIO_PORT(io), GPIO_PIN(io));
 }
 
-void hal_gpio_reset_pin(uint16_t pin)
+void hal_gpio_reset_pin(uint16_t io)
 {
-    GPIO_PORT(pin)->BRR = static_cast<uint32_t>(GPIO_PIN(pin));
+    GPIO_PORT(io)->BRR = static_cast<uint32_t>(GPIO_PIN(io));
 }
 
-void hal_gpio_set_pin(uint16_t pin)
+void hal_gpio_set_pin(uint16_t io)
 {
-    GPIO_PORT(pin)->BSRR = static_cast<uint32_t>(GPIO_PIN(pin));
+    GPIO_PORT(io)->BSRR = static_cast<uint32_t>(GPIO_PIN(io));
+}
+
+uint16_t hal_gpio_get_pin(uint16_t io)
+{
+    return GPIO_PIN(io);
+}
+
+GPIO_TypeDef* hal_gpio_get_port(uint16_t io)
+{
+    return GPIO_PORT(io);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stm-hal/hal-board-init.hpp>
+#include <cstdint>
 
 static constexpr int16_t ADC_SAMPLE_FREQUENCY_HZ = 200;
 
@@ -36,6 +36,5 @@ enum ADCChannelType : uint8_t
 
 using FinishAdcCb = void(*)(uint16_t, void*);
 
-void hal_adc_init_default(const BoardSpecificConfig* board_config);
 void hal_adc_init_channel(const uint8_t channel, FinishAdcCb cb, void* param);
 uint32_t hal_adc_get_timer_sample_frequency();

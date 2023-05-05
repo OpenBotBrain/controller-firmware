@@ -2,6 +2,7 @@
 #include <config/appconfig.h>
 #include <cstring>
 #include <stm-hal/hal-adc.hpp>
+#include <stm-hal/hal-datatype.hpp>
 
 struct AdcData
 {

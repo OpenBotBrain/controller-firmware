@@ -1,4 +1,5 @@
 #include <config/appconfig.h>
+#include <stm-hal/hal-datatype.hpp>
 #include <stm-hal/hal-uart.hpp>
 #include <serial_reception/serial_reception.hpp>
 #include <optional>

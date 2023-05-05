@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <config/appconfig.h>
-#include <stm32l4xx_hal.h>
 #include <stm-hal/hal-adc.hpp>
+#include <stm-hal/hal-datatype.hpp>
 #include <stm-hal/hal-tim.hpp>
 
 struct TimerData
@@ -194,28 +194,6 @@ uint32_t hal_tim_encoder_get_tick(uint8_t type)
     return __HAL_TIM_GET_COUNTER(&data->handler);
 }
 
-extern "C" {
-
-void TIM7_IRQHandler()
-{
-    if (__HAL_TIM_GET_FLAG(&s_tim7, TIM_FLAG_UPDATE) != RESET &&
-        __HAL_TIM_GET_IT_SOURCE(&s_tim7, TIM_IT_UPDATE) != RESET)
-    {
-        __HAL_TIM_CLEAR_IT(&s_tim7, TIM_IT_UPDATE);
-        s_timer_us_cnt += 65536;
-    }
-}
-
-void HAL_IncTick(void)
-{
-    s_timer_ms_cnt++;
-}
-
-uint32_t HAL_GetTick(void)
-{
-    return s_timer_ms_cnt;
-}
-
 uint32_t hal_timer_32_ms(void)
 {
     return s_timer_ms_cnt;
@@ -233,5 +211,25 @@ uint32_t hal_timer_32_us(void)
     return now;
 }
 
-}
+extern "C"
+{
+    void TIM7_IRQHandler()
+    {
+        if (__HAL_TIM_GET_FLAG(&s_tim7, TIM_FLAG_UPDATE) != RESET &&
+            __HAL_TIM_GET_IT_SOURCE(&s_tim7, TIM_IT_UPDATE) != RESET)
+        {
+            __HAL_TIM_CLEAR_IT(&s_tim7, TIM_IT_UPDATE);
+            s_timer_us_cnt += 65536;
+        }
+    }
 
+    void HAL_IncTick(void)
+    {
+        s_timer_ms_cnt++;
+    }
+
+    uint32_t HAL_GetTick(void)
+    {
+        return s_timer_ms_cnt;
+    }
+}
