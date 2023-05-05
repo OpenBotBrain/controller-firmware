@@ -69,6 +69,9 @@ struct UartChannelConfig
 struct SPIChannelConfig
 {
     uint8_t id;
+    SPI_TypeDef* spi;
+    IRQn_Type irq_type;
+    uint8_t irq_priority;
 };
 
 static constexpr uint8_t get_total_channels(const ADCChannelConfig* config, AdcType type, int total)
@@ -97,3 +100,11 @@ struct BoardSpecificConfig
     uint8_t total_adc1;
     uint8_t total_adc3;
 };
+
+void hal_adc_init_default(const BoardSpecificConfig* board_config);
+void hal_exti_init_default(const BoardSpecificConfig* board_config);
+void hal_gpio_init_default(const BoardSpecificConfig* board_config);
+void hal_i2c_init_default(const BoardSpecificConfig* board_config);
+void hal_spi_init_default(const BoardSpecificConfig* board_config);
+void hal_tim_init_default(const BoardSpecificConfig* board_config);
+void hal_uart_init_default(const BoardSpecificConfig* board_config);

@@ -74,7 +74,7 @@ static constexpr I2CChannelConfig s_i2c_config[I2C_TYPE_TOTAL] =
 
 static constexpr SPIChannelConfig s_spi_config[SPI_TOTAL] =
 {
-    { SPI_TYPE_IMU_FLASH },
+    { SPI_TYPE_IMU_FLASH, SPI1, SPI1_IRQn, PRI_HARD_SPI },
 };
 
 static constexpr BoardSpecificConfig s_rev_a_specific_config =

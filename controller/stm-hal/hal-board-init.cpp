@@ -1,14 +1,6 @@
 #include <app/assert.h>
-#include <stm-hal/hal-board-init.hpp>
+#include <stm-hal/hal-datatype.hpp>
 #include <stm-hal/hal-clock.hpp>
-
-void hal_adc_init_default(const BoardSpecificConfig* board_config);
-void hal_exti_init_default(const BoardSpecificConfig* board_config);
-void hal_gpio_init_default(const BoardSpecificConfig* board_config);
-void hal_i2c_init_default(const BoardSpecificConfig* board_config);
-void hal_spi_init_default(const BoardSpecificConfig* board_config);
-void hal_tim_init_default(const BoardSpecificConfig* board_config);
-void hal_uart_init_default(const BoardSpecificConfig* board_config);
 
 static const BoardSpecificConfig* s_board_specific_config = nullptr;
 

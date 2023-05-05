@@ -52,6 +52,7 @@ void board_rev_init(void)
             break;
 
         default:
+            // if assert here, incorrect board ID!
             assert(0);
             break;
     }
