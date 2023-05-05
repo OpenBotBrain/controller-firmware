@@ -230,3 +230,8 @@ void DMA2_Channel5_IRQHandler(void)
 }
 
 }
+
+uint32_t hal_adc_get_timer_sample_frequency()
+{
+    return ADC_CHANNEL_TOTAL * ADC_SAMPLE_FREQUENCY_HZ;
+}

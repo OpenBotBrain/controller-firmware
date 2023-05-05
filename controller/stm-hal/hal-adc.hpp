@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+static constexpr int16_t ADC_SAMPLE_FREQUENCY_HZ = 200;
+
 enum ADCChannelType : uint8_t
 {
     // Input PORT
@@ -36,3 +38,4 @@ using FinishAdcCb = void(*)(uint16_t, void*);
 
 void hal_adc_init_default(uint8_t board_rev);
 void hal_adc_init_channel(const uint8_t channel, FinishAdcCb cb, void* param);
+uint32_t hal_adc_get_timer_sample_frequency();

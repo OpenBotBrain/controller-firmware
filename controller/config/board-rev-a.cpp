@@ -1,4 +1,3 @@
-#include <config/board-gpio.h>
 #include <config/board-rev.hpp>
 #include <stm-hal/hal-gpio.hpp>
 

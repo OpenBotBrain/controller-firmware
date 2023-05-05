@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <config/board-gpio.h>
 #include <config/board-rev.hpp>
 #include <config/board-rev-a.hpp>
 #include <stm-hal/hal-board-init.hpp>
