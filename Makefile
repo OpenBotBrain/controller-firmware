@@ -189,6 +189,13 @@ custom_libs := -L$(gscope_path) -lgscope_mcu_cortex_m4_fpv4
 board_include_paths += -I$(library_path)/serial_reception/include/
 
 # ------------------------------------------------------------------------------------------
+# Library - Submodule Files - Source and Include
+bq25601_path := $(library_path)/bq25601
+board_include_paths += -I$(bq25601_path)/include/
+all_source_path += $(bq25601_path)/src
+
+CXXSRC+=bq25601.cpp
+
 
 # add extra....
 
