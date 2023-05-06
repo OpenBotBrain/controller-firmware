@@ -14,12 +14,18 @@ bool BQ25601::read(uint8_t reg, uint8_t& data)
         data = read_data;
         return true;
     }
+    notify(Notification::ERROR_READING_I2C);
     return false;
 }
 
 bool BQ25601::write(uint8_t reg, uint8_t data)
 {
-    return m_config.write_cb(m_config.device_address, reg, &data, 1);
+    if (m_config.write_cb(m_config.device_address, reg, &data, 1))
+    {
+        return true;
+    }
+    notify(Notification::ERROR_WRITING_I2C);
+    return false;
 }
 
 bool BQ25601::read_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint8_t& value)
@@ -155,13 +161,61 @@ bool BQ25601::irq_get_status()
     return true;
 }
 
-void BQ25601::init()
+bool BQ25601::hardware_init()
+{
+    uint8_t value;
+    // First check that the device really is what its supposed to be
+    if (read_register_bits(BQ25601_REG_VPRS, BQ25601_REG_VPRS_PN_MASK,
+        BQ25601_REG_VPRS_PN_SHIFT, value) == false)
+    {
+        return false;
+    }
+
+    if (value != BQ25601_MODEL_NUMBER)
+    {
+        notify(Notification::ERROR_VALIDATING_MODEL_NUMBER);
+        return false;
+    }
+
+    if (register_reset())
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void BQ25601::init(const DriverConfig& config)
 {
     assert(m_config.read_cb);
     assert(m_config.write_cb);
     assert(m_config.delay_ms_cb);
 
     m_data = {0};
+
+    m_first_time = true;
+    m_new_irq = false;
+    m_data.charger_health_valid = false;
+    m_data.battery_health_valid = false;
+    m_data.battery_status_valid = false;
+
+    // Initialize IC, set all to default
+    if (!hardware_init())
+    {
+        notify(Notification::ERROR_HARDWARE_INIT_FAIL);
+        return;
+    }
+
+    // Configure temperature protection
+    if (!set_temp_alert_max(config.temp_protection))
+    {
+        notify(Notification::ERROR_SETING_MAX_ALERT_TEMPERATURE);
+        return;
+    }
+
+    // TODO: CONFIGURE WORKING VALUES!!!
+
+    m_driver_enable = true;
 }
 
 void BQ25601::update()
@@ -232,6 +286,8 @@ bool BQ25601::register_reset()
         m_config.delay_ms_cb(2);
 
     } while (tries--);
+
+    notify(Notification::ERROR_RESETING_REGISTERS);
 
     return false;
 }
@@ -382,7 +438,7 @@ bool BQ25601::set_online(bool enable)
         BQ25601_REG_MOC_BATFET_DISABLE_SHIFT, bat_fet_disable);
 }
 
-bool BQ25601::get_temp_alert_max(uint16_t& temp_x10)
+bool BQ25601::get_temp_alert_max(TempProtection& temp)
 {
     uint8_t value;
     if (read_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
@@ -390,13 +446,14 @@ bool BQ25601::get_temp_alert_max(uint16_t& temp_x10)
     {
         return false;
     }
-    temp_x10 = convert_reg06_to_celcius_degrees(value);
+
+    temp = value == 0 ? TempProtection::TEMP_PROTECTION_90C : TempProtection::TEMP_PROTECTION_110C;
     return true;
 }
 
-bool BQ25601::set_temp_alert_max(bool high)
+bool BQ25601::set_temp_alert_max(TempProtection temp)
 {
-    uint8_t value = high ? 1 : 0;
+    uint8_t value = temp == TempProtection::TEMP_PROTECTION_110C ? 1 : 0;
     return write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
         BQ25601_REG_CTTC_TREG_SHIFT, value);
 }
