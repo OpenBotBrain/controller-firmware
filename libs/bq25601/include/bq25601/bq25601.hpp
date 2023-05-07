@@ -10,31 +10,40 @@ class BQ25601
         using DelatCb = void(*)(uint32_t);
         using TimestampCb = uint32_t(*)();
 
-        static constexpr uint32_t UPDATE_PERIOD_MS = 1000;
-        static constexpr uint8_t BQ25601_MODEL_NUMBER = 0x02;
-        static constexpr uint32_t CURRENT_STEP_uA = 60000;
-        static constexpr uint32_t VOLTAGE_STEP_uA = 32000;
-
         enum class Notification : uint8_t
         {
-            NONE = 0,
-            CHARGER_SYSTEM_STATUS_CHANGE,           // good time to print sys_reg
-            CHARGER_FAULT_CHANGE,                   // good time to print fault_reg
-            HIGH_CELL_TEMPERATURE,                  // TODO
-            ERROR_READING_SS_REGISTER,
-            ERROR_CAN_NOT_ACCESS_ISC_REGISTER,
-            ERROR_READING_F_REGISTER,
-            ERROR_VALIDATING_MODEL_NUMBER,
+            // STATUS
+            STATUS_NONE = 0,
+            STATUS_INIT_SUCCESS,
+            STATUS_CHARGER_SYSTEM_STATUS_CHANGED, // good time to print sys_reg
+            STATUS_CHARGER_FAULT_CHANGED,         // good time to print fault_reg
+            // HEALTH
+            HEALTH_GOOD,
+            HEALTH_UNSPEC_FAUILURE,
+            HEALTH_OVERVOLTAGE,
+            HEALTH_OVERHEAT,
+            HEALTH_SAFETY_TIMER,
+            HEALTH_UNKNOWN,
+            // ERRORS
             ERROR_READING_I2C,
             ERROR_WRITING_I2C,
+            ERROR_READING_SS_REGISTER,
+            ERROR_READING_F_REGISTER,
+            ERROR_CAN_NOT_ACCESS_ISC_REGISTER,
+            ERROR_VALIDATING_MODEL_NUMBER,
             ERROR_RESETING_REGISTERS,
             ERROR_HARDWARE_INIT_FAIL,
             ERROR_SETING_MAX_ALERT_TEMPERATURE,
             ERROR_SETING_HOST_MODE,
             ERROR_SETING_ONLINE,
+            ERROR_SETTING_CHARGER_ENABLE,
+            ERROR_SETING_CHARGER_VOLTAGE,
+            ERROR_SETING_CHARGER_CURRENT,
+            ERROR_SETING_AUTO_TERMINATION,
+            ERROR_SETTING_INPUT_CURRENT_LIMIT,
         };
 
-        using NotificationCb = void(*)(Notification, uint32_t);
+        using NotificationCb = void(*)(Notification);
 
         enum class TempProtection : uint8_t
         {
@@ -42,16 +51,30 @@ class BQ25601
             TEMP_PROTECTION_110C,
         };
 
+        enum class BoostSetpoint : uint8_t
+        {
+            VOLTAGE_4_85V = 0,
+            VOLTAGE_5_00V,
+            VOLTAGE_5_15,
+            VOLTAGE_5_30,
+        };
+
         struct Config
         {
             RW read_cb;
             RW write_cb;
-            uint8_t device_address;
             DelatCb delay_ms_cb;
             TimestampCb get_timestamp_ms32_cb;
             NotificationCb notification_cb;
+        };
+
+        struct DriverConfig
+        {
             TempProtection temp_protection;         // Shutdown 90C or 110C
             uint32_t charger_setpoint_ua;           // Max 3 Amps
+            uint32_t charger_voltage_uv;            // 3.856V to 4.624V
+            uint32_t input_current_limit_ua;        // Max 3.2 Amp
+            BoostSetpoint boost_setpoint;           // Setpoint when is set to host mode
         };
 
         // Charger power supply property routines
@@ -81,7 +104,7 @@ class BQ25601
             GetHealth charger_health;               // Done
         };
 
-        BQ25601(const Config& config);
+        BQ25601(const Config& config, const DriverConfig& driver_config);
 
         void init();
         void update();
@@ -91,12 +114,14 @@ class BQ25601
 
     private:
         const Config& m_config;             // Driver configuration is stored here
+        const DriverConfig& m_driver_config;
         Data m_data;                        // Driver data is stored here
         uint8_t m_watchdog;
         bool m_new_irq;                     // If true, new irq was registed
         uint32_t m_update_timestamp {0};    // Update timestamp
         bool m_driver_enable {false};       // If true, init was success
         bool m_request_system_shutdown {false};
+        uint8_t m_last_fault_register_helth {0};
 
         bool read(uint8_t reg, uint8_t& data);
         bool write(uint8_t reg, uint8_t data);
@@ -104,7 +129,7 @@ class BQ25601
         bool write_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint8_t value);
 
         uint32_t get_timestamp32();
-        void notify(Notification notification, uint32_t value = 0);
+        void notify(Notification notification);
         bool set_mode_host();
         bool register_reset();
         bool hardware_init();
@@ -120,25 +145,20 @@ class BQ25601
         bool get_online(bool& battery_fet_enable);
         bool set_online(bool enable);
 
-        /**
-         * @brief provide a 2-way mapping for the value that goes in
-         * the register field and the real-world value that it represents.
-         * The index of the array is the value that goes in the register; the
-         * number at that index in the array is the real-world value that it
-         *
-         * @param offset index of the register REG02[7:2]
-         * @return uint32_t current in uA
-         */
+        bool set_charging_voltage(uint32_t voltage_uv);
+        bool set_charger_current(uint32_t current_ua);
+        bool set_input_current_limit(uint32_t current_ua);
+
         uint32_t convert_reg02_to_current_uah(uint8_t offset);
         uint8_t convert_current_ua_to_reg02(uint32_t current_ua);
-
-        /**
-         * @brief Return the voltage offset in micro volts from controller
-         * register
-         *
-         * @param offset index of the register REG04[7:2]
-         * @return uint32_t voltage in uV
-         */
         uint32_t convert_reg04_to_voltage_uv(uint8_t offset);
         uint8_t convert_voltage_ua_to_reg04(uint32_t voltage_uv);
+        uint8_t convert_current_ua_to_reg00(uint32_t current_ua);
+
+        static constexpr uint32_t UPDATE_PERIOD_MS = 1000;
+        static constexpr uint8_t BQ25601_MODEL_NUMBER = 0x02;
+        static constexpr uint32_t CURRENT_STEP_uA = 60000;
+        static constexpr uint32_t VOLTAGE_STEP_uA = 32000;
+        static constexpr uint32_t CURRENT_LIMIT_STEP_uA = 100000;
+        static constexpr uint8_t BQ25601_ADDRESS = 0x6B;
 };

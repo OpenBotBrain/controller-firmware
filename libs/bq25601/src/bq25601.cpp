@@ -1,7 +1,7 @@
 #include <bq25601/bq25601.hpp>
 
-BQ25601::BQ25601(const Config& config) :
-    m_config(config)
+BQ25601::BQ25601(const Config& config, const DriverConfig& driver_config) :
+    m_config(config), m_driver_config(driver_config)
 {
 
 }
@@ -9,7 +9,7 @@ BQ25601::BQ25601(const Config& config) :
 bool BQ25601::read(uint8_t reg, uint8_t& data)
 {
     uint8_t read_data;
-    if (m_config.read_cb(m_config.device_address, reg, &read_data, 1))
+    if (m_config.read_cb(BQ25601_ADDRESS, reg, &read_data, 1))
     {
         data = read_data;
         return true;
@@ -20,7 +20,7 @@ bool BQ25601::read(uint8_t reg, uint8_t& data)
 
 bool BQ25601::write(uint8_t reg, uint8_t data)
 {
-    if (m_config.write_cb(m_config.device_address, reg, &data, 1))
+    if (m_config.write_cb(BQ25601_ADDRESS, reg, &data, 1))
     {
         return true;
     }
@@ -63,11 +63,11 @@ uint32_t BQ25601::get_timestamp32()
     return 0;
 }
 
-void BQ25601::notify(Notification notification, uint32_t value)
+void BQ25601::notify(Notification notification)
 {
     if (m_config.notification_cb)
     {
-        return m_config.notification_cb(notification, value);
+        return m_config.notification_cb(notification);
     }
 }
 
@@ -93,6 +93,11 @@ uint8_t BQ25601::convert_voltage_ua_to_reg04(uint32_t voltage_uv)
     return voltage_uv / VOLTAGE_STEP_uA;
 }
 
+uint8_t BQ25601::convert_current_ua_to_reg00(uint32_t current_ua)
+{
+    return current_ua / CURRENT_LIMIT_STEP_uA;
+}
+
 /*
 * According to the "Host Mode and default Mode" section of the
 * manual, a write to any register causes the bq25601 to switch
@@ -110,8 +115,13 @@ bool BQ25601::set_mode_host()
             BQ25601_REG_CTTC_WATCHDOG_SHIFT);
         read_value &= ~BQ25601_REG_CTTC_WATCHDOG_MASK;
 
-        return write(BQ25601_REG_CTTC, read_value);
+        if (write(BQ25601_REG_CTTC, read_value))
+        {
+            return true;
+        }
     }
+
+    notify(Notification::ERROR_SETING_HOST_MODE);
     return false;
 }
 
@@ -173,7 +183,6 @@ bool BQ25601::hardware_init()
     // Configure Host mode
     if (!set_mode_host())
     {
-        notify(Notification::ERROR_SETING_HOST_MODE);
         return false;
     }
 
@@ -196,8 +205,13 @@ bool BQ25601::get_temp_alert_max(TempProtection& temp)
 bool BQ25601::set_temp_alert_max(TempProtection temp)
 {
     uint8_t value = temp == TempProtection::TEMP_PROTECTION_110C ? 1 : 0;
-    return write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
-        BQ25601_REG_CTTC_TREG_SHIFT, value);
+    if (!write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
+        BQ25601_REG_CTTC_TREG_SHIFT, value))
+    {
+        notify(Notification::ERROR_SETING_MAX_ALERT_TEMPERATURE);
+        return false;
+    }
+    return true;
 }
 
 bool BQ25601::get_charger_type(ChargerType& type)
@@ -223,12 +237,14 @@ bool BQ25601::get_charger_type(ChargerType& type)
             return false;
         }
 
-        uint8_t bits_20_percentage = 2 * convert_current_ua_to_reg02(m_config.charger_setpoint_ua) / 10;
+        uint8_t bits_20_percentage = 2 * convert_current_ua_to_reg02(m_driver_config.charger_setpoint_ua) / 10;
         type = value <= bits_20_percentage ? ChargerType::TYPE_TRICKLE : ChargerType::TYPE_FAST;
     }
     return true;
 }
 
+// This function enable/disable charger, configure the auto termination!
+// Normal use, NONE or FAST
 bool BQ25601::set_charger_type(ChargerType type)
 {
     uint8_t charger_config = 0;
@@ -257,21 +273,34 @@ bool BQ25601::set_charger_type(ChargerType type)
 
     if (charger_config)
     {
-        // configure the charge type
-        if (write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_EN_TERM_MASK,
+        // Enable auto termination
+        if (!write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_EN_TERM_MASK,
             BQ25601_REG_CTTC_EN_TERM_SHIFT, enable_termination) == false)
         {
+            notify(Notification::ERROR_SETING_AUTO_TERMINATION);
             return false;
         }
     }
 
     // enable or disable the charger
-    return write_register_bits(BQ25601_REG_POC, BQ25601_REG_POC_CHG_CONFIG_MASK,
-        BQ25601_REG_POC_CHG_CONFIG_SHIFT, charger_config);
+    if (!write_register_bits(BQ25601_REG_POC, BQ25601_REG_POC_CHG_CONFIG_MASK,
+        BQ25601_REG_POC_CHG_CONFIG_SHIFT, charger_config))
+    {
+        notify(Notification::ERROR_SETTING_CHARGER_ENABLE);
+        return false;
+    }
+
+    return true;
 }
 
 bool BQ25601::get_health(GetHealth& health)
 {
+    if (m_last_fault_register_helth ==m_data.fault_register)
+    {
+        return true;
+    }
+
+    Notification noty;
     if (m_data.fault_register & BQ25601_REG_F_BOOST_FAULT_MASK)
     {
         // This could be over-current or over-voltage but there's
@@ -279,6 +308,7 @@ bool BQ25601::get_health(GetHealth& health)
         // isn't an 'OVERCURRENT' value defined that we can return
         // even if it was over-current.
         health = GetHealth::OVERVOLTAGE;
+        noty = Notification::HEALTH_OVERVOLTAGE;
     }
     else
     {
@@ -289,6 +319,7 @@ bool BQ25601::get_health(GetHealth& health)
         {
             case 0: // normal
                 health = GetHealth::GOOD;
+                noty = Notification::HEALTH_GOOD;
                 break;
             case 1: // Input Fault (VBUS OVP or VBAT<VBUS<3.8V)
                 // This could be over-voltage or under-voltage
@@ -297,18 +328,25 @@ bool BQ25601::get_health(GetHealth& health)
                 // when its really under-voltage, just return
                 // 'UNSPEC_FAILURE'.
                 health = GetHealth::UNSPEC_FAILURE;
+                noty = Notification::HEALTH_UNSPEC_FAUILURE;
                 break;
             case 2: // Thermal Shutdown
                 health = GetHealth::OVERHEAT;
+                noty = Notification::HEALTH_OVERHEAT;
                 break;
             case 3: // Charge Safety Timer Expiration
                 health = GetHealth::SAFETY_TIMER_EXPIRE;
+                noty = Notification::HEALTH_SAFETY_TIMER;
                 break;
             default:
                 health = GetHealth::UNKNOWN;
+                noty = Notification::HEALTH_UNKNOWN;
                 break;
         }
     }
+
+    notify(noty);
+    m_last_fault_register_helth = m_data.fault_register;
 
     return true;
 }
@@ -325,7 +363,7 @@ bool BQ25601::get_system_fault(uint8_t& f_reg)
     if (m_data.fault_register != f_reg_temp)
     {
         f_reg = f_reg_temp;
-        notify(Notification::CHARGER_FAULT_CHANGE);
+        notify(Notification::STATUS_CHARGER_FAULT_CHANGED);
     }
 
     return true;
@@ -355,7 +393,7 @@ bool BQ25601::get_system_status(uint8_t& ss_reg)
             }
         }
         ss_reg = ss_reg_temp;
-        notify(Notification::CHARGER_SYSTEM_STATUS_CHANGE);
+        notify(Notification::STATUS_CHARGER_SYSTEM_STATUS_CHANGED);
     }
     return true;
 }
@@ -386,6 +424,48 @@ bool BQ25601::set_online(bool enable)
     return ret;
 }
 
+bool BQ25601::set_charging_voltage(uint32_t voltage_uv)
+{
+    uint8_t value = convert_voltage_ua_to_reg04(voltage_uv);
+
+    if (!write_register_bits(BQ25601_REG_CVC, BQ25601_REG_CVC_VREG_MASK,
+        BQ25601_REG_CVC_VREG_SHIFT, value))
+    {
+        notify(Notification::ERROR_SETING_CHARGER_VOLTAGE);
+        return false;
+    }
+
+    return true;
+}
+
+bool BQ25601::set_charger_current(uint32_t current_ua)
+{
+    uint8_t value = convert_current_ua_to_reg02(current_ua);
+
+    if (!write_register_bits(BQ25601_REG_CCC, BQ25601_REG_CCC_ICHG_MASK,
+        BQ25601_REG_CCC_ICHG_SHIFT, value))
+    {
+        notify(Notification::ERROR_SETING_CHARGER_CURRENT);
+        return false;
+    }
+
+    return true;
+}
+
+bool BQ25601::set_input_current_limit(uint32_t current_ua)
+{
+    uint8_t value = convert_current_ua_to_reg00(current_ua);
+
+    if (!write_register_bits(BQ25601_REG_ISC, BQ25601_REG_ISC_IINDPM_MASK,
+        BQ25601_REG_ISC_IINDPM_SHIFT, value))
+    {
+        notify(Notification::ERROR_SETTING_INPUT_CURRENT_LIMIT);
+        return false;
+    }
+
+    return true;
+}
+
 // ------------------------------------------------------------------------
 //                              PUBLIC API
 // ------------------------------------------------------------------------
@@ -406,13 +486,34 @@ void BQ25601::init()
     }
 
     // Configure temperature protection
-    if (!set_temp_alert_max(m_config.temp_protection))
+    if (!set_temp_alert_max(m_driver_config.temp_protection))
     {
-        notify(Notification::ERROR_SETING_MAX_ALERT_TEMPERATURE);
         return;
     }
 
-    // TODO: CONFIGURE WORKING VALUES!!!
+    if (!set_charging_voltage(m_driver_config.charger_setpoint_ua))
+    {
+        return;
+    }
+
+    if (!set_charger_current(m_driver_config.charger_voltage_uv))
+    {
+        return;
+    }
+
+    if (!set_input_current_limit(m_driver_config.input_current_limit_ua))
+    {
+        return;
+    }
+
+    // TODO m_driver_config.boost_setpoint
+
+    if (!set_charger_type(ChargerType::TYPE_FAST))
+    {
+        return;
+    }
+
+    notify(Notification::STATUS_INIT_SUCCESS);
 
     m_driver_enable = true;
 }
