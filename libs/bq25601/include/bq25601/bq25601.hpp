@@ -10,14 +10,17 @@ class BQ25601
         using DelatCb = void(*)(uint32_t);
         using TimestampCb = uint32_t(*)();
 
-        static constexpr uint32_t UPDATE_PERIOD_MS = 500;
+        static constexpr uint32_t UPDATE_PERIOD_MS = 1000;
         static constexpr uint8_t BQ25601_MODEL_NUMBER = 0x02;
+        static constexpr uint32_t CURRENT_STEP_uA = 60000;
+        static constexpr uint32_t VOLTAGE_STEP_uA = 32000;
 
         enum class Notification : uint8_t
         {
             NONE = 0,
-            POWER_SUPPLY_BATTERY_AND_CHARGER_CHANGE,    // good time to print ss_reg and f reg
-            HIGH_CELL_TEMPERATURE,                      // TODO
+            CHARGER_SYSTEM_STATUS_CHANGE,           // good time to print sys_reg
+            CHARGER_FAULT_CHANGE,                   // good time to print fault_reg
+            HIGH_CELL_TEMPERATURE,                  // TODO
             ERROR_READING_SS_REGISTER,
             ERROR_CAN_NOT_ACCESS_ISC_REGISTER,
             ERROR_READING_F_REGISTER,
@@ -27,9 +30,17 @@ class BQ25601
             ERROR_RESETING_REGISTERS,
             ERROR_HARDWARE_INIT_FAIL,
             ERROR_SETING_MAX_ALERT_TEMPERATURE,
+            ERROR_SETING_HOST_MODE,
+            ERROR_SETING_ONLINE,
         };
 
         using NotificationCb = void(*)(Notification, uint32_t);
+
+        enum class TempProtection : uint8_t
+        {
+            TEMP_PROTECTION_90C,
+            TEMP_PROTECTION_110C,
+        };
 
         struct Config
         {
@@ -39,70 +50,9 @@ class BQ25601
             DelatCb delay_ms_cb;
             TimestampCb get_timestamp_ms32_cb;
             NotificationCb notification_cb;
+            TempProtection temp_protection;         // Shutdown 90C or 110C
+            uint32_t charger_setpoint_ua;           // Max 3 Amps
         };
-
-        enum class TempProtection : uint8_t
-        {
-            TEMP_PROTECTION_90C,
-            TEMP_PROTECTION_110C,
-        };
-
-        struct DriverConfig
-        {
-            TempProtection temp_protection;
-        };
-
-        struct Data
-        {
-            uint32_t charge_current_setpoint_ua;
-            uint8_t system_status_register;         // Done
-            uint8_t fault_register;                 // Done
-            bool charger_health_valid;
-            bool battery_health_valid;
-            bool battery_status_valid;
-            TempProtection temp_protection; // TODO!
-        };
-
-        BQ25601(const Config& config);
-
-        void init(const DriverConfig& config);
-        void update();
-        void irq_handler();
-        const Data& get_status();
-
-    private:
-        const Config& m_config;
-        uint8_t m_watchdog;
-        uint32_t m_charge_current_setpoint_ua;  // Driver Charger setpoint!
-        bool m_new_irq;
-        bool m_first_time;
-        uint32_t m_update_timestamp {0};
-        Data m_data;
-        bool m_driver_enable {false};
-
-        uint32_t get_timestamp32();
-        void notify(Notification notification, uint32_t value = 0);
-        bool irq_get_status();
-        bool hardware_init();
-        bool register_reset();
-        bool get_temp_alert_max(TempProtection& temp);
-        bool set_temp_alert_max(TempProtection temp);
-
-        bool read(uint8_t reg, uint8_t& data);
-        bool write(uint8_t reg, uint8_t data);
-        bool read_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint8_t& value);
-        bool write_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint8_t value);
-
-        /*
-        * According to the "Host Mode and default Mode" section of the
-        * manual, a write to any register causes the bq25601 to switch
-        * from default mode to host mode.  It will switch back to default
-        * mode after a WDT timeout unless the WDT is turned off as well.
-        * So, by simply turning off the WDT, we accomplish both with the
-        * same write.
-        */
-        bool set_mode_host();
-
 
         // Charger power supply property routines
         enum class ChargerType : uint8_t
@@ -111,8 +61,6 @@ class BQ25601
             TYPE_TRICKLE,   // PRE-CHARGE
             TYPE_FAST,      // NORMAL
         };
-        bool get_charger_type(ChargerType& type);
-        bool set_charger_type(ChargerType type);
 
         enum class GetHealth : uint8_t
         {
@@ -123,13 +71,54 @@ class BQ25601
             SAFETY_TIMER_EXPIRE,
             UNKNOWN,
         };
-        bool m_health_is_valid = {false};
-        uint8_t m_f_reg {0};
+
+        struct Data
+        {
+            uint8_t system_status_register;         // Done
+            uint8_t fault_register;                 // Done
+            TempProtection temp_protection;         // Done
+            ChargerType charger_type;               // Done
+            GetHealth charger_health;               // Done
+        };
+
+        BQ25601(const Config& config);
+
+        void init();
+        void update();
+        void irq_handler();
+        const Data& get_status();
+        void set_system_shutdown();
+
+    private:
+        const Config& m_config;             // Driver configuration is stored here
+        Data m_data;                        // Driver data is stored here
+        uint8_t m_watchdog;
+        bool m_new_irq;                     // If true, new irq was registed
+        uint32_t m_update_timestamp {0};    // Update timestamp
+        bool m_driver_enable {false};       // If true, init was success
+        bool m_request_system_shutdown {false};
+
+        bool read(uint8_t reg, uint8_t& data);
+        bool write(uint8_t reg, uint8_t data);
+        bool read_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint8_t& value);
+        bool write_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint8_t value);
+
+        uint32_t get_timestamp32();
+        void notify(Notification notification, uint32_t value = 0);
+        bool set_mode_host();
+        bool register_reset();
+        bool hardware_init();
+        bool get_temp_alert_max(TempProtection& temp);
+        bool set_temp_alert_max(TempProtection temp);
+        bool get_charger_type(ChargerType& type);
+        bool set_charger_type(ChargerType type);
+
         bool get_health(GetHealth& health);
+        bool get_system_fault(uint8_t& f_reg);
+        bool get_system_status(uint8_t& ss_reg);
 
         bool get_online(bool& battery_fet_enable);
         bool set_online(bool enable);
-
 
         /**
          * @brief provide a 2-way mapping for the value that goes in
@@ -152,12 +141,4 @@ class BQ25601
          */
         uint32_t convert_reg04_to_voltage_uv(uint8_t offset);
         uint8_t convert_voltage_ua_to_reg04(uint32_t voltage_uv);
-
-        /**
-         * @brief Convert the temperature register value to C degree.
-         *
-         * @param offset REG06[1:0] (TREG)
-         * @return uint32_t in tenths of degrees Celcius
-         */
-        uint32_t convert_reg06_to_celcius_degrees(uint8_t offset);
 };

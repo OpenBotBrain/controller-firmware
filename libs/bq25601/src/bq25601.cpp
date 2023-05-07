@@ -54,35 +54,6 @@ bool BQ25601::write_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint
     return false;
 }
 
-static constexpr uint32_t CURRENT_STEP_uA = 60000;
-uint32_t BQ25601::convert_reg02_to_current_uah(uint8_t offset)
-{
-    assert(offset <= 50);
-    return static_cast<uint32_t>(offset) * CURRENT_STEP_uA;
-}
-
-uint8_t BQ25601::convert_current_ua_to_reg02(uint32_t current_ua)
-{
-    return current_ua / CURRENT_STEP_uA;
-}
-
-static constexpr uint32_t VOLTAGE_STEP_uA = 32000;
-uint32_t BQ25601::convert_reg04_to_voltage_uv(uint8_t offset)
-{
-    assert(offset <= 24);
-    return 3856000 + static_cast<uint32_t>(offset) * 32000;
-}
-
-uint8_t BQ25601::convert_voltage_ua_to_reg04(uint32_t voltage_uv)
-{
-    return voltage_uv / VOLTAGE_STEP_uA;
-}
-
-uint32_t BQ25601::convert_reg06_to_celcius_degrees(uint8_t offset)
-{
-    return offset == 0 ? 900 : 1100;
-}
-
 uint32_t BQ25601::get_timestamp32()
 {
     if (m_config.get_timestamp_ms32_cb)
@@ -100,150 +71,36 @@ void BQ25601::notify(Notification notification, uint32_t value)
     }
 }
 
-bool BQ25601::irq_get_status()
+uint32_t BQ25601::convert_reg02_to_current_uah(uint8_t offset)
 {
-    uint8_t ss_reg;
-    bool report = false;
-
-    if (read(BQ25601_REG_SS, ss_reg) == false)
-    {
-        notify(Notification::ERROR_READING_SS_REGISTER);
-        return false;
-    }
-
-    if (ss_reg != m_data.system_status_register)
-    {
-        // The device is in host mode so when PG_STAT goes from 1->0
-        // (i.e., power removed) HIZ needs to be disabled.
-        if ((ss_reg & BQ25601_REG_SS_PG_STAT_MASK) &&
-            !(ss_reg & BQ25601_REG_SS_PG_STAT_MASK))
-        {
-            if (write_register_bits(BQ25601_REG_ISC, BQ25601_REG_ISC_EN_HIZ_MASK,
-                BQ25601_REG_ISC_EN_HIZ_SHIFT, 0x00) == false)
-            {
-                notify(Notification::ERROR_CAN_NOT_ACCESS_ISC_REGISTER);
-                return false;
-            }
-        }
-        report = true;
-        m_data.system_status_register = ss_reg;
-    }
-
-    uint8_t f_reg;
-    if (read(BQ25601_REG_F, f_reg) == false)
-    {
-        notify(Notification::ERROR_READING_F_REGISTER);
-        return false;
-    }
-
-    if (m_data.fault_register != f_reg)
-    {
-        m_data.fault_register = f_reg;
-        m_data.charger_health_valid = true;
-        m_data.battery_health_valid = true;
-        m_data.battery_status_valid = true;
-        report = true;
-    }
-
-    // Sometimes bq25601 gives a steady trickle of interrupts even
-    // though the watchdog timer is turned off and neither the STATUS
-    // nor FAULT registers have changed.  Weed out these sprurious
-    // interrupts so userspace isn't alerted for no reason.
-    // In addition, the chip always generates an interrupt after
-    // register reset so we should ignore that one (the very first
-    // interrupt received).
-
-    if (report)
-    {
-        notify(Notification::POWER_SUPPLY_BATTERY_AND_CHARGER_CHANGE);
-    }
-
-    return true;
+    assert(offset <= 50);
+    return static_cast<uint32_t>(offset) * CURRENT_STEP_uA;
 }
 
-bool BQ25601::hardware_init()
+uint8_t BQ25601::convert_current_ua_to_reg02(uint32_t current_ua)
 {
-    uint8_t value;
-    // First check that the device really is what its supposed to be
-    if (read_register_bits(BQ25601_REG_VPRS, BQ25601_REG_VPRS_PN_MASK,
-        BQ25601_REG_VPRS_PN_SHIFT, value) == false)
-    {
-        return false;
-    }
-
-    if (value != BQ25601_MODEL_NUMBER)
-    {
-        notify(Notification::ERROR_VALIDATING_MODEL_NUMBER);
-        return false;
-    }
-
-    if (register_reset())
-    {
-        return false;
-    }
-
-    return true;
+    return current_ua / CURRENT_STEP_uA;
 }
 
-void BQ25601::init(const DriverConfig& config)
+uint32_t BQ25601::convert_reg04_to_voltage_uv(uint8_t offset)
 {
-    assert(m_config.read_cb);
-    assert(m_config.write_cb);
-    assert(m_config.delay_ms_cb);
-
-    m_data = {0};
-
-    m_first_time = true;
-    m_new_irq = false;
-    m_data.charger_health_valid = false;
-    m_data.battery_health_valid = false;
-    m_data.battery_status_valid = false;
-
-    // Initialize IC, set all to default
-    if (!hardware_init())
-    {
-        notify(Notification::ERROR_HARDWARE_INIT_FAIL);
-        return;
-    }
-
-    // Configure temperature protection
-    if (!set_temp_alert_max(config.temp_protection))
-    {
-        notify(Notification::ERROR_SETING_MAX_ALERT_TEMPERATURE);
-        return;
-    }
-
-    // TODO: CONFIGURE WORKING VALUES!!!
-
-    m_driver_enable = true;
+    assert(offset <= 24);
+    return 3856000 + static_cast<uint32_t>(offset) * 32000;
 }
 
-void BQ25601::update()
+uint8_t BQ25601::convert_voltage_ua_to_reg04(uint32_t voltage_uv)
 {
-    // TODO: PERIODIC GET
-    uint32_t now = get_timestamp32();
-
-    if (m_new_irq)
-    {
-        irq_get_status();
-        m_new_irq = false;
-    }
-    else if ((now - m_update_timestamp) >= UPDATE_PERIOD_MS)
-    {
-
-    }
+    return voltage_uv / VOLTAGE_STEP_uA;
 }
 
-void BQ25601::irq_handler()
-{
-    m_new_irq = true;
-}
-
-const BQ25601::Data& BQ25601::get_status()
-{
-    return m_data;
-}
-
+/*
+* According to the "Host Mode and default Mode" section of the
+* manual, a write to any register causes the bq25601 to switch
+* from default mode to host mode.  It will switch back to default
+* mode after a WDT timeout unless the WDT is turned off as well.
+* So, by simply turning off the WDT, we accomplish both with the
+* same write.
+*/
 bool BQ25601::set_mode_host()
 {
     uint8_t read_value;
@@ -287,9 +144,60 @@ bool BQ25601::register_reset()
 
     } while (tries--);
 
-    notify(Notification::ERROR_RESETING_REGISTERS);
-
     return false;
+}
+
+bool BQ25601::hardware_init()
+{
+    uint8_t value;
+    // First check that the device really is what its supposed to be
+    if (read_register_bits(BQ25601_REG_VPRS, BQ25601_REG_VPRS_PN_MASK,
+        BQ25601_REG_VPRS_PN_SHIFT, value) == false)
+    {
+        return false;
+    }
+
+    if (value != BQ25601_MODEL_NUMBER)
+    {
+        notify(Notification::ERROR_VALIDATING_MODEL_NUMBER);
+        return false;
+    }
+
+    // Reset all register to default
+    if (!register_reset())
+    {
+        notify(Notification::ERROR_RESETING_REGISTERS);
+        return false;
+    }
+
+    // Configure Host mode
+    if (!set_mode_host())
+    {
+        notify(Notification::ERROR_SETING_HOST_MODE);
+        return false;
+    }
+
+    return true;
+}
+
+bool BQ25601::get_temp_alert_max(TempProtection& temp)
+{
+    uint8_t value;
+    if (read_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
+        BQ25601_REG_CTTC_TREG_SHIFT, value) == false)
+    {
+        return false;
+    }
+
+    temp = value == 0 ? TempProtection::TEMP_PROTECTION_90C : TempProtection::TEMP_PROTECTION_110C;
+    return true;
+}
+
+bool BQ25601::set_temp_alert_max(TempProtection temp)
+{
+    uint8_t value = temp == TempProtection::TEMP_PROTECTION_110C ? 1 : 0;
+    return write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
+        BQ25601_REG_CTTC_TREG_SHIFT, value);
 }
 
 bool BQ25601::get_charger_type(ChargerType& type)
@@ -315,7 +223,7 @@ bool BQ25601::get_charger_type(ChargerType& type)
             return false;
         }
 
-        uint8_t bits_20_percentage = 2 * convert_current_ua_to_reg02(m_charge_current_setpoint_ua) / 10;
+        uint8_t bits_20_percentage = 2 * convert_current_ua_to_reg02(m_config.charger_setpoint_ua) / 10;
         type = value <= bits_20_percentage ? ChargerType::TYPE_TRICKLE : ChargerType::TYPE_FAST;
     }
     return true;
@@ -364,21 +272,7 @@ bool BQ25601::set_charger_type(ChargerType type)
 
 bool BQ25601::get_health(GetHealth& health)
 {
-    uint8_t value;
-    if (m_health_is_valid)
-    {
-        value = m_f_reg;
-        m_health_is_valid = false;
-    }
-    else
-    {
-        if (read(BQ25601_REG_F, value) == false)
-        {
-            return false;
-        }
-    }
-
-    if (value & BQ25601_REG_F_BOOST_FAULT_MASK)
+    if (m_data.fault_register & BQ25601_REG_F_BOOST_FAULT_MASK)
     {
         // This could be over-current or over-voltage but there's
         // no way to tell which.  Return 'OVERVOLTAGE' since there
@@ -388,10 +282,10 @@ bool BQ25601::get_health(GetHealth& health)
     }
     else
     {
-        value &= BQ25601_REG_F_CHRG_FAULT_MASK;
-        value >>= BQ25601_REG_F_CHRG_FAULT_SHIFT;
+        uint8_t tmp = m_data.fault_register & BQ25601_REG_F_CHRG_FAULT_MASK;
+        tmp = tmp >> BQ25601_REG_F_CHRG_FAULT_SHIFT;
 
-        switch (value)
+        switch (tmp)
         {
             case 0: // normal
                 health = GetHealth::GOOD;
@@ -419,6 +313,53 @@ bool BQ25601::get_health(GetHealth& health)
     return true;
 }
 
+bool BQ25601::get_system_fault(uint8_t& f_reg)
+{
+    uint8_t f_reg_temp;
+    if (read(BQ25601_REG_F, f_reg_temp) == false)
+    {
+        notify(Notification::ERROR_READING_F_REGISTER);
+        return false;
+    }
+
+    if (m_data.fault_register != f_reg_temp)
+    {
+        f_reg = f_reg_temp;
+        notify(Notification::CHARGER_FAULT_CHANGE);
+    }
+
+    return true;
+}
+
+bool BQ25601::get_system_status(uint8_t& ss_reg)
+{
+    uint8_t ss_reg_temp;
+    if (read(BQ25601_REG_SS, ss_reg_temp) == false)
+    {
+        notify(Notification::ERROR_READING_SS_REGISTER);
+        return false;
+    }
+
+    if (ss_reg_temp != m_data.system_status_register)
+    {
+        // The device is in host mode so when PG_STAT goes from 1->0
+        // (i.e., power removed) HIZ needs to be disabled.
+        if ((ss_reg_temp & BQ25601_REG_SS_PG_STAT_MASK) &&
+            !(ss_reg_temp & BQ25601_REG_SS_PG_STAT_MASK))
+        {
+            if (write_register_bits(BQ25601_REG_ISC, BQ25601_REG_ISC_EN_HIZ_MASK,
+                BQ25601_REG_ISC_EN_HIZ_SHIFT, 0x00) == false)
+            {
+                notify(Notification::ERROR_CAN_NOT_ACCESS_ISC_REGISTER);
+                return false;
+            }
+        }
+        ss_reg = ss_reg_temp;
+        notify(Notification::CHARGER_SYSTEM_STATUS_CHANGE);
+    }
+    return true;
+}
+
 bool BQ25601::get_online(bool& battery_fet_enable)
 {
     uint8_t bat_fet_disable;
@@ -434,68 +375,88 @@ bool BQ25601::get_online(bool& battery_fet_enable)
 bool BQ25601::set_online(bool enable)
 {
     uint8_t bat_fet_disable = enable ? 0 : 1;
-    return write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_MOC_BATFET_DISABLE_MASK,
+    bool ret = write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_MOC_BATFET_DISABLE_MASK,
         BQ25601_REG_MOC_BATFET_DISABLE_SHIFT, bat_fet_disable);
-}
 
-bool BQ25601::get_temp_alert_max(TempProtection& temp)
-{
-    uint8_t value;
-    if (read_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
-        BQ25601_REG_CTTC_TREG_SHIFT, value) == false)
+    if (ret)
     {
-        return false;
+        notify(Notification::ERROR_SETING_ONLINE);
     }
 
-    temp = value == 0 ? TempProtection::TEMP_PROTECTION_90C : TempProtection::TEMP_PROTECTION_110C;
-    return true;
+    return ret;
 }
 
-bool BQ25601::set_temp_alert_max(TempProtection temp)
+// ------------------------------------------------------------------------
+//                              PUBLIC API
+// ------------------------------------------------------------------------
+void BQ25601::init()
 {
-    uint8_t value = temp == TempProtection::TEMP_PROTECTION_110C ? 1 : 0;
-    return write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_TREG_MASK,
-        BQ25601_REG_CTTC_TREG_SHIFT, value);
+    assert(m_config.read_cb);
+    assert(m_config.write_cb);
+    assert(m_config.delay_ms_cb);
+
+    m_data = {0};
+    m_new_irq = true;
+
+    // Initialize IC, set all to default
+    if (!hardware_init())
+    {
+        notify(Notification::ERROR_HARDWARE_INIT_FAIL);
+        return;
+    }
+
+    // Configure temperature protection
+    if (!set_temp_alert_max(m_config.temp_protection))
+    {
+        notify(Notification::ERROR_SETING_MAX_ALERT_TEMPERATURE);
+        return;
+    }
+
+    // TODO: CONFIGURE WORKING VALUES!!!
+
+    m_driver_enable = true;
 }
 
+void BQ25601::update()
+{
+    if (!m_driver_enable)
+    {
+        return;
+    }
 
-// static int bq25601_battery_get_property(struct power_supply *psy,
-// 		enum power_supply_property psp, union power_supply_propval *val)
-// {
-// 	struct bq25601_dev_info *bdi =
-// 			container_of(psy, struct bq25601_dev_info, battery);
-// 	int ret;
+    uint32_t now = get_timestamp32();
 
-// 	dev_dbg(bdi->dev, "prop: %d\n", psp);
+    if (m_new_irq || (now - m_update_timestamp) >= UPDATE_PERIOD_MS)
+    {
+        m_new_irq = false;
 
-// 	pm_runtime_get_sync(bdi->dev);
+        get_system_fault(m_data.fault_register);
+        get_system_status(m_data.system_status_register);
+        get_health(m_data.charger_health);
+        get_temp_alert_max(m_data.temp_protection);
+        get_charger_type(m_data.charger_type);
 
-// 	switch (psp) {
-// 	case POWER_SUPPLY_PROP_STATUS:
-// 		ret = bq25601_battery_get_status(bdi, val);
-// 		break;
-// 	case POWER_SUPPLY_PROP_HEALTH:
-// 		ret = bq25601_battery_get_health(bdi, val);
-// 		break;
-// 	case POWER_SUPPLY_PROP_ONLINE:
-// 		ret = bq25601_battery_get_online(bdi, val);
-// 		break;
-// 	case POWER_SUPPLY_PROP_TECHNOLOGY:
-// 		/* Could be Li-on or Li-polymer but no way to tell which */
-// 		val->intval = POWER_SUPPLY_TECHNOLOGY_UNKNOWN;
-// 		ret = 0;
-// 		break;
-// 	case POWER_SUPPLY_PROP_TEMP_ALERT_MAX:
-// 		ret = bq25601_battery_get_temp_alert_max(bdi, val);
-// 		break;
-// 	case POWER_SUPPLY_PROP_SCOPE:
-// 		val->intval = POWER_SUPPLY_SCOPE_SYSTEM;
-// 		ret = 0;
-// 		break;
-// 	default:
-// 		ret = -ENODATA;
-// 	}
+        m_update_timestamp = now;
+    }
 
-// 	pm_runtime_put_sync(bdi->dev);
-// 	return ret;
-// }
+    if (m_request_system_shutdown)
+    {
+        m_request_system_shutdown = false;
+        set_online(false);
+    }
+}
+
+void BQ25601::irq_handler()
+{
+    m_new_irq = true;
+}
+
+const BQ25601::Data& BQ25601::get_status()
+{
+    return m_data;
+}
+
+void BQ25601::set_system_shutdown()
+{
+    m_request_system_shutdown = true;
+}
