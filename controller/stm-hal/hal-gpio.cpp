@@ -17,7 +17,7 @@ static void hal_gpio_init_config(const GPIOInitConfig* gpios, int num_gpios)
     }
 }
 
-void hal_gpio_init_initialize(const GPIOInitConfig* gpios_arr, int num_gpios)
+void hal_gpio_init_initialize(uint8_t type, const GPIOInitConfig* gpios_arr, int num_gpios)
 {
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -30,7 +30,7 @@ void hal_gpio_init_initialize(const GPIOInitConfig* gpios_arr, int num_gpios)
     {
         const GPIOInitConfig* config = &gpios_arr[i];
 
-        if (config->pin != 0)
+        if (config->pin != 0 && config->config_type == type)
         {
             GPIO_InitTypeDef gpio_config;
             gpio_config.Pin = config->pin;
@@ -65,7 +65,7 @@ void hal_gpio_init_default(const BoardSpecificConfig* board_config)
     hal_gpio_init_config(s_gpio_config, TOTAL_GPIO);
 
     // Initialize GPIOS
-    hal_gpio_init_initialize(s_gpio_config, TOTAL_GPIO);
+    hal_gpio_init_initialize(CONFIG_TYPE_DEFAULT, s_gpio_config, TOTAL_GPIO);
 }
 
 bool hal_gpio_read_pin_default(GPIO_TypeDef* port, uint16_t pin)

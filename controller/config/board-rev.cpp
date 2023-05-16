@@ -9,18 +9,18 @@
 // These pins can not change from board version
 static constexpr GPIOInitConfig s_gpio_board_rev_id[2] =
 {
-    { 0, GPIOC, GPIO_PIN_13, GPIO_MODE_INPUT, GPIO_NOPULL, 0, GPIO_SPEED_FREQ_LOW, DONT_CARE },
-    { 1, GPIOC, GPIO_PIN_14, GPIO_MODE_INPUT, GPIO_NOPULL, 0, GPIO_SPEED_FREQ_LOW, DONT_CARE },
+    { 0, CONFIG_TYPE_DEFAULT, GPIOC, GPIO_PIN_13, GPIO_MODE_INPUT, GPIO_NOPULL, 0, GPIO_SPEED_FREQ_LOW, DONT_CARE },
+    { 1, CONFIG_TYPE_DEFAULT, GPIOC, GPIO_PIN_14, GPIO_MODE_INPUT, GPIO_NOPULL, 0, GPIO_SPEED_FREQ_LOW, DONT_CARE },
 };
 
 static uint8_t s_board_rev = BOARD_REV_SIZE;
-void hal_gpio_init_initialize(const GPIOInitConfig* gpios_arr, int num_gpios);
+void hal_gpio_init_initialize(uint8_t type, const GPIOInitConfig* gpios_arr, int num_gpios);
 bool hal_gpio_read_pin_default(GPIO_TypeDef* port, uint16_t pin);
 
 static void board_rev_id_initialize(void)
 {
     // Configure GPIO Ids
-    hal_gpio_init_initialize(s_gpio_board_rev_id, lengthof(s_gpio_board_rev_id));
+    hal_gpio_init_initialize(CONFIG_TYPE_DEFAULT, s_gpio_board_rev_id, lengthof(s_gpio_board_rev_id));
 }
 
 static uint8_t board_rev_id_get_raw()
