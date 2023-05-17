@@ -89,6 +89,7 @@ CXXSRC+=system-version.cpp
 # Task
 CXXSRC+=task-blinky.cpp
 CXXSRC+=task-gscope.cpp
+CXXSRC+=task-power-supply.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp

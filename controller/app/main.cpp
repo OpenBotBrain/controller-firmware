@@ -3,6 +3,7 @@
 #include <system/system-freertos.hpp>
 #include <task/task-blinky.hpp>
 #include <task/task-gscope.hpp>
+#include <task/task-power-supply.hpp>
 
 int main(void)
 {
@@ -11,6 +12,8 @@ int main(void)
     task_blinky_init();             // Init main blinky task.
 
     task_gscope_init();             // Init gscope debug app
+
+    task_power_supply_init();       // Init power supply system task
 
     vTaskStartScheduler();          // Start RTOS
 

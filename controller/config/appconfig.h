@@ -14,6 +14,9 @@
 #define PRI_GSCOPE                          2
 #define SIZE_GSCOPE                         256
 
+#define PRI_POWER_SUPPLY                    3
+#define SIZE_POWER_sUPPLY                   256
+
 // -------------------------- Hardware Interruptions -----------------------
 #define PRI_HARD_LPUART1                    8   // lpuart 1 for debug
 #define PRI_HARD_PORT_UART                  9   // PORT 1 TO 4 uart interruption level
