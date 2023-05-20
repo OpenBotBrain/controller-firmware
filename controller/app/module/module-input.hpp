@@ -12,8 +12,7 @@ class ModuleInput
             uint16_t pin6_enable_n_io;
             uint8_t pin1_adc_channel;
             uint8_t pin6_adc_channel;
-            uint8_t pin5_mode[4]; // input/output/serial/i2c
-            uint8_t pin5_mode[4]; // input/output/serial/i2c
+            uint8_t pin56_mode[4]; // input/output/serial/i2c
         };
 
         enum class ModeConfiguration : uint8_t

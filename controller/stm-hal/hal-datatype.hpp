@@ -93,6 +93,7 @@ struct BoardSpecificConfig
     const char* board_name;
     const uint8_t board_rev;
     const GPIOInitConfig* gpio_config;
+    uint16_t gpio_total;
     const ADCChannelConfig* adc_config;
     const UartChannelConfig* uart_config;
     const TimerChannelConfig* timer_config;
