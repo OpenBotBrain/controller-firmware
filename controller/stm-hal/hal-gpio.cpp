@@ -19,13 +19,6 @@ static void hal_gpio_init_config(const GPIOInitConfig* gpios, int num_gpios)
 
 void hal_gpio_init_initialize(uint8_t type, const GPIOInitConfig* gpios_arr, int num_gpios)
 {
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-    __HAL_RCC_GPIOE_CLK_ENABLE();
-    __HAL_RCC_GPIOF_CLK_ENABLE();
-
     for (int i = 0; i < num_gpios; i++)
     {
         const GPIOInitConfig* config = &gpios_arr[i];
@@ -60,6 +53,13 @@ void hal_gpio_init_default(const BoardSpecificConfig* board_config)
 {
     s_gpio_config = board_config->gpio_config;
     assert(s_gpio_config);
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOE_CLK_ENABLE();
+    __HAL_RCC_GPIOF_CLK_ENABLE();
 
     // Initialize ID table
     hal_gpio_init_config(s_gpio_config, TOTAL_GPIO);

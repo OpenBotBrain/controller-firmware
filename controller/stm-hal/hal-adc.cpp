@@ -19,6 +19,13 @@ static DMA_HandleTypeDef s_hdma_adc3;
 static uint16_t s_adc_sample[ADC_CHANNEL_TOTAL] = {0};
 static AdcData s_adc_data[ADC_CHANNEL_TOTAL] = {0};
 
+static constexpr uint32_t s_adc_rank[] = {
+    ADC_REGULAR_RANK_1, ADC_REGULAR_RANK_2, ADC_REGULAR_RANK_3, ADC_REGULAR_RANK_4,
+    ADC_REGULAR_RANK_5, ADC_REGULAR_RANK_6, ADC_REGULAR_RANK_7, ADC_REGULAR_RANK_8,
+    ADC_REGULAR_RANK_9, ADC_REGULAR_RANK_10, ADC_REGULAR_RANK_11, ADC_REGULAR_RANK_12,
+    ADC_REGULAR_RANK_13, ADC_REGULAR_RANK_14, ADC_REGULAR_RANK_15, ADC_REGULAR_RANK_16
+};
+
 static void finish_sample_callback_update(AdcType type)
 {
     for (int i = 0; i < ADC_CHANNEL_TOTAL; i++)
@@ -51,7 +58,7 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
 
     std::memset(static_cast<void*>(&s_adc_data[0]), 0, sizeof(s_adc_data));
 
-    // Configure ADC
+    // Configure ADC - no ADC sequence - continuous conversion mode -> ADC in independent mode
     s_adc1.Instance = ADC1;
     s_adc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV4;
     s_adc1.Init.Resolution = ADC_RESOLUTION_12B;
@@ -61,7 +68,7 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
     s_adc1.Init.LowPowerAutoWait = DISABLE;
     s_adc1.Init.ContinuousConvMode = DISABLE;
     s_adc1.Init.NbrOfConversion = board_config->total_adc1;
-    s_adc1.Init.DiscontinuousConvMode = DISABLE;
+    s_adc1.Init.DiscontinuousConvMode = ENABLE;
     s_adc1.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T6_TRGO;
     s_adc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
     s_adc1.Init.DMAContinuousRequests = ENABLE;
@@ -104,25 +111,30 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
     assert (HAL_ADCEx_MultiModeConfigChannel(&s_adc3, &multimode) == HAL_OK);
 
     ADC_ChannelConfTypeDef sConfig = {0};
-    sConfig.Channel = ADC_CHANNEL_3;
-    sConfig.Rank = ADC_REGULAR_RANK_1;
     sConfig.SamplingTime = ADC_SAMPLETIME_24CYCLES_5;
     sConfig.SingleDiff = ADC_SINGLE_ENDED;
     sConfig.OffsetNumber = ADC_OFFSET_NONE;
     sConfig.Offset = 0;
 
+    int adc1_offset = 0;
+    int adc3_offset = 0;
     for (uint8_t i = 0; i < ADC_CHANNEL_TOTAL; i++)
     {
         ADC_HandleTypeDef* adc;
-        if (s_adc_config[i].adc == AdcType::TypeADC1)
+        const ADCChannelConfig* config = &s_adc_config[i];
+        if (config->adc == AdcType::TypeADC1)
         {
             adc = &s_adc1;
+            sConfig.Rank = s_adc_rank[adc1_offset];
+            adc1_offset++;
         }
         else
         {
             adc = &s_adc3;
+            sConfig.Rank = s_adc_rank[adc3_offset];
+            adc3_offset++;
         }
-        sConfig.Channel = s_adc_config[i].adc_channel;
+        sConfig.Channel = config->adc_channel;
         assert (HAL_ADC_ConfigChannel(adc, &sConfig) == HAL_OK);
     }
 
@@ -139,7 +151,7 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
     __HAL_DMA_ENABLE_IT(&s_hdma_adc3, DMA_IT_TC);
 
     // Start ADC with DMA
-    HAL_ADC_Start_DMA(&s_adc1, (uint32_t*)s_adc_sample, board_config->total_adc1);
+    HAL_ADC_Start_DMA(&s_adc1, (uint32_t*)&s_adc_sample[0], board_config->total_adc1);
     HAL_ADC_Start_DMA(&s_adc3, (uint32_t*)&s_adc_sample[board_config->total_adc1], board_config->total_adc3);
 }
 

@@ -20,6 +20,7 @@ bool hal_gpio_read_pin_default(GPIO_TypeDef* port, uint16_t pin);
 static void board_rev_id_initialize(void)
 {
     // Configure GPIO Ids
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     hal_gpio_init_initialize(CONFIG_TYPE_DEFAULT, s_gpio_board_rev_id, lengthof(s_gpio_board_rev_id));
 }
 
