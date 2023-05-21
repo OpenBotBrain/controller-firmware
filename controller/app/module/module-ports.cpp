@@ -2,7 +2,9 @@
 #include <module/module-ports.hpp>
 #include <stm-hal/hal-adc.hpp>
 #include <stm-hal/hal-gpio.hpp>
+#include <stm-hal/hal-i2c.hpp>
 #include <stm-hal/hal-tim.hpp>
+#include <stm-hal/hal-uart.hpp>
 
 static constexpr InputPort::Config s_input_config[TOTAL_INPUT_PORTS] =
 {
@@ -15,6 +17,8 @@ static constexpr InputPort::Config s_input_config[TOTAL_INPUT_PORTS] =
         .pin1_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT1_PIN1,
         .pin6_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT1_PIN6 ,
         .pin56_mode = {CONFIG_TYPE_I1_INPUT, CONFIG_TYPE_I1_OUTPUT, CONGIG_TYPE_I1_SERIAL, CONFIG_TYPE_I1_I2C},
+        .uart_type = UART_TYPE_PORT_INPUT_1,
+        .i2c_type = I2C_TYPE_PORT_INPUT_1,
     },
     {
         .pin1_current_enable_io = INPUT2_PIN1_CURRENT_ENABLE_IO,
@@ -25,6 +29,8 @@ static constexpr InputPort::Config s_input_config[TOTAL_INPUT_PORTS] =
         .pin1_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT2_PIN1,
         .pin6_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT2_PIN6 ,
         .pin56_mode = {CONFIG_TYPE_I2_INPUT, CONFIG_TYPE_I2_OUTPUT, CONGIG_TYPE_I2_SERIAL, CONFIG_TYPE_I2_I2C},
+        .uart_type = UART_TYPE_PORT_INPUT_2,
+        .i2c_type = I2C_TYPE_PORT_INPUT_2,
     },
     {
         .pin1_current_enable_io = INPUT3_PIN1_CURRENT_ENABLE_IO,
@@ -35,6 +41,8 @@ static constexpr InputPort::Config s_input_config[TOTAL_INPUT_PORTS] =
         .pin1_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT3_PIN1,
         .pin6_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT3_PIN6 ,
         .pin56_mode = {CONFIG_TYPE_I3_INPUT, CONFIG_TYPE_I3_OUTPUT, CONGIG_TYPE_I3_SERIAL, CONFIG_TYPE_I3_I2C},
+        .uart_type = UART_TYPE_PORT_INPUT_3,
+        .i2c_type = I2C_TYPE_PORT_INPUT_3,
     },
     {
         .pin1_current_enable_io = INPUT4_PIN1_CURRENT_ENABLE_IO,
@@ -45,6 +53,8 @@ static constexpr InputPort::Config s_input_config[TOTAL_INPUT_PORTS] =
         .pin1_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT4_PIN1,
         .pin6_adc_channel = ADC_CHANNEL_TYPE_PORT_INPUT4_PIN6 ,
         .pin56_mode = {CONFIG_TYPE_I4_INPUT, CONFIG_TYPE_I4_OUTPUT, CONGIG_TYPE_I4_SERIAL, CONFIG_TYPE_I4_I2C},
+        .uart_type = UART_TYPE_PORT_INPUT_4,
+        .i2c_type = InputPort::INVALID,
     },
 };
 
