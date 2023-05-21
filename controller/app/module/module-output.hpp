@@ -1,6 +1,8 @@
 #pragma once
 
-class ModuleOutput
+#include <cstdint>
+
+class OutputPort
 {
     public:
         struct Config
@@ -14,7 +16,7 @@ class ModuleOutput
             uint8_t adc_pin6_channel;
         };
 
-        ModuleOutput(const Config& config) : m_config(config) {}
+        OutputPort(const Config& config) : m_config(config) {}
 
         enum class Mode
         {

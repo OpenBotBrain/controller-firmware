@@ -75,6 +75,7 @@ all_source_path := \
 	$(application_path) \
 	$(application_path)/system \
 	$(application_path)/task \
+	$(application_path)/module \
 	$(config_path) \
 	$(stm_hal_library_path)
 
@@ -89,11 +90,17 @@ CXXSRC+=system-version.cpp
 # Task
 CXXSRC+=task-blinky.cpp
 CXXSRC+=task-gscope.cpp
+CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
 CXXSRC+=board-rev-a.cpp
+
+# Module folder
+CXXSRC+=module-input.cpp
+CXXSRC+=module-output.cpp
+CXXSRC+=module-ports.cpp
 
 # ------------------------------------------------------------------------------------------
 # stm-hal low level config files APP - Source and Include

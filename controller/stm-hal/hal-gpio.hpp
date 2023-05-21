@@ -5,10 +5,6 @@
 enum ConfigType
 {
     CONFIG_TYPE_DEFAULT = 0,
-    CONFIG_TYPE_I1_I2C,
-    CONFIG_TYPE_I2_I2C,
-    CONFIG_TYPE_I3_I2C,
-    CONFIG_TYPE_I4_I2C,         // it is not supported!
     CONFIG_TYPE_I1_INPUT,
     CONFIG_TYPE_I2_INPUT,
     CONFIG_TYPE_I3_INPUT,
@@ -21,6 +17,10 @@ enum ConfigType
     CONGIG_TYPE_I2_SERIAL,
     CONGIG_TYPE_I3_SERIAL,
     CONGIG_TYPE_I4_SERIAL,
+    CONFIG_TYPE_I1_I2C,
+    CONFIG_TYPE_I2_I2C,
+    CONFIG_TYPE_I3_I2C,
+    CONFIG_TYPE_I4_I2C,         // it is not supported!
 };
 
 enum BoardGPIONames
@@ -91,8 +91,6 @@ enum BoardGPIONames
     MOTORC_PWM2_IO,
     MOTORC_PWM1_IO,
     MOTORA_PIN6_DETECT_IO,
-    INPUT3_PIN6_SDA_IO,
-    INPUT3_PIN5_SCL_IO,
     ADC_3V3_SENSE_IO,
     ADC_9V_SENSE_IO,
     ADC_5V_SENSE_IO,
@@ -117,14 +115,16 @@ enum BoardGPIONames
     INPUT3_PIN1_CURRENT_ENABLE_IO,
     INPUT1_PIN5_IO,
     INPUT1_PIN6_IO,
-    INPUT2_PIN5_IO,
-    INPUT2_PIN6_IO,
-    INPUT3_PIN5_IO,
-    INPUT3_PIN6_IO,
+    INPUT2_PIN5_IO,     // pin shared with other io
+    INPUT2_PIN6_IO,     // pin shared with other io
+    INPUT2_PIN6_SDA_IO, // pin shared with other io
+    INPUT2_PIN5_SCL_IO, // pin shared with other io
+    INPUT3_PIN5_IO,     // pin shared with other io
+    INPUT3_PIN6_IO,     // pin shared with other io
+    INPUT3_PIN6_SDA_IO, // pin shared with other io
+    INPUT3_PIN5_SCL_IO, // pin shared with other io
     INPUT4_PIN5_IO,
     INPUT4_PIN6_IO,
-    INPUT2_PIN6_SDA_IO,
-    INPUT2_PIN5_SCL_IO,
 
     TOTAL_GPIO
 };

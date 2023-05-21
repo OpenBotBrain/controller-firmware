@@ -1,6 +1,8 @@
 #pragma once
 
-class ModuleInput
+#include <cstdint>
+
+class InputPort
 {
     public:
         struct Config
@@ -32,7 +34,7 @@ class ModuleInput
             PIN6
         };
 
-        ModuleInput(const Config& config) : m_config(config) {}
+        InputPort(const Config& config) : m_config(config) {}
 
         void init();
         void update();

@@ -3,6 +3,7 @@
 #include <system/system-freertos.hpp>
 #include <task/task-blinky.hpp>
 #include <task/task-gscope.hpp>
+#include <task/task-ports.hpp>
 #include <task/task-power-supply.hpp>
 
 int main(void)
@@ -14,6 +15,8 @@ int main(void)
     task_gscope_init();             // Init gscope debug app
 
     task_power_supply_init();       // Init power supply system task
+
+    task_ports_init();              // Init main task ports (motor pids, and regular work)
 
     vTaskStartScheduler();          // Start RTOS
 
