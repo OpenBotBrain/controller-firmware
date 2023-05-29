@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <module/module-ports.hpp>
+#include <gscope/gscope.hpp>
 #include <stm-hal/hal-adc.hpp>
 #include <stm-hal/hal-gpio.hpp>
 #include <stm-hal/hal-i2c.hpp>
@@ -120,6 +121,33 @@ static OutputPort s_output_port[TOTAL_OUTPUT_PORTS] =
     s_output_config[3]
 };
 
+GScopeChannel(s_voltage_pin1, "input_pin1_voltage", float, TOTAL_INPUT_PORTS)
+GScopeChannel(s_voltage_pin6, "input_pin6_voltage", float, TOTAL_INPUT_PORTS)
+
+static void s_debug_update()
+{
+    static uint32_t s_timestamp;
+
+    uint32_t now = hal_timer_32_ms();
+
+    if ((now - s_timestamp) >= 50)
+    {
+        s_timestamp = now;
+
+        float pin1_voltage[TOTAL_INPUT_PORTS];
+        float pin6_voltage[TOTAL_INPUT_PORTS];
+
+        for (int i = 0; i < TOTAL_INPUT_PORTS; i++)
+        {
+            pin1_voltage[i] = s_input_port[i].get_voltage_v(InputPort::PinID::PIN1);
+            pin6_voltage[i] = s_input_port[i].get_voltage_v(InputPort::PinID::PIN6);
+        }
+
+        s_voltage_pin1.produce(pin1_voltage);
+        s_voltage_pin6.produce(pin6_voltage);
+    }
+}
+
 OutputPort& module_port_get_outpur_port(uint8_t output_id)
 {
     assert(output_id < TOTAL_OUTPUT_PORTS);
@@ -150,4 +178,6 @@ void module_port_update()
     {
         s_output_port[i].update();
     }
+
+    s_debug_update();
 }

@@ -8,7 +8,7 @@ static void s_ports_thread(void*)
 {
     while(1)
     {
-        // module_port_update();
+        module_port_update();
 
         vTaskDelay(10);
     }

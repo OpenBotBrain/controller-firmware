@@ -7,8 +7,8 @@
 
 void InputPort::convert_adc_reading_update()
 {
-    m_pin1_voltage_v = 0; // TODO m_adc_raw_reading_input1
-    m_pin6_voltage_v = 0; // TODO m_adc_raw_reading_input6
+    m_pin1_voltage_v = m_adc_raw_reading_input1 * ADC_TO_VOLTAGE_INPUTS;
+    m_pin6_voltage_v = m_adc_raw_reading_input6 * ADC_TO_VOLTAGE_INPUTS;
 }
 
 void InputPort::uart_tx_end_callback(void* param)
@@ -29,11 +29,11 @@ void InputPort::adc_new_sample_input6(uint16_t value, void* param)
 void InputPort::init()
 {
     set_9v_output(false);
-    set_mode(ModeConfiguration::INPUT);
+    set_mode(ModeConfiguration::ANALOG);
 
     if (m_config.i2c_type != InputPort::INVALID)
     {
-        hal_i2c_init(m_config.i2c_type);
+        // hal_i2c_init(m_config.i2c_type); //TODOOOOOOOOO
     }
 
     if (m_config.uart_type != InputPort::INVALID)

@@ -86,4 +86,6 @@ class InputPort
         static void adc_new_sample_input6(uint16_t, void*);
         static void i2c_finish(bool, void*, uint8_t*, uint16_t);
 
+        static constexpr float ADC_TO_VOLTAGE_INPUTS = 0.00127364196f;
+
 };
