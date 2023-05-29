@@ -20,7 +20,7 @@ static void s_blinky_thread(void*)
             hal_gpio_reset_pin(LED1_IO);
         }
 
-        vTaskDelay(500);
+        vTaskDelay(250);
     }
 }
 

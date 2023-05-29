@@ -16,6 +16,9 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "memory": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp"
     }
 }

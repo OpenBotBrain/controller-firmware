@@ -3,6 +3,7 @@
 #include <system/system-freertos.hpp>
 #include <system/system-version.hpp>
 #include <stm-hal/hal-uart.hpp>
+#include <stm-hal/hal-tim.hpp>
 
 static TaskHandle_t s_task_handler;
 static SemaphoreHandle_t s_add_buffer_mutex = NULL;

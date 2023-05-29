@@ -65,6 +65,7 @@ struct UartChannelConfig
     uint8_t rx_request;
     IRQn_Type rx_irq_type;
     uint8_t irq_priority;
+    IRQn_Type uart_irq_type;
 };
 
 struct SPIChannelConfig

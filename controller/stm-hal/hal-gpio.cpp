@@ -62,6 +62,7 @@ void hal_gpio_init_default(const BoardSpecificConfig* board_config)
     __HAL_RCC_GPIOD_CLK_ENABLE();
     __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_GPIOF_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();
 
     // Initialize ID table
     hal_gpio_init_config(s_gpio_config, s_gpio_total);

@@ -66,6 +66,18 @@ void hal_uart_init_default(const BoardSpecificConfig* board_config)
     __HAL_RCC_USART3_CLK_ENABLE();
     __HAL_RCC_UART4_CLK_ENABLE();
     __HAL_RCC_UART5_CLK_ENABLE();
+
+    RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LPUART1 |
+        RCC_PERIPHCLK_UART4 | RCC_PERIPHCLK_UART5 | RCC_PERIPHCLK_USART1 |
+        RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_USART3;
+    PeriphClkInit.Lpuart1ClockSelection = RCC_LPUART1CLKSOURCE_PCLK1;
+    PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+    PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
+    PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
+    PeriphClkInit.Uart4ClockSelection = RCC_UART4CLKSOURCE_PCLK1;
+    PeriphClkInit.Uart5ClockSelection = RCC_UART5CLKSOURCE_PCLK1;
+    assert(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) == HAL_OK);
 }
 
 void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
@@ -127,7 +139,7 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
         DMA_HandleTypeDef* rx_dma = &s_uart_data[type].rx_dma;
 
         rx_dma->Instance = config->rx_channel;
-        rx_dma->Init.Request = config->rx_request;;
+        rx_dma->Init.Request = config->rx_request;
         rx_dma->Init.Direction = DMA_PERIPH_TO_MEMORY;
         rx_dma->Init.PeriphInc = DMA_PINC_DISABLE;
         rx_dma->Init.MemInc = DMA_MINC_ENABLE;
@@ -138,14 +150,17 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
         assert(HAL_DMA_Init(rx_dma) == HAL_OK);
 
         __HAL_LINKDMA(uart, hdmarx, *rx_dma);
-    }
 
-    HAL_NVIC_SetPriority(config->rx_irq_type, config->irq_priority, 0);
-    HAL_NVIC_EnableIRQ(config->rx_irq_type);
+        HAL_NVIC_SetPriority(config->rx_irq_type, config->irq_priority, 0);
+        HAL_NVIC_EnableIRQ(config->rx_irq_type);
+    }
 
     // Call object constructor
     serial->rx.emplace(s_serial_reception_config, serial);
     serial->rx->init(); // start reading usign DMA or IRQ
+
+    HAL_NVIC_SetPriority(config->uart_irq_type, config->irq_priority, 0);
+    HAL_NVIC_EnableIRQ(config->uart_irq_type);
 }
 
 void hal_uart_write(const uint8_t type, const uint8_t* data, uint32_t size)
@@ -261,9 +276,34 @@ void DMA2_Channel7_IRQHandler(void)
     HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_DEBUG_SERIAL].rx_dma);    // lpuart rx
 }
 
+void USART1_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_4].handler);
+}
+
+void USART2_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_3].handler);
+}
+
+void USART3_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_1].handler);
+}
+
 void UART4_IRQHandler(void)
 {
     HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_INPUT_2].handler);
+}
+
+void UART5_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_PORT_RPI].handler);
+}
+
+void LPUART1_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&s_uart_data[UART_TYPE_DEBUG_SERIAL].handler);
 }
 
 }

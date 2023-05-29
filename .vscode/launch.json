@@ -11,10 +11,10 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceFolder}/result/openbotbrain_binary/openbotbrain.elf",
-            "name": "Debug Bootloader - WINDOWS",
+            "name": "OBB - WINDOWS",
             "runToMain": true,
             "configFiles": [
-                "board/st_nucleo_l4.cfg"
+                "board/st_nucleo_l4_obb.cfg"
             ],
             "serverpath": "${workspaceFolder}\\additionals\\OpenOCD-20230202-0.12.0\\bin\\openocd.exe",
             "armToolchainPath": "${workspaceFolder}\\additionals\\arm-none-eabi"
