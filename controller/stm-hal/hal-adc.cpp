@@ -14,8 +14,8 @@ struct AdcData
 static const ADCChannelConfig* s_adc_config = nullptr;
 static ADC_HandleTypeDef s_adc1;
 static ADC_HandleTypeDef s_adc3;
-static DMA_HandleTypeDef s_hdma_adc1;
-static DMA_HandleTypeDef s_hdma_adc3;
+static DMA_HandleTypeDef s_hdma_adc1 = {0};
+static DMA_HandleTypeDef s_hdma_adc3 = {0};
 static uint16_t s_adc_sample[ADC_CHANNEL_TOTAL] = {0};
 static AdcData s_adc_data[ADC_CHANNEL_TOTAL] = {0};
 
@@ -56,6 +56,13 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
     s_adc_config = board_config->adc_config;
     assert(s_adc_config);
 
+    RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+    PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_SYSCLK;
+    assert(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) == HAL_OK);
+
+    __HAL_RCC_ADC_CLK_ENABLE();
+
     std::memset(static_cast<void*>(&s_adc_data[0]), 0, sizeof(s_adc_data));
 
     // Configure ADC - no ADC sequence - continuous conversion mode -> ADC in independent mode
@@ -74,9 +81,9 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
     s_adc1.Init.DMAContinuousRequests = ENABLE;
     s_adc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
     s_adc1.Init.OversamplingMode = DISABLE;
+    s_adc3 = s_adc1;
     assert (HAL_ADC_Init(&s_adc1) == HAL_OK);
 
-    s_adc3 = s_adc1;
     s_adc3.Instance = ADC3;
     s_adc3.Init.NbrOfConversion = board_config->total_adc3;
     assert (HAL_ADC_Init(&s_adc3) == HAL_OK);
@@ -91,11 +98,11 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
     s_hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
     s_hdma_adc1.Init.Mode = DMA_CIRCULAR;
     s_hdma_adc1.Init.Priority = DMA_PRIORITY_HIGH;
+    s_hdma_adc3 = s_hdma_adc1;
     assert (HAL_DMA_Init(&s_hdma_adc1) == HAL_OK);
 
     __HAL_LINKDMA(&s_adc1, DMA_Handle, s_hdma_adc1);
 
-    s_hdma_adc3 = s_hdma_adc1;
     s_hdma_adc3.Instance = DMA2_Channel5;
     s_hdma_adc3.Init.Request = DMA_REQUEST_0;
     assert (HAL_DMA_Init(&s_hdma_adc3) == HAL_OK);
@@ -108,7 +115,7 @@ void hal_adc_init_default(const BoardSpecificConfig* board_config)
     multimode.Mode = ADC_MODE_INDEPENDENT;
 
     assert (HAL_ADCEx_MultiModeConfigChannel(&s_adc1, &multimode) == HAL_OK);
-    assert (HAL_ADCEx_MultiModeConfigChannel(&s_adc3, &multimode) == HAL_OK);
+    // assert (HAL_ADCEx_MultiModeConfigChannel(&s_adc3, &multimode) == HAL_OK);
 
     ADC_ChannelConfTypeDef sConfig = {0};
     sConfig.SamplingTime = ADC_SAMPLETIME_24CYCLES_5;
@@ -168,25 +175,27 @@ extern "C" {
 
 void DMA1_Channel1_IRQHandler(void)
 {
-    if (__HAL_DMA_GET_FLAG(&s_hdma_adc1, DMA_FLAG_TC4) != RESET)
+    if (__HAL_DMA_GET_FLAG(&s_hdma_adc1, DMA_FLAG_TC1) != RESET)
     {
         finish_sample_callback_update(AdcType::TypeADC1);
+        __HAL_DMA_CLEAR_FLAG(&s_hdma_adc1, DMA_FLAG_TC1);
     }
-    else if (__HAL_DMA_GET_FLAG(&s_hdma_adc1, DMA_FLAG_HT4) != RESET)
+    else if (__HAL_DMA_GET_FLAG(&s_hdma_adc1, DMA_FLAG_HT1) != RESET)
     {
-        __HAL_DMA_CLEAR_FLAG(&s_hdma_adc1, DMA_FLAG_HT4);
+        __HAL_DMA_CLEAR_FLAG(&s_hdma_adc1, DMA_FLAG_HT1);
     }
 }
 
 void DMA2_Channel5_IRQHandler(void)
 {
-    if (__HAL_DMA_GET_FLAG(&s_hdma_adc3, DMA_FLAG_TC4) != RESET)
+    if (__HAL_DMA_GET_FLAG(&s_hdma_adc3, DMA_FLAG_TC5) != RESET)
     {
         finish_sample_callback_update(AdcType::TypeADC3);
+        __HAL_DMA_CLEAR_FLAG(&s_hdma_adc3, DMA_FLAG_TC5);
     }
-    else if (__HAL_DMA_GET_FLAG(&s_hdma_adc3, DMA_FLAG_HT4) != RESET)
+    else if (__HAL_DMA_GET_FLAG(&s_hdma_adc3, DMA_FLAG_HT5) != RESET)
     {
-        __HAL_DMA_CLEAR_FLAG(&s_hdma_adc3, DMA_FLAG_HT4);
+        __HAL_DMA_CLEAR_FLAG(&s_hdma_adc3, DMA_FLAG_HT5);
     }
 }
 

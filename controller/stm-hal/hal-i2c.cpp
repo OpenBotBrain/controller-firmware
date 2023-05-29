@@ -35,6 +35,16 @@ void hal_i2c_init_default(const BoardSpecificConfig* board_config)
     s_i2c_config = board_config->i2c_config;
     assert(s_i2c_config);
 
+    RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C1 |
+        RCC_PERIPHCLK_I2C2 | RCC_PERIPHCLK_I2C3 | RCC_PERIPHCLK_I2C4;
+    PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+    PeriphClkInit.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
+    PeriphClkInit.I2c3ClockSelection = RCC_I2C3CLKSOURCE_PCLK1;
+    PeriphClkInit.I2c4ClockSelection = RCC_I2C4CLKSOURCE_PCLK1;
+
+    assert(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) == HAL_OK);
+
     __HAL_RCC_I2C1_CLK_ENABLE();
     __HAL_RCC_I2C2_CLK_ENABLE();
     __HAL_RCC_I2C3_CLK_ENABLE();

@@ -17,11 +17,11 @@ void hal_board_init(const BoardSpecificConfig* board_config)
     hal_clock_init_default();
     hal_gpio_init_default(board_config);
     hal_uart_init_default(board_config);
-    // hal_tim_init_default(board_config);
-    // hal_adc_init_default(board_config);
-    // hal_i2c_init_default(board_config);
-    // hal_exti_init_default(board_config);
-    // hal_spi_init_default(board_config);
+    hal_tim_init_default(board_config);
+    hal_adc_init_default(board_config);
+    hal_i2c_init_default(board_config);
+    hal_exti_init_default(board_config);
+    hal_spi_init_default(board_config);
 }
 
 const BoardSpecificConfig* board_get_specific_configuration()

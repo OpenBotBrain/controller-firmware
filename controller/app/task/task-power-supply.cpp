@@ -1,10 +1,10 @@
 #include <config/appconfig.h>
 #include <system/system-freertos.hpp>
+#include <system/system-status.hpp>
 #include <stm-hal/hal-tim.hpp>
 #include <gscope/gscope.hpp>
 
 static TaskHandle_t s_task_handler;
-GScopeChannel(s_test_channel, "test", char, 0)
 
 static void s_debug_produce_update()
 {
@@ -14,7 +14,6 @@ static void s_debug_produce_update()
     if ((now - s_timestamp) >= 1000)
     {
         s_timestamp = now;
-        s_test_channel.print("hello %d", now);
     }
 }
 
@@ -24,7 +23,9 @@ static void s_blinky_thread(void*)
     {
         s_debug_produce_update();
 
-        vTaskDelay(100);
+        system_status_update();
+
+        vTaskDelay(25);
     }
 }
 
@@ -37,4 +38,6 @@ void task_power_supply_init()
 
     s_task_handler = xTaskCreateStatic(s_blinky_thread, "Power Supply", SIZE_POWER_sUPPLY,
         0, PRI_POWER_SUPPLY, s_stack, &s_task_buffer);
+
+    system_status_init();
 }

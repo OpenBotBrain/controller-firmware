@@ -3,7 +3,7 @@
 #include <stm-hal/hal-adc.hpp>
 #include <stm-hal/hal-datatype.hpp>
 #include <stm-hal/hal-tim.hpp>
-
+#include <stm-hal/hal-gpio.hpp>
 struct TimerData
 {
     TIM_HandleTypeDef handler;
@@ -43,7 +43,8 @@ static void us_timer_init()
     s_tim7.Instance = TIM7;
     s_tim7.Init.Prescaler = 0;
     s_tim7.Init.CounterMode = TIM_COUNTERMODE_UP;
-    s_tim7.Init.Period = HAL_RCC_GetPCLK1Freq() / 1000000;
+    s_tim7.Init.Prescaler = HAL_RCC_GetPCLK1Freq() / 1000000;
+    s_tim7.Init.Period = 65535;
     s_tim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     assert (HAL_TIM_Base_Init(&s_tim7) == HAL_OK);
 
@@ -219,6 +220,7 @@ extern "C"
             __HAL_TIM_GET_IT_SOURCE(&s_tim7, TIM_IT_UPDATE) != RESET)
         {
             __HAL_TIM_CLEAR_IT(&s_tim7, TIM_IT_UPDATE);
+            __HAL_TIM_CLEAR_FLAG(&s_tim7, TIM_FLAG_UPDATE);
             s_timer_us_cnt += 65536;
         }
     }

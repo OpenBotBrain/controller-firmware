@@ -85,6 +85,8 @@ CSRC:=assert.c
 
 # System Folder
 CXXSRC+=system-freertos.cpp
+CXXSRC+=system-status.cpp
+
 CXXSRC+=system-version.cpp
 
 # Task

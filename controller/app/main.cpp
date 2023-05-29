@@ -16,7 +16,7 @@ int main(void)
 
     task_power_supply_init();       // Init power supply system task
 
-    task_ports_init();              // Init main task ports (motor pids, and regular work)
+    // task_ports_init();              // Init main task ports (motor pids, and regular work)
 
     vTaskStartScheduler();          // Start RTOS
 
