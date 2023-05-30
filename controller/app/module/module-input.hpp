@@ -4,12 +4,12 @@
 
 class InputPort
 {
-    enum Pin45Mode
+    enum Pin56Mode
     {
-        Pin45ModeInput = 0,
-        Pin45ModeOutput,
-        Pin45ModeSerial,
-        Pin45ModeI2C
+        Pin56ModeInput = 0,
+        Pin56ModeOutput,
+        Pin56ModeSerial,
+        Pin56ModeI2C
     };
 
     public:

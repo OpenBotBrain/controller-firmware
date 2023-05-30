@@ -123,6 +123,10 @@ static OutputPort s_output_port[TOTAL_OUTPUT_PORTS] =
 
 GScopeChannel(s_voltage_pin1, "input_pin1_voltage", float, TOTAL_INPUT_PORTS)
 GScopeChannel(s_voltage_pin6, "input_pin6_voltage", float, TOTAL_INPUT_PORTS)
+GScopeChannel(s_state_pin2, "input_pin2_state", uint8_t, TOTAL_INPUT_PORTS)
+GScopeChannel(s_state_pin5, "input_pin5_state", uint8_t, TOTAL_INPUT_PORTS)
+GScopeChannel(s_state_pin6, "input_pin6_state", uint8_t, TOTAL_INPUT_PORTS)
+
 
 static void s_debug_update()
 {
@@ -136,15 +140,25 @@ static void s_debug_update()
 
         float pin1_voltage[TOTAL_INPUT_PORTS];
         float pin6_voltage[TOTAL_INPUT_PORTS];
+        uint8_t pin2_state[TOTAL_INPUT_PORTS];
+        uint8_t pin5_state[TOTAL_INPUT_PORTS];
+        uint8_t pin6_state[TOTAL_INPUT_PORTS];
+
 
         for (int i = 0; i < TOTAL_INPUT_PORTS; i++)
         {
             pin1_voltage[i] = s_input_port[i].get_voltage_v(InputPort::PinID::PIN1);
+            pin2_state[i] = s_input_port[i].get_gpio(InputPort::PinID::PIN2);
+            pin5_state[i] = s_input_port[i].get_gpio(InputPort::PinID::PIN5);
+            pin6_state[i] = s_input_port[i].get_gpio(InputPort::PinID::PIN6);
             pin6_voltage[i] = s_input_port[i].get_voltage_v(InputPort::PinID::PIN6);
         }
 
         s_voltage_pin1.produce(pin1_voltage);
         s_voltage_pin6.produce(pin6_voltage);
+        s_state_pin2.produce(pin2_state);
+        s_state_pin5.produce(pin5_state);
+        s_state_pin6.produce(pin6_state);
     }
 }
 
@@ -181,3 +195,47 @@ void module_port_update()
 
     s_debug_update();
 }
+
+// Debug input ports
+static void s_enable_9volt_output(int idx, int enable)
+{
+    if (idx >= 0 && idx < TOTAL_INPUT_PORTS)
+    {
+        s_input_port[idx].set_9v_output(enable != 0);
+        GSDebug("Input port %d - 9 Volt out is now %s", idx, (enable != 0) ? "ON" : "OFF");
+    }
+}
+GScopeCommand("input_9v_enable", s_enable_9volt_output)
+
+static void s_set_pin_mode(int idx, int mode)
+{
+    if (idx >= 0 && idx < TOTAL_INPUT_PORTS &&
+        mode >= 0 && mode < 5)
+    {
+        s_input_port[idx].set_mode(static_cast<InputPort::ModeConfiguration>(mode));
+        GSDebug("Input port %d - Mode is %d", idx, mode);
+    }
+}
+GScopeCommand("input_mode", s_set_pin_mode)
+
+static void s_input_mode_type()
+{
+    GSDebug("[0] Analog");
+    GSDebug("[1] Input");
+    GSDebug("[2] Output");
+    GSDebug("[3] Serial");
+    GSDebug("[4] I2C");
+}
+GScopeCommand("input_mode?", s_input_mode_type)
+
+static void s_set_pin_enable(int idx, int pin, int enable)
+{
+    if (idx >= 0 && idx < TOTAL_INPUT_PORTS &&
+        pin >= 5 && pin <= 6)
+    {
+        InputPort::PinID pinid = pin == 5 ? InputPort::PinID::PIN5 : InputPort::PinID::PIN6;
+        s_input_port[idx].set_gpio(pinid, enable != 0);
+        GSDebug("Input port %d - Mode is %d", idx, enable);
+    }
+}
+GScopeCommand("input_set", s_set_pin_enable)

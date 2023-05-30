@@ -14,10 +14,14 @@ static void s_blinky_thread(void*)
         if (s_enabled)
         {
             hal_gpio_set_pin(LED1_IO);
+            hal_gpio_reset_pin(LED2_IO);
+            hal_gpio_set_pin(LED3_IO);
         }
         else
         {
             hal_gpio_reset_pin(LED1_IO);
+            hal_gpio_set_pin(LED2_IO);
+            hal_gpio_reset_pin(LED3_IO);
         }
 
         vTaskDelay(250);

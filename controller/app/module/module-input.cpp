@@ -98,25 +98,28 @@ void InputPort::set_mode(ModeConfiguration mode)
     switch (mode)
     {
         case ModeConfiguration::ANALOG:
-            hal_gpio_configure_io(m_config.pin56_mode[Pin45ModeOutput]);
-            hal_gpio_reset_pin(m_config.pin6_io);   // Pin 6 must be low!
-            hal_gpio_set_pin(m_config.pin6_enable_n_io);   // Pin 6 must be low!
+            hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeOutput]);
+            hal_gpio_reset_pin(m_config.pin5_io);
+            hal_gpio_reset_pin(m_config.pin6_io);           // Pin 6 must be low!
+            hal_gpio_set_pin(m_config.pin6_enable_n_io);    // Pin 6 must be high when using ADC
             break;
 
         case ModeConfiguration::INPUT:
-            hal_gpio_configure_io(m_config.pin56_mode[Pin45ModeInput]);
+            hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeInput]);
             break;
 
         case ModeConfiguration::OUTPUT:
-            hal_gpio_configure_io(m_config.pin56_mode[Pin45ModeOutput]);
+            hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeOutput]);
+            hal_gpio_reset_pin(m_config.pin5_io);
+            hal_gpio_reset_pin(m_config.pin6_io);
             break;
 
         case ModeConfiguration::SERIAL:
-            hal_gpio_configure_io(m_config.pin56_mode[Pin45ModeSerial]);
+            hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeSerial]);
             break;
 
         case ModeConfiguration::I2C:
-            hal_gpio_configure_io(m_config.pin56_mode[Pin45ModeI2C]);
+            hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeI2C]);
             break;
     }
 }
