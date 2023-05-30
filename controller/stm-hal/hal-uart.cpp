@@ -127,7 +127,6 @@ void hal_uart_init(const uint8_t type, FinishCb finish_tx_cb, void* param)
         __HAL_LINKDMA(uart, hdmatx, *tx_dma);
 
         __HAL_DMA_ENABLE_IT(tx_dma, DMA_IT_TC);
-
     }
 
     HAL_NVIC_SetPriority(config->tx_irq_type, config->irq_priority, 0);
@@ -188,8 +187,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart)
             {
                 data->tx_end_cb(data->param);
             }
+            return;
         }
-        return;
     }
 }
 

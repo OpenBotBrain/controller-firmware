@@ -69,7 +69,7 @@ void hal_i2c_init(uint8_t type)
     i2c->handler.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
     i2c->handler.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     i2c->handler.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-    assert (HAL_I2C_Init(&i2c->handler) != HAL_OK);
+    assert (HAL_I2C_Init(&i2c->handler) == HAL_OK);
 
     assert (HAL_I2CEx_ConfigAnalogFilter(&i2c->handler, I2C_ANALOGFILTER_ENABLE) == HAL_OK);
 
@@ -91,7 +91,7 @@ bool hal_i2c_read(uint8_t type, uint8_t address, uint8_t reg, uint16_t data_size
     I2CData* data = &s_i2c_data[type];
     I2C_HandleTypeDef* handler = &data->handler;
 
-    if (data->state != I2CState::NONE)
+    if (data->state == I2CState::NONE)
     {
         data->buf_size = data_size;
         data->address = address;
@@ -122,7 +122,7 @@ bool hal_i2c_write(uint8_t type, uint8_t address, uint8_t reg, uint8_t* buf, uin
     I2CData* data = &s_i2c_data[type];
     I2C_HandleTypeDef* handler = &data->handler;
 
-    if (data->state != I2CState::NONE)
+    if (data->state == I2CState::NONE)
     {
         data->buf[0] = reg;
         data->buf_size = 0;

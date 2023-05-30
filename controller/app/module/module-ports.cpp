@@ -127,7 +127,6 @@ GScopeChannel(s_state_pin2, "input_pin2_state", uint8_t, TOTAL_INPUT_PORTS)
 GScopeChannel(s_state_pin5, "input_pin5_state", uint8_t, TOTAL_INPUT_PORTS)
 GScopeChannel(s_state_pin6, "input_pin6_state", uint8_t, TOTAL_INPUT_PORTS)
 
-
 static void s_debug_update()
 {
     static uint32_t s_timestamp;
@@ -234,8 +233,21 @@ static void s_set_pin_enable(int idx, int pin, int enable)
         pin >= 5 && pin <= 6)
     {
         InputPort::PinID pinid = pin == 5 ? InputPort::PinID::PIN5 : InputPort::PinID::PIN6;
+        s_input_port[idx].set_mode(InputPort::ModeConfiguration::OUTPUT);
         s_input_port[idx].set_gpio(pinid, enable != 0);
         GSDebug("Input port %d - Mode is %d", idx, enable);
     }
 }
 GScopeCommand("input_set", s_set_pin_enable)
+
+static void s_test_serial(int idx)
+{
+    static char s_test_msg[] = "Hello, this is a test message";
+    if (idx >= 0 && idx < TOTAL_INPUT_PORTS)
+    {
+        s_input_port[idx].set_mode(InputPort::ModeConfiguration::SERIAL);
+        s_input_port[idx].uart_write((const uint8_t*)s_test_msg, sizeof(s_test_msg));
+        GSDebug("Test OK");
+    }
+}
+GScopeCommand("input_serial_test", s_test_serial)

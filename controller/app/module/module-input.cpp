@@ -33,7 +33,7 @@ void InputPort::init()
 
     if (m_config.i2c_type != InputPort::INVALID)
     {
-        // hal_i2c_init(m_config.i2c_type); //TODOOOOOOOOO
+        hal_i2c_init(m_config.i2c_type);
     }
 
     if (m_config.uart_type != InputPort::INVALID)
