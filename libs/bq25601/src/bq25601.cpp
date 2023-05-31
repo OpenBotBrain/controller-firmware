@@ -498,6 +498,22 @@ bool BQ25601::set_boost_setpoint(BoostSetpoint setpoint)
         BQ25601_REG_ICTRC_BOOSTV_SHIFT, val);
 }
 
+bool BQ25601::set_boost_current_setpoint(BoostCurrentLimit limit)
+{
+    uint8_t val = limit == BoostCurrentLimit::CURRENT_LIMIT_500_MA ? 0 : 1;
+
+    return write_register_bits(BQ25601_REG_CCC, BQ25601_REG_CCC_BOOST_LIM_MASK,
+        BQ25601_REG_CCC_BOOST_LIM_SHIFT, val);
+}
+
+bool BQ25601::set_boost_power_enable(bool enable)
+{
+    uint8_t val = enable ? 0x02 : 0x01;
+
+    return write_register_bits(BQ25601_REG_POC, BQ25601_REG_POC_CHG_CONFIG_MASK,
+        BQ25601_REG_POC_CHG_CONFIG_SHIFT, val);
+}
+
 // ------------------------------------------------------------------------
 //                              PUBLIC API
 // ------------------------------------------------------------------------
@@ -539,6 +555,11 @@ void BQ25601::init()
     }
 
     if (!set_boost_setpoint(m_driver_config.boost_setpoint))
+    {
+        return;
+    }
+
+    if (!set_boost_current_setpoint(m_driver_config.boost_current_setpoint))
     {
         return;
     }
@@ -600,6 +621,12 @@ void BQ25601::update()
         set_input_current_limit(m_new_input_current_setpoint_ma);
         m_new_input_current_setpoint_ma = INVALID_VALUE;
     }
+
+    if (m_boost_request != INVALID_VALUE)
+    {
+        set_boost_power_enable(m_boost_request != 0);
+        m_boost_request = INVALID_VALUE;
+    }
 }
 
 void BQ25601::irq_handler()
@@ -623,4 +650,9 @@ void BQ25601::set_max_input_current(uint16_t current_ma)
     {
         m_new_input_current_setpoint_ma = current_ma;
     }
+}
+
+void BQ25601::set_boost_power_supply_enabled(bool enable)
+{
+    m_boost_request = enable;
 }

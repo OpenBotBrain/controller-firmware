@@ -59,6 +59,12 @@ class BQ25601
             VOLTAGE_5_30,
         };
 
+        enum class BoostCurrentLimit : uint8_t
+        {
+            CURRENT_LIMIT_500_MA = 0,
+            CURRENT_LIMIT_1200_MA
+        };
+
         struct Config
         {
             RW read_cb;
@@ -75,6 +81,7 @@ class BQ25601
             uint16_t charger_voltage_mv;            // 3.856V to 4.624V
             uint16_t input_current_limit_ma;        // Max 3.2 Amp
             BoostSetpoint boost_setpoint;           // Setpoint when is set to host mode
+            BoostCurrentLimit boost_current_setpoint;
         };
 
         // Charger power supply property routines
@@ -113,6 +120,7 @@ class BQ25601
         const Data& get_status();
         void set_system_shutdown();
         void set_max_input_current(uint16_t current_ma);
+        void set_boost_power_supply_enabled(bool enable);
 
     private:
         static constexpr uint16_t INVALID_VALUE = 0xffff;
@@ -126,7 +134,8 @@ class BQ25601
         bool m_driver_enable {false};       // If true, init was success
         bool m_request_system_shutdown {false};
         uint8_t m_last_fault_register_helth {0};
-        uint32_t m_new_input_current_setpoint_ma {INVALID_VALUE};
+        uint16_t m_new_input_current_setpoint_ma {INVALID_VALUE};
+        uint16_t m_boost_request {INVALID_VALUE};
 
         bool read(uint8_t reg, uint8_t& data);
         bool write(uint8_t reg, uint8_t data);
@@ -145,6 +154,8 @@ class BQ25601
         bool set_fet_reset_enable(bool enable);
         bool set_boost_setpoint(BoostSetpoint setpoint);
         bool set_shutdown_delay_time(bool immediately);
+        bool set_boost_current_setpoint(BoostCurrentLimit);
+        bool set_boost_power_enable(bool enable);
 
         bool get_health(GetHealth& health);
         bool get_system_fault(uint8_t& f_reg);

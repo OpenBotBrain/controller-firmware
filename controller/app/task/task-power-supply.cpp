@@ -63,22 +63,10 @@ static constexpr BQ25601::DriverConfig s_bq25601_driver_default_config =
     .charger_voltage_mv = 4200,
     .input_current_limit_ma = 1500,  // max 3.2 amps
     .boost_setpoint = BQ25601::BoostSetpoint::VOLTAGE_5_00V,
+    .boost_current_setpoint = BQ25601::BoostCurrentLimit::CURRENT_LIMIT_500_MA,
 };
 
 static BQ25601 s_bq25601(s_bq25601_config, s_bq25601_driver_default_config);
-
-static void s_shutdown()
-{
-    s_bq25601.set_system_shutdown();
-}
-GScopeButton("Shutdown", s_shutdown)
-GScopeCommand("shutdown", s_shutdown)
-
-static void s_set_max_input_current(int current_ma)
-{
-    s_bq25601.set_max_input_current(current_ma);
-}
-GScopeCommand("charger_set_input_current", s_set_max_input_current)
 
 static void s_charger_irq_callback(void*)
 {
@@ -91,6 +79,7 @@ static void s_charger_debug_produce()
 
     const BQ25601::Data& charger_data = s_bq25601.get_status();
 
+    // update data only when we have new information
     if (s_last_timestamp != charger_data.timestamp)
     {
         s_last_timestamp = charger_data.timestamp;
@@ -103,7 +92,7 @@ static void s_charger_debug_produce()
         print_data[4] = static_cast<uint8_t>(charger_data.charger_health);
         s_charger_status.produce(print_data);
 
-        // Add some console debuging
+        // Add some debuging on the console when charger is connected or not
         static bool s_last_power_good = false;
         bool power_good = charger_data.system_status_register & BQ25601_REG_SS_PG_STAT_MASK;
         if (s_last_power_good != power_good)
@@ -112,6 +101,7 @@ static void s_charger_debug_produce()
             GSDebug("[CHARGER] Input power is %s", power_good ? "Connected" : "Disconnected");
         }
 
+        // indicate some charging states
         static uint8_t s_last_charging_status = 0;
         uint8_t chargin_status = (charger_data.system_status_register & BQ25601_REG_SS_CHRG_STAT_MASK) >> BQ25601_REG_SS_CHRG_STAT_SHIFT;
         if (s_last_charging_status != chargin_status)
@@ -149,7 +139,7 @@ static void s_check_shutdown_update()
         else if ((now - s_timestamp) >= 1000 && !s_done)
         {
             s_done = true;
-            GSDebug("Entering to sleep");
+            GSDebug("Shutting the system down");
             s_bq25601.set_system_shutdown();
         }
     }
@@ -195,3 +185,23 @@ void task_power_supply_init()
 
     hal_exti_init(BM_NIRQ_IO, TriggerType::FALLING, s_charger_irq_callback, nullptr);
 }
+
+// Debug functions
+static void s_shutdown_vbat_charger()
+{
+    s_bq25601.set_system_shutdown();
+}
+GScopeButton("Shutdown", s_shutdown_vbat_charger)
+GScopeCommand("shutdown", s_shutdown_vbat_charger)
+
+static void s_set_max_input_current(int current_ma)
+{
+    s_bq25601.set_max_input_current(current_ma);
+}
+GScopeCommand("charger_set_input_current", s_set_max_input_current)
+
+static void s_enable_boost_power(bool enable)
+{
+    s_bq25601.set_boost_power_supply_enabled(enable);
+}
+GScopeCommand("charger_boost_enable", s_enable_boost_power)
