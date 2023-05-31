@@ -2,6 +2,7 @@
 #include <config/board-rev.hpp>
 #include <system/system-freertos.hpp>
 #include <task/task-blinky.hpp>
+#include <task/task-display.hpp>
 #include <task/task-gscope.hpp>
 #include <task/task-ports.hpp>
 #include <task/task-power-supply.hpp>
@@ -17,6 +18,8 @@ int main(void)
     task_power_supply_init();       // Init power supply system task
 
     task_ports_init();              // Init main task ports (motor pids, and regular work)
+
+    task_display_init();            // Init main display task
 
     vTaskStartScheduler();          // Start RTOS
 

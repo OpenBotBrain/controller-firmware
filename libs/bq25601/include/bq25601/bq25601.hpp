@@ -6,7 +6,7 @@
 class BQ25601
 {
     public:
-        using RW = bool(*)(uint8_t dir, uint8_t reg, uint8_t* buf, uint8_t size);
+        using RW = bool(*)(uint8_t dir, uint8_t reg, uint8_t* buf, uint16_t size);
         using DelatCb = void(*)(uint32_t);
         using TimestampCb = uint32_t(*)();
 

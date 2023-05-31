@@ -17,7 +17,10 @@
 #define PRI_POWER_SUPPLY                    3
 #define SIZE_POWER_sUPPLY                   256
 
-#define PRI_PORTS                           4
+#define PRI_DISPLAY                         4
+#define SIZE_DISPLAY                        256
+
+#define PRI_PORTS                           5
 #define SIZE_PORTS                          256
 
 // -------------------------- Hardware Interruptions -----------------------

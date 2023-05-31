@@ -91,6 +91,7 @@ CXXSRC+=system-version.cpp
 
 # Task
 CXXSRC+=task-blinky.cpp
+CXXSRC+=task-display.cpp
 CXXSRC+=task-gscope.cpp
 CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
@@ -206,8 +207,21 @@ all_source_path += $(bq25601_path)/src
 
 CXXSRC+=bq25601.cpp
 
+# ------------------------------------------------------------------------------------------
+# Library - Submodule Files - Source and Include
+all_source_path += $(library_path)/ssd1306/src
+board_include_paths += -I$(library_path)/ssd1306/include/
 
-# add extra....
+CXXSRC+=ssd1306.cpp
+CXXSRC+=glcdfont.cpp
+CXXSRC+=gscommon-graph.cpp
+
+# ------------------------------------------------------------------------------------------
+# Library - Submodule Files - Source and Include
+all_source_path += $(library_path)/gsmenu/src
+board_include_paths += -I$(library_path)/gsmenu/include/
+
+CXXSRC+=gsmenu.cpp
 
 # --------------------------- BUILD FLAG CONFIGURATION -------------------------------------
 DEBUG_OPTLVL := 0	# Optimization level, can be [0, 1, 2, 3, s].

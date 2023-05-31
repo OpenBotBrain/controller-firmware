@@ -8,6 +8,8 @@
 
 extern "C" {
 
+void __cxa_pure_virtual() { while (1); }
+
 bool system_freertos_semaphore_take(SemaphoreHandle_t hSemaphore, uint32_t timeout)
 {
     bool ret = false;

@@ -34,7 +34,7 @@ void system_safe_i2c_init()
     hal_i2c_init(I2C_TYPE_SYSTEM);
 }
 
-bool system_safe_i2c_write(uint8_t address, uint8_t reg, uint8_t* buf, uint8_t buf_size)
+bool system_safe_i2c_write(uint8_t address, uint8_t reg, uint8_t* buf, uint16_t buf_size)
 {
     bool ret = false;
 
@@ -53,7 +53,7 @@ bool system_safe_i2c_write(uint8_t address, uint8_t reg, uint8_t* buf, uint8_t b
     return ret;
 }
 
-bool system_safe_i2c_read(uint8_t address, uint8_t reg, uint8_t* buf, uint8_t buf_size)
+bool system_safe_i2c_read(uint8_t address, uint8_t reg, uint8_t* buf, uint16_t buf_size)
 {
     bool ret = false;
 
