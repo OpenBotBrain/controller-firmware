@@ -19,6 +19,8 @@
         "system_error": "cpp",
         "deque": "cpp",
         "unordered_map": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "initializer_list": "cpp",
+        "cstring": "cpp"
     }
 }

@@ -93,13 +93,14 @@ bool hal_i2c_read(uint8_t type, uint8_t address, uint8_t reg, uint16_t data_size
 
     if (data->state == I2CState::NONE)
     {
+        data->buf[0] = reg;
         data->buf_size = data_size;
         data->address = address;
         data->finish_tx_cb = finish_tx_cb;
         data->param = param;
 
         // send the command first
-        if (HAL_I2C_Master_Transmit_IT(handler, address, &reg, 1) == HAL_OK)
+        if (HAL_I2C_Master_Transmit_IT(handler, address, data->buf, 1) == HAL_OK)
         {
             data->state = I2CState::RX_MODE_CMD;
             return true;

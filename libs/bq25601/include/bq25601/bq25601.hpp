@@ -19,7 +19,7 @@ class BQ25601
             STATUS_CHARGER_FAULT_CHANGED,         // good time to print fault_reg
             // HEALTH
             HEALTH_GOOD,
-            HEALTH_UNSPEC_FAUILURE,
+            HEALTH_UNSPEC_FAILURE,
             HEALTH_OVERVOLTAGE,
             HEALTH_OVERHEAT,
             HEALTH_SAFETY_TIMER,
@@ -102,6 +102,7 @@ class BQ25601
             TempProtection temp_protection;         // Done
             ChargerType charger_type;               // Done
             GetHealth charger_health;               // Done
+            uint32_t timestamp;
         };
 
         BQ25601(const Config& config, const DriverConfig& driver_config);
@@ -160,5 +161,5 @@ class BQ25601
         static constexpr uint32_t CURRENT_STEP_uA = 60000;
         static constexpr uint32_t VOLTAGE_STEP_uA = 32000;
         static constexpr uint32_t CURRENT_LIMIT_STEP_uA = 100000;
-        static constexpr uint8_t BQ25601_ADDRESS = 0x6B;
+        static constexpr uint8_t BQ25601_ADDRESS = 0x6B << 1;
 };

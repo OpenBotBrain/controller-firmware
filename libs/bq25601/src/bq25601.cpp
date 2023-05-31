@@ -274,7 +274,7 @@ bool BQ25601::set_charger_type(ChargerType type)
     if (charger_config)
     {
         // Enable auto termination
-        if (!write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_EN_TERM_MASK,
+        if (write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_CTTC_EN_TERM_MASK,
             BQ25601_REG_CTTC_EN_TERM_SHIFT, enable_termination) == false)
         {
             notify(Notification::ERROR_SETING_AUTO_TERMINATION);
@@ -283,8 +283,8 @@ bool BQ25601::set_charger_type(ChargerType type)
     }
 
     // enable or disable the charger
-    if (!write_register_bits(BQ25601_REG_POC, BQ25601_REG_POC_CHG_CONFIG_MASK,
-        BQ25601_REG_POC_CHG_CONFIG_SHIFT, charger_config))
+    if (write_register_bits(BQ25601_REG_POC, BQ25601_REG_POC_CHG_CONFIG_MASK,
+        BQ25601_REG_POC_CHG_CONFIG_SHIFT, charger_config) == false)
     {
         notify(Notification::ERROR_SETTING_CHARGER_ENABLE);
         return false;
@@ -328,7 +328,7 @@ bool BQ25601::get_health(GetHealth& health)
                 // when its really under-voltage, just return
                 // 'UNSPEC_FAILURE'.
                 health = GetHealth::UNSPEC_FAILURE;
-                noty = Notification::HEALTH_UNSPEC_FAUILURE;
+                noty = Notification::HEALTH_UNSPEC_FAILURE;
                 break;
             case 2: // Thermal Shutdown
                 health = GetHealth::OVERHEAT;
@@ -536,6 +536,8 @@ void BQ25601::update()
         get_health(m_data.charger_health);
         get_temp_alert_max(m_data.temp_protection);
         get_charger_type(m_data.charger_type);
+
+        m_data.timestamp = now;
 
         m_update_timestamp = now;
     }

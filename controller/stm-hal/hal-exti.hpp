@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <stm-hal/hal-gpio.hpp>
 
 enum class TriggerType : uint8_t
 {
