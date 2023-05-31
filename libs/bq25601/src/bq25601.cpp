@@ -48,7 +48,6 @@ bool BQ25601::write_register_bits(uint8_t reg, uint8_t mask, uint8_t shift, uint
     {
         read_reg &= ~mask;
         read_reg |= (value << shift) & mask;
-        read_reg >>= shift;
         return write(reg, read_reg);
     }
     return false;
@@ -71,31 +70,31 @@ void BQ25601::notify(Notification notification)
     }
 }
 
-uint32_t BQ25601::convert_reg02_to_current_uah(uint8_t offset)
+uint32_t BQ25601::convert_reg02_to_current_mah(uint8_t offset)
 {
     assert(offset <= 50);
-    return static_cast<uint32_t>(offset) * CURRENT_STEP_uA;
+    return static_cast<uint32_t>(offset) * CURRENT_STEP_mA;
 }
 
 uint8_t BQ25601::convert_current_ua_to_reg02(uint32_t current_ua)
 {
-    return current_ua / CURRENT_STEP_uA;
+    return current_ua / CURRENT_STEP_mA;
 }
 
-uint32_t BQ25601::convert_reg04_to_voltage_uv(uint8_t offset)
+uint32_t BQ25601::convert_reg04_to_voltage_mv(uint8_t offset)
 {
     assert(offset <= 24);
-    return 3856000 + static_cast<uint32_t>(offset) * 32000;
+    return 3856 + static_cast<uint32_t>(offset) * 32;
 }
 
 uint8_t BQ25601::convert_voltage_ua_to_reg04(uint32_t voltage_uv)
 {
-    return voltage_uv / VOLTAGE_STEP_uA;
+    return voltage_uv / VOLTAGE_STEP_mA;
 }
 
 uint8_t BQ25601::convert_current_ua_to_reg00(uint32_t current_ua)
 {
-    return current_ua / CURRENT_LIMIT_STEP_uA;
+    return current_ua / CURRENT_LIMIT_STEP_mA;
 }
 
 /*
@@ -237,7 +236,7 @@ bool BQ25601::get_charger_type(ChargerType& type)
             return false;
         }
 
-        uint8_t bits_20_percentage = 2 * convert_current_ua_to_reg02(m_driver_config.charger_setpoint_ua) / 10;
+        uint8_t bits_20_percentage = 2 * convert_current_ua_to_reg02(m_driver_config.charger_setpoint_ma) / 10;
         type = value <= bits_20_percentage ? ChargerType::TYPE_TRICKLE : ChargerType::TYPE_FAST;
     }
     return true;
@@ -413,7 +412,7 @@ bool BQ25601::get_online(bool& battery_fet_enable)
 bool BQ25601::set_online(bool enable)
 {
     uint8_t bat_fet_disable = enable ? 0 : 1;
-    bool ret = write_register_bits(BQ25601_REG_CTTC, BQ25601_REG_MOC_BATFET_DISABLE_MASK,
+    bool ret = write_register_bits(BQ25601_REG_MOC, BQ25601_REG_MOC_BATFET_DISABLE_MASK,
         BQ25601_REG_MOC_BATFET_DISABLE_SHIFT, bat_fet_disable);
 
     if (ret)
@@ -424,9 +423,27 @@ bool BQ25601::set_online(bool enable)
     return ret;
 }
 
-bool BQ25601::set_charging_voltage(uint32_t voltage_uv)
+bool BQ25601::set_fet_reset_enable(bool enable)
 {
-    uint8_t value = convert_voltage_ua_to_reg04(voltage_uv);
+    uint8_t bat_fet_disable = enable ? 1 : 0;
+    bool ret = write_register_bits(BQ25601_REG_MOC, BQ25601_REG_MOC_BATFET_RST_EN_MASK,
+        BQ25601_REG_MOC_BATFET_RST_EN_SHIFT, bat_fet_disable);
+
+    return ret;
+}
+
+bool BQ25601::set_shutdown_delay_time(bool immediately)
+{
+    uint8_t now = immediately ? 0 : 1;
+    bool ret = write_register_bits(BQ25601_REG_MOC, BQ25601_REG_MOC_BATFET_DLY_MASK,
+        BQ25601_REG_MOC_BATFET_DLY_SHIFT, now);
+
+    return ret;
+}
+
+bool BQ25601::set_charging_voltage(uint32_t voltage_mv)
+{
+    uint8_t value = convert_voltage_ua_to_reg04(voltage_mv);
 
     if (!write_register_bits(BQ25601_REG_CVC, BQ25601_REG_CVC_VREG_MASK,
         BQ25601_REG_CVC_VREG_SHIFT, value))
@@ -438,9 +455,9 @@ bool BQ25601::set_charging_voltage(uint32_t voltage_uv)
     return true;
 }
 
-bool BQ25601::set_charger_current(uint32_t current_ua)
+bool BQ25601::set_charger_current(uint32_t current_ma)
 {
-    uint8_t value = convert_current_ua_to_reg02(current_ua);
+    uint8_t value = convert_current_ua_to_reg02(current_ma);
 
     if (!write_register_bits(BQ25601_REG_CCC, BQ25601_REG_CCC_ICHG_MASK,
         BQ25601_REG_CCC_ICHG_SHIFT, value))
@@ -452,9 +469,9 @@ bool BQ25601::set_charger_current(uint32_t current_ua)
     return true;
 }
 
-bool BQ25601::set_input_current_limit(uint32_t current_ua)
+bool BQ25601::set_input_current_limit(uint32_t current_ma)
 {
-    uint8_t value = convert_current_ua_to_reg00(current_ua);
+    uint8_t value = convert_current_ua_to_reg00(current_ma);
 
     if (!write_register_bits(BQ25601_REG_ISC, BQ25601_REG_ISC_IINDPM_MASK,
         BQ25601_REG_ISC_IINDPM_SHIFT, value))
@@ -464,6 +481,21 @@ bool BQ25601::set_input_current_limit(uint32_t current_ua)
     }
 
     return true;
+}
+
+bool BQ25601::set_boost_setpoint(BoostSetpoint setpoint)
+{
+    uint8_t val = 0;
+    switch (setpoint)
+    {
+        case BoostSetpoint::VOLTAGE_4_85V: val = 0; break;
+        case BoostSetpoint::VOLTAGE_5_00V: val = 1; break;
+        case BoostSetpoint::VOLTAGE_5_15: val = 2; break;
+        case BoostSetpoint::VOLTAGE_5_30: val = 3; break;
+    }
+
+    return write_register_bits(BQ25601_REG_ICTRC, BQ25601_REG_ICTRC_BOOSTV_MASK,
+        BQ25601_REG_ICTRC_BOOSTV_SHIFT, val);
 }
 
 // ------------------------------------------------------------------------
@@ -491,24 +523,39 @@ void BQ25601::init()
         return;
     }
 
-    if (!set_charging_voltage(m_driver_config.charger_setpoint_ua))
+    if (!set_charging_voltage(m_driver_config.charger_voltage_mv))
     {
         return;
     }
 
-    if (!set_charger_current(m_driver_config.charger_voltage_uv))
+    if (!set_charger_current(m_driver_config.charger_setpoint_ma))
     {
         return;
     }
 
-    if (!set_input_current_limit(m_driver_config.input_current_limit_ua))
+    if (!set_input_current_limit(m_driver_config.input_current_limit_ma))
     {
         return;
     }
 
-    // TODO m_driver_config.boost_setpoint
+    if (!set_boost_setpoint(m_driver_config.boost_setpoint))
+    {
+        return;
+    }
 
     if (!set_charger_type(ChargerType::TYPE_FAST))
+    {
+        return;
+    }
+
+    // power button will turn the fet off instead of reseting the system
+    if (!set_fet_reset_enable(false))
+    {
+        return;
+    }
+
+    // Dont wait to shutdown the system
+    if (!set_shutdown_delay_time(true))
     {
         return;
     }
@@ -547,6 +594,12 @@ void BQ25601::update()
         m_request_system_shutdown = false;
         set_online(false);
     }
+
+    if (m_new_input_current_setpoint_ma != INVALID_VALUE)
+    {
+        set_input_current_limit(m_new_input_current_setpoint_ma);
+        m_new_input_current_setpoint_ma = INVALID_VALUE;
+    }
 }
 
 void BQ25601::irq_handler()
@@ -562,4 +615,12 @@ const BQ25601::Data& BQ25601::get_status()
 void BQ25601::set_system_shutdown()
 {
     m_request_system_shutdown = true;
+}
+
+void BQ25601::set_max_input_current(uint16_t current_ma)
+{
+    if (current_ma >= 100 && current_ma <= 3200)
+    {
+        m_new_input_current_setpoint_ma = current_ma;
+    }
 }

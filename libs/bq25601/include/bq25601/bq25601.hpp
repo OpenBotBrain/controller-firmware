@@ -71,9 +71,9 @@ class BQ25601
         struct DriverConfig
         {
             TempProtection temp_protection;         // Shutdown 90C or 110C
-            uint32_t charger_setpoint_ua;           // Max 3 Amps
-            uint32_t charger_voltage_uv;            // 3.856V to 4.624V
-            uint32_t input_current_limit_ua;        // Max 3.2 Amp
+            uint16_t charger_setpoint_ma;           // Max 3 Amps
+            uint16_t charger_voltage_mv;            // 3.856V to 4.624V
+            uint16_t input_current_limit_ma;        // Max 3.2 Amp
             BoostSetpoint boost_setpoint;           // Setpoint when is set to host mode
         };
 
@@ -112,8 +112,11 @@ class BQ25601
         void irq_handler();
         const Data& get_status();
         void set_system_shutdown();
+        void set_max_input_current(uint16_t current_ma);
 
     private:
+        static constexpr uint16_t INVALID_VALUE = 0xffff;
+
         const Config& m_config;             // Driver configuration is stored here
         const DriverConfig& m_driver_config;
         Data m_data;                        // Driver data is stored here
@@ -123,6 +126,7 @@ class BQ25601
         bool m_driver_enable {false};       // If true, init was success
         bool m_request_system_shutdown {false};
         uint8_t m_last_fault_register_helth {0};
+        uint32_t m_new_input_current_setpoint_ma {INVALID_VALUE};
 
         bool read(uint8_t reg, uint8_t& data);
         bool write(uint8_t reg, uint8_t data);
@@ -138,6 +142,9 @@ class BQ25601
         bool set_temp_alert_max(TempProtection temp);
         bool get_charger_type(ChargerType& type);
         bool set_charger_type(ChargerType type);
+        bool set_fet_reset_enable(bool enable);
+        bool set_boost_setpoint(BoostSetpoint setpoint);
+        bool set_shutdown_delay_time(bool immediately);
 
         bool get_health(GetHealth& health);
         bool get_system_fault(uint8_t& f_reg);
@@ -150,16 +157,16 @@ class BQ25601
         bool set_charger_current(uint32_t current_ua);
         bool set_input_current_limit(uint32_t current_ua);
 
-        uint32_t convert_reg02_to_current_uah(uint8_t offset);
+        uint32_t convert_reg02_to_current_mah(uint8_t offset);
         uint8_t convert_current_ua_to_reg02(uint32_t current_ua);
-        uint32_t convert_reg04_to_voltage_uv(uint8_t offset);
+        uint32_t convert_reg04_to_voltage_mv(uint8_t offset);
         uint8_t convert_voltage_ua_to_reg04(uint32_t voltage_uv);
         uint8_t convert_current_ua_to_reg00(uint32_t current_ua);
 
         static constexpr uint32_t UPDATE_PERIOD_MS = 1000;
         static constexpr uint8_t BQ25601_MODEL_NUMBER = 0x02;
-        static constexpr uint32_t CURRENT_STEP_uA = 60000;
-        static constexpr uint32_t VOLTAGE_STEP_uA = 32000;
-        static constexpr uint32_t CURRENT_LIMIT_STEP_uA = 100000;
+        static constexpr uint32_t CURRENT_STEP_mA = 60;
+        static constexpr uint32_t VOLTAGE_STEP_mA = 32;
+        static constexpr uint32_t CURRENT_LIMIT_STEP_mA = 100;
         static constexpr uint8_t BQ25601_ADDRESS = 0x6B << 1;
 };
