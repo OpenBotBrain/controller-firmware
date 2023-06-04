@@ -42,7 +42,7 @@ static bool s_send_data(const uint8_t* data, uint32_t size)
 {
     if (s_connection_type == ConnectionType::SERIAL)
     {
-        hal_uart_write(USB_TYPE_GSCOPE, data, size);
+        hal_uart_write(UART_TYPE_DEBUG_SERIAL, data, size);
         return system_freertos_semaphore_take(s_wait_tx_finish, 200);
     }
     else
@@ -64,16 +64,6 @@ static constexpr GScopeSerialBuffer::SerialConfig s_serial_config =
 
 static GScope s_gscope(s_serial_config, system_version_get_version);
 
-static bool s_usb_incoming_data(const uint8_t* data, uint16_t size, void*)
-{
-    if (s_gscope.incoming(data, size))
-    {
-        s_connection_type = ConnectionType::USB;
-        return true;
-    }
-    return false;
-}
-
 static void s_gscope_thread(void*)
 {
     s_rtos_on = true;
@@ -85,8 +75,20 @@ static void s_gscope_thread(void*)
 
         if (read_size != 0)
         {
-            s_connection_type = ConnectionType::SERIAL;
-            s_gscope.incoming_fragmented(s_local_rx_buffer, read_size, s_fragmented_rx_buffer, sizeof(s_fragmented_rx_buffer));
+            if (s_gscope.incoming_fragmented(s_local_rx_buffer, read_size, s_fragmented_rx_buffer, sizeof(s_fragmented_rx_buffer)))
+            {
+                s_connection_type = ConnectionType::SERIAL;
+            }
+        }
+
+        uint32_t read_usb = hal_usb_read(s_local_rx_buffer, sizeof(s_local_rx_buffer));
+
+        if (read_usb != 0)
+        {
+            if (s_gscope.incoming(s_local_rx_buffer, read_usb))
+            {
+                s_connection_type = ConnectionType::USB;
+            }
         }
 
         // Update main routine, if return true, we should keep updating information
@@ -116,7 +118,6 @@ void task_gscope_init()
     s_wait_tx_finish = xSemaphoreCreateBinaryStatic(&s_wait_ts_sem);
 
     hal_uart_init(UART_TYPE_DEBUG_SERIAL, s_finish_sending_data, nullptr);
-    hal_usb_reception_add_handler(USB_TYPE_GSCOPE, s_usb_incoming_data, nullptr);
 
-    s_gscope.enable_transmission(true);
+    s_gscope.enable_transmission(false);
 }

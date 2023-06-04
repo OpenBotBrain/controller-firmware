@@ -40,6 +40,12 @@ void OTG_FS_IRQHandler(void)
     HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
 }
 
+static bool s_usb_connected = false;
+bool usbd_conf_get_is_up(void)
+{
+    return s_usb_connected;
+}
+
 /*******************************************************************************
                        LL Driver Callbacks (PCD -> USB Device Library)
 *******************************************************************************/
@@ -218,6 +224,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
 {
   __HAL_PCD_GATE_PHYCLOCK(hpcd);
+  s_usb_connected = false;
   /* Inform USB library that core enters in suspend Mode. */
   USBD_LL_Suspend((USBD_HandleTypeDef*)hpcd->pData);
   /* Enter in STOP mode. */
@@ -496,6 +503,8 @@ USBD_StatusTypeDef USBD_LL_OpenEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr, uin
       usb_status = USBD_FAIL;
     break;
   }
+
+  s_usb_connected = true;
   return usb_status;
 }
 
@@ -529,6 +538,8 @@ USBD_StatusTypeDef USBD_LL_CloseEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
       usb_status = USBD_FAIL;
     break;
   }
+
+  s_usb_connected = false;
   return usb_status;
 }
 

@@ -3,6 +3,8 @@
 #include <stm32l4xx_hal.h>
 #include <usbd_cdc.h>
 #include <stm-hal/hal-usb.hpp>
+#include <cstdint>
+#include <cstring>
 
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
@@ -19,15 +21,9 @@ static USBD_HandleTypeDef s_usb_device_fs_handler;
 static SemaphoreHandle_t s_wait_complete_transaction = nullptr;
 static SemaphoreHandle_t s_new_usb_data = nullptr;
 static uint32_t s_rx_data_length = 0;
+static uint32_t s_rx_data_size = 0;
 static TaskHandle_t s_task_handler;
 
-struct USBCofig
-{
-    USBDataCb cb;
-    void* param;
-    bool enable;
-};
-static USBCofig s_config[USB_CALLBACK_TYPES] = {0};
 static FinishTransmiteCallback s_finish_tx = nullptr;
 static void* s_tx_param;
 static bool s_busy = false;
@@ -129,6 +125,11 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 
 uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
+    if (!usbd_conf_get_is_up())
+    {
+        return USBD_OK;   // USB is not connected
+    }
+
     uint8_t result = USBD_OK;
     USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)s_usb_device_fs_handler.pClassData;
 
@@ -176,21 +177,8 @@ static USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
 
 static void s_process_rx_data(void)
 {
-    for (int i = 0; i < USB_CALLBACK_TYPES; i++)
-    {
-        USBCofig& config = s_config[i];
-        if (config.enable && config.cb != nullptr)
-        {
-            if (config.cb(s_user_rx_buffer, s_rx_data_length, config.param))
-            {
-                return;
-            }
-        }
-    }
-
-    s_reset_usb_rx();  // restart RX
+    s_rx_data_size = s_rx_data_length;
 }
-
 
 static void s_usb_app_rx_task(void*)
 {
@@ -254,14 +242,39 @@ bool hal_usb_transmitte(const uint8_t* data, uint16_t size, FinishTransmiteCallb
     return ret;
 }
 
-bool hal_usb_reception_add_handler(uint8_t id, USBDataCb cb, void* param)
+uint32_t hal_usb_read(uint8_t* data, uint32_t max_data_size)
 {
-    assert(id < USB_CALLBACK_TYPES);
-    USBCofig& config = s_config[id];
+    static uint32_t s_last_read_offset = 0;
 
-    config.cb = cb;
-    config.param = param;
-    config.enable = true;
+    if (s_rx_data_size != 0)
+    {
+        bool update_offset = false;
+        uint32_t copy_size = s_rx_data_size - s_last_read_offset;
+        if (copy_size > max_data_size)
+        {
+            copy_size = max_data_size;
+            update_offset = true;
+        }
 
-    return true;
+        std::memcpy(data, s_user_rx_buffer + s_last_read_offset, copy_size);
+
+        if (update_offset)
+        {
+            s_last_read_offset += copy_size;
+        }
+        else
+        {
+            s_last_read_offset = 0;
+            s_rx_data_size = 0;
+            s_reset_usb_rx();  // restart RX
+        }
+
+        return copy_size;
+    }
+    else
+    {
+        s_last_read_offset = 0;
+    }
+
+    return 0;
 }

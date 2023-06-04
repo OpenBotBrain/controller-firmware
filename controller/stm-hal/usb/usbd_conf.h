@@ -31,6 +31,7 @@
 #include <string.h>
 #include "stm32l4xx.h"
 #include "stm32l4xx_hal.h"
+#include <stdbool.h>
 
 /*---------- -----------*/
 #define USBD_MAX_NUM_INTERFACES     1U
@@ -94,6 +95,7 @@
 /* Exported functions -------------------------------------------------------*/
 void *USBD_static_malloc(uint32_t size);
 void USBD_static_free(void *p);
+bool usbd_conf_get_is_up(void);
 
 #ifdef __cplusplus
 }
