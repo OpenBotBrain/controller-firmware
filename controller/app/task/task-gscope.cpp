@@ -4,6 +4,13 @@
 #include <system/system-version.hpp>
 #include <stm-hal/hal-uart.hpp>
 #include <stm-hal/hal-tim.hpp>
+#include <stm-hal/hal-usb.hpp>
+
+enum class ConnectionType
+{
+    SERIAL = 0,
+    USB
+};
 
 static TaskHandle_t s_task_handler;
 static SemaphoreHandle_t s_add_buffer_mutex = NULL;
@@ -11,6 +18,7 @@ static SemaphoreHandle_t s_wait_tx_finish;
 static bool s_rtos_on = false;
 static uint8_t s_local_rx_buffer[128];
 static uint8_t s_fragmented_rx_buffer[128];
+static ConnectionType s_connection_type = ConnectionType::SERIAL;
 
 static bool s_buffer_lock(void)
 {
@@ -25,11 +33,22 @@ static void s_buffer_unlock(void)
     }
 }
 
+static void s_finish_sending_data(void*)
+{
+    system_freertos_semaphore_give(s_wait_tx_finish);
+}
+
 static bool s_send_data(const uint8_t* data, uint32_t size)
 {
-    hal_uart_write(UART_TYPE_DEBUG_SERIAL, data, size);
-
-    return system_freertos_semaphore_take(s_wait_tx_finish, 200);
+    if (s_connection_type == ConnectionType::SERIAL)
+    {
+        hal_uart_write(USB_TYPE_GSCOPE, data, size);
+        return system_freertos_semaphore_take(s_wait_tx_finish, 200);
+    }
+    else
+    {
+        return hal_usb_transmitte(data, size, nullptr, nullptr);
+    }
 }
 
 static constexpr uint32_t RING_BUFFER_SIZE = 4096;
@@ -45,9 +64,14 @@ static constexpr GScopeSerialBuffer::SerialConfig s_serial_config =
 
 static GScope s_gscope(s_serial_config, system_version_get_version);
 
-static void s_finish_sending_data(void*)
+static bool s_usb_incoming_data(const uint8_t* data, uint16_t size, void*)
 {
-    system_freertos_semaphore_give(s_wait_tx_finish);
+    if (s_gscope.incoming(data, size))
+    {
+        s_connection_type = ConnectionType::USB;
+        return true;
+    }
+    return false;
 }
 
 static void s_gscope_thread(void*)
@@ -61,6 +85,7 @@ static void s_gscope_thread(void*)
 
         if (read_size != 0)
         {
+            s_connection_type = ConnectionType::SERIAL;
             s_gscope.incoming_fragmented(s_local_rx_buffer, read_size, s_fragmented_rx_buffer, sizeof(s_fragmented_rx_buffer));
         }
 
@@ -91,6 +116,7 @@ void task_gscope_init()
     s_wait_tx_finish = xSemaphoreCreateBinaryStatic(&s_wait_ts_sem);
 
     hal_uart_init(UART_TYPE_DEBUG_SERIAL, s_finish_sending_data, nullptr);
+    hal_usb_reception_add_handler(USB_TYPE_GSCOPE, s_usb_incoming_data, nullptr);
 
     s_gscope.enable_transmission(true);
 }

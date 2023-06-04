@@ -70,6 +70,7 @@ board_include_paths := \
 	-I$(root_folder_path)/ \
 	-I$(application_path)/ \
 	-I$(config_path)/ \
+	-I$(stm_hal_library_path)/usb \
 
 all_source_path := \
 	$(application_path) \
@@ -77,7 +78,8 @@ all_source_path := \
 	$(application_path)/task \
 	$(application_path)/module \
 	$(config_path) \
-	$(stm_hal_library_path)
+	$(stm_hal_library_path) \
+	$(stm_hal_library_path)/usb
 
 # Main System File
 CXXSRC:=main.cpp
@@ -120,6 +122,11 @@ CSRC+=hal-sys-init.c
 CXXSRC+=hal-spi.cpp
 CXXSRC+=hal-tim.cpp
 CXXSRC+=hal-uart.cpp
+CXXSRC+=hal-usb.cpp
+
+# STM-Hal - USB
+CSRC+=usbd_conf.c
+CSRC+=usbd_desc.c
 
 # ------------------------------------------------------------------------------------------
 # ST Driver Files - Source and Include
@@ -162,7 +169,22 @@ CSRC+=stm32l4xx_hal_tim.c
 CSRC+=stm32l4xx_hal_tim_ex.c
 CSRC+=stm32l4xx_hal_pcd.c
 CSRC+=stm32l4xx_hal_pcd_ex.c
-# CSRC+=stm32l4xx_ll_usb.c
+CSRC+=stm32l4xx_ll_usb.c
+
+# ------------------------------------------------------------------------------------------
+# USB Files - Source and Include
+usb_device_path := $(library_path)/STM32_USB_Device_Library
+board_include_paths += \
+	-I$(usb_device_path)/Core/Inc/ \
+	-I$(usb_device_path)/Class/CDC/Inc/
+
+all_source_path += $(usb_device_path)/Core/Src/ \
+                   $(usb_device_path)/Class/CDC/Src/ \
+# Individual files
+CSRC+=usbd_core.c
+CSRC+=usbd_ctlreq.c
+CSRC+=usbd_ioreq.c
+CSRC+=usbd_cdc.c
 
 # ------------------------------------------------------------------------------------------
 # FreeRTOS Files - Source and Include

@@ -1,6 +1,7 @@
 #include <app/assert.h>
 #include <stm-hal/hal-datatype.hpp>
 #include <stm-hal/hal-clock.hpp>
+#include <stm-hal/hal-usb.hpp>
 
 static const BoardSpecificConfig* s_board_specific_config = nullptr;
 
@@ -22,6 +23,7 @@ void hal_board_init(const BoardSpecificConfig* board_config)
     hal_i2c_init_default(board_config);
     hal_exti_init_default(board_config);
     hal_spi_init_default(board_config);
+    hal_usb_init();
 }
 
 const BoardSpecificConfig* board_get_specific_configuration()
