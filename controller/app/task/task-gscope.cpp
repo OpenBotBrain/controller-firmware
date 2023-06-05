@@ -53,7 +53,7 @@ static bool s_send_data(const uint8_t* data, uint32_t size)
 
 static constexpr uint32_t RING_BUFFER_SIZE = 4096;
 static uint8_t s_ring_buffer[RING_BUFFER_SIZE];
-static constexpr GScopeSerialBuffer::SerialConfig s_serial_config =
+static constexpr GScope::SerialConfig s_serial_config =
 {
     .buffer_lock = s_buffer_lock,
     .buffer_unlock = s_buffer_unlock,
