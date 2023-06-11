@@ -119,5 +119,5 @@ void task_gscope_init()
 
     hal_uart_init(UART_TYPE_DEBUG_SERIAL, s_finish_sending_data, nullptr);
 
-    s_gscope.enable_transmission(false);
+    s_gscope.enable_transmission(true);
 }

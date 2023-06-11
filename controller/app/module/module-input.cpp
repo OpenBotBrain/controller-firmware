@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <module/module-common.hpp>
 #include <module/module-input.hpp>
 #include <stm-hal/hal-adc.hpp>
 #include <stm-hal/hal-gpio.hpp>
@@ -7,8 +8,8 @@
 
 void InputPort::convert_adc_reading_update()
 {
-    m_pin1_voltage_v = m_adc_raw_reading_input1 * ADC_TO_VOLTAGE_INPUTS;
-    m_pin6_voltage_v = m_adc_raw_reading_input6 * ADC_TO_VOLTAGE_INPUTS;
+    ModuleCommon::low_pass_filter_update(m_pin1_voltage_v, m_adc_raw_reading_input1 * ModuleCommon::ADC_TO_VOLTAGE_INPUTS);
+    ModuleCommon::low_pass_filter_update(m_pin6_voltage_v, m_adc_raw_reading_input6 * ModuleCommon::ADC_TO_VOLTAGE_INPUTS);
 }
 
 void InputPort::uart_tx_end_callback(void* param)

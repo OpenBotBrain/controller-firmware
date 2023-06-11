@@ -83,6 +83,7 @@ static constexpr OutputPort::Config s_output_config[TOTAL_OUTPUT_PORTS] =
         .fault_io = MOTORAB_FAULT_N_IO,
         .adc_pin5_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT1_PIN5,
         .adc_pin6_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT1_PIN6,
+        .invert_encoder_polarity = false,
     },
     {
         .pin5_adc_enable_n_io = MOTORB_PIN5_DETECT_IO,
@@ -92,6 +93,7 @@ static constexpr OutputPort::Config s_output_config[TOTAL_OUTPUT_PORTS] =
         .fault_io = MOTORAB_FAULT_N_IO,
         .adc_pin5_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT2_PIN5,
         .adc_pin6_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT2_PIN6,
+        .invert_encoder_polarity = true,
     },
     {
         .pin5_adc_enable_n_io = MOTORC_PIN5_DETECT_IO,
@@ -101,6 +103,7 @@ static constexpr OutputPort::Config s_output_config[TOTAL_OUTPUT_PORTS] =
         .fault_io = MOTORCD_FAULT_N_IO,
         .adc_pin5_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT3_PIN5,
         .adc_pin6_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT3_PIN6,
+        .invert_encoder_polarity = false,
     },
         {
         .pin5_adc_enable_n_io = MOTORD_PIN5_DETECT_IO,
@@ -110,6 +113,7 @@ static constexpr OutputPort::Config s_output_config[TOTAL_OUTPUT_PORTS] =
         .fault_io = MOTORCD_FAULT_N_IO,
         .adc_pin5_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT4_PIN5,
         .adc_pin6_channel = ADC_CHANNEL_TYPE_PORT_OUTPUT4_PIN6,
+        .invert_encoder_polarity = false,
     }
 };
 
@@ -139,7 +143,7 @@ static void s_debug_update()
 
     uint32_t now = hal_timer_32_ms();
 
-    if ((now - s_input_timestamp) >= 25)
+    if ((now - s_input_timestamp) >= 20)
     {
         s_input_timestamp = now;
 
@@ -166,7 +170,7 @@ static void s_debug_update()
         s_state_pin6.produce(pin6_state);
     }
 
-    if ((now - s_output_timestamp) >= 50)
+    if ((now - s_output_timestamp) >= 40)
     {
         s_output_timestamp = now;
 

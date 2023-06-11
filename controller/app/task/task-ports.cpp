@@ -10,7 +10,7 @@ static void s_ports_thread(void*)
     {
         module_port_update();
 
-        vTaskDelay(10);
+        vTaskDelay(5);
     }
 }
 

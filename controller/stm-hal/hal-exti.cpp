@@ -27,11 +27,12 @@ static void exti_handle_interrupt(uint8_t line_start, uint8_t line_end)
 {
     for (uint8_t line = line_start; line <= line_end; line++)
     {
-        uint32_t flag = s_exti_line[line];
-        if (__HAL_GPIO_EXTI_GET_FLAG(flag) && __HAL_GPIO_EXTI_GET_IT(flag))
+        uint32_t gpio = (1 << line);
+        // uint32_t flag = s_exti_line[line];
+        if (__HAL_GPIO_EXTI_GET_FLAG(gpio) && __HAL_GPIO_EXTI_GET_IT(gpio))
         {
-            __HAL_GPIO_EXTI_CLEAR_FLAG(flag);
-            __HAL_GPIO_EXTI_CLEAR_IT(flag);
+            __HAL_GPIO_EXTI_CLEAR_FLAG(gpio);
+            __HAL_GPIO_EXTI_CLEAR_IT(gpio);
 
             EXTIData* data = &s_exti_data[line];
             if (data->cb != nullptr)
@@ -110,9 +111,13 @@ uint8_t get_exti_port(GPIO_TypeDef* port)
     {
         return EXTI_GPIOE;
     }
-    else
+    else if (port == GPIOF)
     {
         return EXTI_GPIOF;
+    }
+    else
+    {
+        return EXTI_GPIOG;
     }
 }
 
@@ -159,7 +164,7 @@ void hal_exti_init(uint16_t gpio_id, TriggerType trigger, FinishEXTICb cb, void*
 
     HAL_EXTI_SetConfigLine(handler, &cfg);
 
-    IRQn_Type irq_type = get_irq_type(gpio_id);
+    IRQn_Type irq_type = get_irq_type(hal_gpio_get_pin(gpio_id));
     HAL_NVIC_SetPriority(irq_type, PRI_HARD_EXTI, 0);
     HAL_NVIC_EnableIRQ(irq_type);
 }

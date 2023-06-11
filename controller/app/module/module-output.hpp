@@ -14,6 +14,7 @@ class OutputPort
             uint16_t fault_io;
             uint8_t adc_pin5_channel;
             uint8_t adc_pin6_channel;
+            bool invert_encoder_polarity;
         };
 
         OutputPort(const Config& config) : m_config(config) {}
@@ -52,7 +53,4 @@ class OutputPort
         float m_pin5_voltage_v;
         float m_pin6_voltage_v;
         float m_pwm_value;
-
-        // 4.7k and 2.4k -> 0.6619718(calc) or 0.6633819 (Measured)
-        static constexpr float ADC_TO_VOLTAGE_INPUTS = 0.0012247766;//0.00127364196f;
 };

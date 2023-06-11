@@ -1,4 +1,6 @@
 #include <assert.h>
+#include <limits>
+#include <module/module-common.hpp>
 #include <module/module-output.hpp>
 #include <stm-hal/hal-adc.hpp>
 #include <stm-hal/hal-gpio.hpp>
@@ -6,8 +8,8 @@
 
 void OutputPort::convert_adc_reading_update()
 {
-    m_pin5_voltage_v = m_adc_raw_reading_input5 * ADC_TO_VOLTAGE_INPUTS;
-    m_pin6_voltage_v = m_adc_raw_reading_input6 * ADC_TO_VOLTAGE_INPUTS;
+    ModuleCommon::low_pass_filter_update(m_pin5_voltage_v, m_adc_raw_reading_input5 * ModuleCommon::ADC_TO_VOLTAGE_INPUTS);
+    ModuleCommon::low_pass_filter_update(m_pin6_voltage_v, m_adc_raw_reading_input6 * ModuleCommon::ADC_TO_VOLTAGE_INPUTS);
 }
 
 void OutputPort::adc_new_sample_input5(uint16_t value, void* param)
@@ -44,7 +46,14 @@ void OutputPort::update()
 
 uint16_t OutputPort::get_encoder_ticks()
 {
-    return hal_tim_encoder_get_tick(m_config.encoder_id);
+    uint16_t ret = hal_tim_encoder_get_tick(m_config.encoder_id);
+
+    if (m_config.invert_encoder_polarity)
+    {
+        ret = (std::numeric_limits<uint16_t>::max() - ret) + 1;
+    }
+
+    return ret;
 }
 
 float OutputPort::get_voltage(PinID id)

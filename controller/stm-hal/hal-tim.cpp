@@ -4,6 +4,8 @@
 #include <stm-hal/hal-datatype.hpp>
 #include <stm-hal/hal-tim.hpp>
 #include <stm-hal/hal-gpio.hpp>
+#include <stm-hal/hal-exti.hpp>
+
 struct TimerData
 {
     TIM_HandleTypeDef handler;
@@ -16,6 +18,7 @@ static uint32_t s_timer_us_cnt = 0;
 static uint32_t s_timer_ms_cnt = 0;
 static TIM_HandleTypeDef s_tim6;    // ADC Timer
 static TIM_HandleTypeDef s_tim7;    // us timer
+static uint16_t s_timer15_local_counter = 0;
 
 static void adc_timer_init()
 {
@@ -160,6 +163,30 @@ void hal_tim_pwm_set_pwm(uint8_t type, float duty)
     __HAL_TIM_SET_COMPARE(&data->handler, config->channel_sec, static_cast<uint16_t>(in2 * data->period));
 }
 
+static void s_encoder_tim15_rissing_edge_pin5(void*)
+{
+    if (hal_gpio_read_pin(MOTORD_PIN6_ENCODER_IO))
+    {
+        s_timer15_local_counter++;
+    }
+    else
+    {
+        s_timer15_local_counter--;
+    }
+}
+
+static void s_encoder_tim15_rissing_edge_pin6(void*)
+{
+    if (!hal_gpio_read_pin(MOTORD_PIN5_ENCODER_IO))
+    {
+        s_timer15_local_counter++;
+    }
+    else
+    {
+        s_timer15_local_counter--;
+    }
+}
+
 void hal_tim_encoder_init(uint8_t type)
 {
     assert(type < TIMER_TYPE_TOTAL);
@@ -168,13 +195,21 @@ void hal_tim_encoder_init(uint8_t type)
     TimerData* data = &s_timer_data[type];
     TIM_HandleTypeDef* handler = &data->handler;
 
+    if (config->tim == TIM15)
+    {
+        // Special case, does not support encoder, do it via software
+        hal_exti_init(MOTORD_PIN5_ENCODER_IO, TriggerType::RISSING, s_encoder_tim15_rissing_edge_pin5, nullptr);
+        hal_exti_init(MOTORD_PIN6_ENCODER_IO, TriggerType::RISSING, s_encoder_tim15_rissing_edge_pin6, nullptr);
+        return;
+    }
+
     handler->Instance = config->tim;
     handler->Init.Prescaler = 0;
     handler->Init.CounterMode = TIM_COUNTERMODE_UP;
     handler->Init.Period = 65535;
     handler->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     handler->Init.RepetitionCounter = 0;
-    handler->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    handler->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
     assert(HAL_TIM_IC_Init(handler) == HAL_OK);
 
     TIM_MasterConfigTypeDef sMasterConfig = {0};
@@ -182,23 +217,31 @@ void hal_tim_encoder_init(uint8_t type)
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     assert(HAL_TIMEx_MasterConfigSynchronization(handler, &sMasterConfig) == HAL_OK);
 
-    // TODO: THIS CONFIGURATION IT IS NOT CORRECT!!!
-    TIM_IC_InitTypeDef sConfigIC = {0};
-    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
-    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-    sConfigIC.ICFilter = 0;
-    assert(HAL_TIM_IC_ConfigChannel(handler, &sConfigIC, config->channel_pri) == HAL_OK);
-    assert(HAL_TIM_IC_ConfigChannel(handler, &sConfigIC, config->channel_sec) == HAL_OK);
+    TIM_Encoder_InitTypeDef sConfig = {0};
+    sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+    sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
+    sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
+    sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
+    sConfig.IC1Filter = 10;
+    sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+    sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
+    sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
+    sConfig.IC2Filter = 10;
+    assert(HAL_TIM_Encoder_Init(handler, &sConfig) == HAL_OK);
 
-    assert(HAL_TIM_IC_Start(handler, config->channel_pri) == HAL_OK);
-    assert(HAL_TIM_IC_Start(handler, config->channel_sec) == HAL_OK);
+    assert(HAL_TIM_Encoder_Start(handler, config->channel_pri) == HAL_OK);
+    assert(HAL_TIM_Encoder_Start(handler, config->channel_sec) == HAL_OK);
 }
 
 uint32_t hal_tim_encoder_get_tick(uint8_t type)
 {
     assert(type < TIMER_TYPE_TOTAL);
     TimerData* data = &s_timer_data[type];
+
+    if (s_timer_config[type].tim == TIM15)
+    {
+        return s_timer15_local_counter;
+    }
 
     return __HAL_TIM_GET_COUNTER(&data->handler);
 }
