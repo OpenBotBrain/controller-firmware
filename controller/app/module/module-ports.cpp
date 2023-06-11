@@ -121,21 +121,27 @@ static OutputPort s_output_port[TOTAL_OUTPUT_PORTS] =
     s_output_config[3]
 };
 
-GScopeChannel(s_voltage_pin1, "input_pin1_voltage", float, TOTAL_INPUT_PORTS)
-GScopeChannel(s_voltage_pin6, "input_pin6_voltage", float, TOTAL_INPUT_PORTS)
+GScopeChannel(s_voltage_in_pin1, "input_pin1_voltage", float, TOTAL_INPUT_PORTS)
+GScopeChannel(s_voltage_in_pin6, "input_pin6_voltage", float, TOTAL_INPUT_PORTS)
 GScopeChannel(s_state_pin2, "input_pin2_state", uint8_t, TOTAL_INPUT_PORTS)
 GScopeChannel(s_state_pin5, "input_pin5_state", uint8_t, TOTAL_INPUT_PORTS)
 GScopeChannel(s_state_pin6, "input_pin6_state", uint8_t, TOTAL_INPUT_PORTS)
 
+GScopeChannel(s_voltage_out_pin5, "output_pin5_voltage", float, TOTAL_OUTPUT_PORTS)
+GScopeChannel(s_voltage_out_pin6, "output_pin6_voltage", float, TOTAL_OUTPUT_PORTS)
+GScopeChannel(s_encoder_ticks, "output_encoder_ticks", uint16_t, TOTAL_OUTPUT_PORTS)
+GScopeChannel(s_pwm_value, "output_pwm", float, TOTAL_OUTPUT_PORTS)
+
 static void s_debug_update()
 {
-    static uint32_t s_timestamp;
+    static uint32_t s_input_timestamp;
+    static uint32_t s_output_timestamp;
 
     uint32_t now = hal_timer_32_ms();
 
-    if ((now - s_timestamp) >= 50)
+    if ((now - s_input_timestamp) >= 25)
     {
-        s_timestamp = now;
+        s_input_timestamp = now;
 
         float pin1_voltage[TOTAL_INPUT_PORTS];
         float pin6_voltage[TOTAL_INPUT_PORTS];
@@ -153,11 +159,34 @@ static void s_debug_update()
             pin6_voltage[i] = s_input_port[i].get_voltage_v(InputPort::PinID::PIN6);
         }
 
-        s_voltage_pin1.produce(pin1_voltage);
-        s_voltage_pin6.produce(pin6_voltage);
+        s_voltage_in_pin1.produce(pin1_voltage);
+        s_voltage_in_pin6.produce(pin6_voltage);
         s_state_pin2.produce(pin2_state);
         s_state_pin5.produce(pin5_state);
         s_state_pin6.produce(pin6_state);
+    }
+
+    if ((now - s_output_timestamp) >= 50)
+    {
+        s_output_timestamp = now;
+
+        float pin5_voltage[TOTAL_OUTPUT_PORTS];
+        float pin6_voltage[TOTAL_OUTPUT_PORTS];
+        uint16_t encoder_ticks[TOTAL_OUTPUT_PORTS];
+        float pwm_value[TOTAL_OUTPUT_PORTS];
+
+        for (int i = 0; i < TOTAL_OUTPUT_PORTS; i++)
+        {
+            pin5_voltage[i] = s_output_port[i].get_voltage(OutputPort::PinID::PIN5);
+            pin6_voltage[i] = s_output_port[i].get_voltage(OutputPort::PinID::PIN6);
+            encoder_ticks[i] = s_output_port[i].get_encoder_ticks();
+            pwm_value[i] = s_output_port[i].get_pwm_duty();
+        }
+
+        s_voltage_out_pin5.produce(pin5_voltage);
+        s_voltage_out_pin6.produce(pin6_voltage);
+        s_encoder_ticks.produce(encoder_ticks);
+        s_pwm_value.produce(pwm_value);
     }
 }
 
@@ -169,6 +198,9 @@ OutputPort& module_port_get_outpur_port(uint8_t output_id)
 
 void module_port_init()
 {
+    hal_gpio_set_pin(MOTORAB_SLEEP_N_IO);
+    hal_gpio_set_pin(MOTORCD_SLEEP_N_IO);
+
     for (int i = 0; i < TOTAL_INPUT_PORTS; i++)
     {
         s_input_port[i].init();
@@ -195,7 +227,9 @@ void module_port_update()
     s_debug_update();
 }
 
-// Debug input ports
+// -----------------------------------------------------------------------------------------
+//                                  Debug input ports
+// -----------------------------------------------------------------------------------------
 static void s_enable_9volt_output(int idx, int enable)
 {
     if (idx >= 0 && idx < TOTAL_INPUT_PORTS)
@@ -206,16 +240,16 @@ static void s_enable_9volt_output(int idx, int enable)
 }
 GScopeCommand("input_9v_enable", s_enable_9volt_output)
 
-static void s_set_pin_mode(int idx, int mode)
+static void s_set_input_mode(int idx, int mode)
 {
     if (idx >= 0 && idx < TOTAL_INPUT_PORTS &&
         mode >= 0 && mode < 5)
     {
-        s_input_port[idx].set_mode(static_cast<InputPort::ModeConfiguration>(mode));
+        s_input_port[idx].set_mode(static_cast<InputPort::Mode>(mode));
         GSDebug("Input port %d - Mode is %d", idx, mode);
     }
 }
-GScopeCommand("input_mode", s_set_pin_mode)
+GScopeCommand("input_mode", s_set_input_mode)
 
 static void s_input_mode_type()
 {
@@ -233,7 +267,7 @@ static void s_set_pin_enable(int idx, int pin, int enable)
         pin >= 5 && pin <= 6)
     {
         InputPort::PinID pinid = pin == 5 ? InputPort::PinID::PIN5 : InputPort::PinID::PIN6;
-        s_input_port[idx].set_mode(InputPort::ModeConfiguration::OUTPUT);
+        s_input_port[idx].set_mode(InputPort::Mode::OUTPUT);
         s_input_port[idx].set_gpio(pinid, enable != 0);
         GSDebug("Input port %d - Mode is %d", idx, enable);
     }
@@ -245,9 +279,41 @@ static void s_test_serial(int idx)
     static char s_test_msg[] = "Hello, this is a test message";
     if (idx >= 0 && idx < TOTAL_INPUT_PORTS)
     {
-        s_input_port[idx].set_mode(InputPort::ModeConfiguration::SERIAL);
+        s_input_port[idx].set_mode(InputPort::Mode::SERIAL);
         s_input_port[idx].uart_write((const uint8_t*)s_test_msg, sizeof(s_test_msg));
         GSDebug("Test OK");
     }
 }
 GScopeCommand("input_serial_test", s_test_serial)
+
+// -----------------------------------------------------------------------------------------
+//                                  Debug outputs ports
+// -----------------------------------------------------------------------------------------
+static void s_set_output_mode(int idx, int mode)
+{
+    if (idx >= 0 && idx < TOTAL_OUTPUT_PORTS &&
+        mode >= 0 && mode < 3)
+    {
+        s_output_port[idx].set_mode(static_cast<OutputPort::Mode>(mode));
+        GSDebug("Output port %d - Mode is %d", idx, mode);
+    }
+}
+GScopeCommand("output_mode", s_set_output_mode)
+
+static void s_output_mode_type()
+{
+    GSDebug("[0] Detect Pin");
+    GSDebug("[1] Encoder");
+    GSDebug("[2] Analog");
+}
+GScopeCommand("output_mode?", s_output_mode_type)
+
+static void s_set_output_duty(int idx, float duty)
+{
+    if (idx >= 0 && idx < TOTAL_OUTPUT_PORTS)
+    {
+        s_output_port[idx].set_pwm_duty(duty);
+        GSDebug("Output port %d - Duty is %f", idx, duty);
+    }
+}
+GScopeCommand("output_pwm", s_set_output_duty)

@@ -170,15 +170,12 @@ static void i2c_tx_rx_complete(I2C_HandleTypeDef* hi2c, bool error)
                 case I2CState::RX_MODE_DATA:
                 case I2CState::TX_MODE:
                 case I2CState::ERROR:
+                default:
                     data->state = I2CState::NONE;
                     if (data->finish_tx_cb)
                     {
                         data->finish_tx_cb(error, data->param, data->buf, data->buf_size);
                     }
-                    break;
-
-                default:
-                    assert(0);  // error
                     break;
             }
             return;

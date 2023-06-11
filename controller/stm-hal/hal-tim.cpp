@@ -134,6 +134,7 @@ void hal_tim_pwm_set_pwm(uint8_t type, float duty)
     assert(type < TIMER_TYPE_TOTAL);
 
     TimerData* data = &s_timer_data[type];
+    const TimerChannelConfig* config = &s_timer_config[type];
 
     if (duty > 1.0f)
     {
@@ -144,12 +145,19 @@ void hal_tim_pwm_set_pwm(uint8_t type, float duty)
         duty = -1.0f;
     }
 
-    // TODO! Work with negative values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    assert(duty >= 0.0);
+    float in1 = 0.0f;
+    float in2 = 0.0f;
+    if (duty >= 0)
+    {
+        in1 = duty;
+    }
+    else
+    {
+        in2 = -duty;
+    }
 
-    uint16_t new_period = duty * data->period;
-
-    __HAL_TIM_SET_AUTORELOAD(&data->handler, new_period);
+    __HAL_TIM_SET_COMPARE(&data->handler, config->channel_pri, static_cast<uint16_t>(in1 * data->period));
+    __HAL_TIM_SET_COMPARE(&data->handler, config->channel_sec, static_cast<uint16_t>(in2 * data->period));
 }
 
 void hal_tim_encoder_init(uint8_t type)

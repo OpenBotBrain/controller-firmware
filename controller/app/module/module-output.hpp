@@ -20,6 +20,7 @@ class OutputPort
 
         enum class Mode
         {
+            DETECT_PIN = 0,     // TODO: NOT WORKING DUE TO HW ISSUE!
             ENCODER,
             ANALOG,
         };
@@ -37,7 +38,21 @@ class OutputPort
         float get_voltage(PinID id);
         void set_mode(Mode mode);
         void set_pwm_duty(float duty);
+        float get_pwm_duty();
 
     private:
         const Config& m_config;
+
+        static void adc_new_sample_input5(uint16_t value, void* param);
+        static void adc_new_sample_input6(uint16_t value, void* param);
+        void convert_adc_reading_update();
+
+        uint16_t m_adc_raw_reading_input5;
+        uint16_t m_adc_raw_reading_input6;
+        float m_pin5_voltage_v;
+        float m_pin6_voltage_v;
+        float m_pwm_value;
+
+        // 4.7k and 2.4k -> 0.6619718(calc) or 0.6633819 (Measured)
+        static constexpr float ADC_TO_VOLTAGE_INPUTS = 0.0012247766;//0.00127364196f;
 };

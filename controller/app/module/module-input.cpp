@@ -29,7 +29,7 @@ void InputPort::adc_new_sample_input6(uint16_t value, void* param)
 void InputPort::init()
 {
     set_9v_output(false);
-    set_mode(ModeConfiguration::ANALOG);
+    set_mode(Mode::ANALOG);
 
     if (m_config.i2c_type != InputPort::INVALID)
     {
@@ -90,35 +90,35 @@ bool InputPort::get_gpio(PinID id)
     return false;
 }
 
-void InputPort::set_mode(ModeConfiguration mode)
+void InputPort::set_mode(Mode mode)
 {
     // as a default, digital switch needs to be disabled!, except analog mode!
     hal_gpio_reset_pin(m_config.pin6_enable_n_io);
 
     switch (mode)
     {
-        case ModeConfiguration::ANALOG:
+        case Mode::ANALOG:
             hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeOutput]);
             hal_gpio_reset_pin(m_config.pin5_io);
             hal_gpio_reset_pin(m_config.pin6_io);           // Pin 6 must be low!
             hal_gpio_set_pin(m_config.pin6_enable_n_io);    // Pin 6 must be high when using ADC
             break;
 
-        case ModeConfiguration::INPUT:
+        case Mode::INPUT:
             hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeInput]);
             break;
 
-        case ModeConfiguration::OUTPUT:
+        case Mode::OUTPUT:
             hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeOutput]);
             hal_gpio_reset_pin(m_config.pin5_io);
             hal_gpio_reset_pin(m_config.pin6_io);
             break;
 
-        case ModeConfiguration::SERIAL:
+        case Mode::SERIAL:
             hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeSerial]);
             break;
 
-        case ModeConfiguration::I2C:
+        case Mode::I2C:
             hal_gpio_configure_io(m_config.pin56_mode[Pin56ModeI2C]);
             break;
     }

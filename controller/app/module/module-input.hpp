@@ -30,7 +30,7 @@ class InputPort
             uint8_t i2c_type;
         };
 
-        enum class ModeConfiguration : uint8_t
+        enum class Mode : uint8_t
         {
             ANALOG = 0,     // Only PIN6 will work as ANALOG!
             INPUT,
@@ -57,7 +57,7 @@ class InputPort
         float get_voltage_v(PinID id);
         bool get_gpio(PinID id);
 
-        void set_mode(ModeConfiguration mode);
+        void set_mode(Mode mode);
         void set_gpio(PinID id, bool enable);
         void set_9v_output(bool enable);
         bool uart_write(const uint8_t* data, uint16_t size);
@@ -86,6 +86,6 @@ class InputPort
         static void adc_new_sample_input6(uint16_t, void*);
         static void i2c_finish(bool, void*, uint8_t*, uint16_t);
 
-        static constexpr float ADC_TO_VOLTAGE_INPUTS = 0.00127364196f;
-
+        // 4.7k and 2.4k -> 0.6619718(calc) or 0.6633819 (Measured)
+        static constexpr float ADC_TO_VOLTAGE_INPUTS = 0.0012247766;//0.00127364196f;
 };
