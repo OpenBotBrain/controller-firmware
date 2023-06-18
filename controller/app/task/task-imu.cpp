@@ -7,6 +7,7 @@
 #include <stm-hal/hal-tim.hpp>
 #include <stm-hal/hal-spi.hpp>
 #include <system/system-freertos.hpp>
+#include <complementary-filter/complementary-filter.hpp>
 
 static TaskHandle_t s_task_handler;
 static SemaphoreHandle_t s_wait_tx_finish;
@@ -15,8 +16,11 @@ static SemaphoreHandle_t s_wait_tx_finish;
 static uint8_t s_tx_buffer[16];
 static uint8_t s_rx_buffer[16];
 
-GScopeChannel(s_accelerometer, "imu_accel", float, LSM6DS::TOTAL_AXIS)
-GScopeChannel(s_gyro, "imu_gyro", float, LSM6DS::TOTAL_AXIS)
+GScopeChannel(s_accelerometer, "imu_accel_n2m", float, LSM6DS::TOTAL_AXIS)
+GScopeChannel(s_gyro, "imu_gyro_dps", float, LSM6DS::TOTAL_AXIS)
+GScopeChannel(s_gyro_integrated, "imu_gyro_integrated_rad", float, LSM6DS::TOTAL_AXIS)
+GScopeChannel(s_gyro_omega, "imu_gyro_omega_rad_s", float, LSM6DS::TOTAL_AXIS)
+GScopeChannel(s_imu_roll_pitch, "imu_roll_pitch", float, 2)
 
 static void s_set_chip_select(bool enable)
 {
@@ -67,25 +71,40 @@ static constexpr LSM6DS::Config s_imu_config =
 };
 
 static LSM6DS s_imu(s_imu_config);
-
-static void as_imu_debug_update()
-{
-    float data[LSM6DS::TOTAL_AXIS];
-    s_imu.get_acceleration(data);
-    s_accelerometer.produce(data);
-    s_imu.get_gyro(data);
-    s_gyro.produce(data);
-}
+static ComplementaryFilter s_complementary_filter;
 
 static void s_imu_thread(void*)
 {
+    static float accel[LSM6DS::TOTAL_AXIS];
+    static float gyro[LSM6DS::TOTAL_AXIS];
+    static uint32_t s_timestamp_us;
+
     s_imu.init();
 
     while(1)
     {
+        uint32_t now = hal_timer_32_us();
+        uint32_t elapse = now - s_timestamp_us;
+        s_timestamp_us = now;
+
         s_imu.update();
 
-        as_imu_debug_update();
+        s_imu.get_acceleration(accel);
+        s_imu.get_gyro(gyro);
+
+        // Produce raw accelerometer and gyro values
+        s_accelerometer.produce(accel);
+        s_gyro.produce(gyro);
+
+        s_complementary_filter.update(accel, gyro, static_cast<float>(elapse) * 1e-6);
+
+        // Produce some output of the complementary filter
+        s_gyro_integrated.produce(s_complementary_filter.get_integrated_gyro_rad());
+        s_gyro_omega.produce(s_complementary_filter.get_angular_speed_rad_s());
+
+        float roll_pitch[2];
+        s_complementary_filter.get_roll_pitch(roll_pitch);
+        s_imu_roll_pitch.produce(roll_pitch);
 
         vTaskDelay(5);
     }
@@ -107,4 +126,6 @@ void task_imu_init()
     s_wait_tx_finish = xSemaphoreCreateBinaryStatic(&s_wait_ts_sem);
 
     hal_spi_init(SPI_TYPE_IMU_FLASH, s_spi_end_callback, nullptr);
+
+    s_complementary_filter.init();
 }

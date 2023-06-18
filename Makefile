@@ -237,6 +237,18 @@ all_source_path += $(lsm6ds_path)/src
 
 CXXSRC+=lsm6dsl.cpp
 
+# Library - Submodule Files - Source and Include
+bla_path := $(library_path)/basic-linear-algebra
+board_include_paths += -I$(bla_path)/include/
+
+# Library - Submodule Files - Source and Include
+cf_path := $(library_path)/complementary-filter
+board_include_paths += -I$(cf_path)/include/
+all_source_path += $(cf_path)/src
+
+CXXSRC+=complementary-filter.cpp
+
+
 # ------------------------------------------------------------------------------------------
 # Library - Submodule Files - Source and Include
 all_source_path += $(library_path)/ssd1306/src
