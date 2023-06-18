@@ -25,7 +25,6 @@ class ComplementaryFilter
 
     private:
         float m_integrated_gyro_rad[TOTAL_AXIS];
-        float m_integrated_gyro_rad_last[TOTAL_AXIS];
         float m_gravity_magnitude_m2s {9.8};
         float m_omega_magnitude {0};
         float m_angular_speed_rad_s[TOTAL_AXIS];
@@ -35,7 +34,7 @@ class ComplementaryFilter
 
         void integrate_value_update(float* gyro_dps, float period_s);
         void gravity_magnitude_update(float new_val);
-        void angular_velocity_update(float period_s);
+        void angular_velocity_update(float* gyro_dps);
         float get_filter_pole(float accel_magnitude);
         float get_module(float* data);
 };

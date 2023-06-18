@@ -15,12 +15,10 @@ void ComplementaryFilter::integrate_value_update(float* gyro_dps, float period_s
         if (m_integrated_gyro_rad[i] > PI)
         {
             m_integrated_gyro_rad[i] -= 2*PI;
-            m_integrated_gyro_rad_last[i] -= 2*PI;
         }
         else if (m_integrated_gyro_rad[i] < -PI)
         {
             m_integrated_gyro_rad[i] += 2*PI;
-            m_integrated_gyro_rad_last[i] += 2*PI;
         }
     }
 }
@@ -41,12 +39,11 @@ void ComplementaryFilter::gravity_magnitude_update(float new_val)
     m_gravity_magnitude_m2s = GRAVITY_POLE * (m_gravity_magnitude_m2s) + ( 1.0f - GRAVITY_POLE ) * new_val;
 }
 
-void ComplementaryFilter::angular_velocity_update(float period_s)
+void ComplementaryFilter::angular_velocity_update(float* gyro_dps)
 {
     for (int i = 0; i < TOTAL_AXIS; i++)
     {
-        m_angular_speed_rad_s[i] = (m_integrated_gyro_rad[i] - m_integrated_gyro_rad_last[i]) * period_s;
-        m_integrated_gyro_rad_last[i] = m_integrated_gyro_rad[i];
+        m_angular_speed_rad_s[i] = gyro_dps[i] * DEG_TO_RAD;
     }
 }
 
@@ -81,7 +78,6 @@ void ComplementaryFilter::init()
     for (int i = 0; i < TOTAL_AXIS; i++)
     {
         m_integrated_gyro_rad[i] = 0.0f;
-        m_integrated_gyro_rad_last[i] = 0.0f;
         m_angular_speed_rad_s[i] = 0.0f;
     }
 }
@@ -95,8 +91,8 @@ void ComplementaryFilter::update(float* accel_m2s, float* gyro_dps, float dt_s)
     float accel_module = get_module(accel_m2s);
     gravity_magnitude_update(accel_module);
 
-    // Estimate the angular speed with no offset
-    angular_velocity_update(dt_s);
+    // Estimate the angular in rad/s
+    angular_velocity_update(gyro_dps);
 
     // Get the current pole that we need to use depending on system noise
     float k = get_filter_pole(accel_module);
