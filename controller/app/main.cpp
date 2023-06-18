@@ -4,6 +4,7 @@
 #include <task/task-blinky.hpp>
 #include <task/task-display.hpp>
 #include <task/task-gscope.hpp>
+#include <task/task-imu.hpp>
 #include <task/task-ports.hpp>
 #include <task/task-power-supply.hpp>
 
@@ -20,6 +21,8 @@ int main(void)
     task_ports_init();              // Init main task ports (motor pids, and regular work)
 
     task_display_init();            // Init main display task
+
+    task_imu_init();                // Init Inertial measurement unit task
 
     vTaskStartScheduler();          // Start RTOS
 

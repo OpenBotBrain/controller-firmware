@@ -55,3 +55,68 @@ void hal_spi_init(uint8_t type, FinishSPICb cb, void* param)
     HAL_NVIC_SetPriority(config->irq_type, config->irq_priority, 0);
     HAL_NVIC_EnableIRQ(config->irq_type);
 }
+
+bool hal_spi_transmit_receive(uint8_t type, uint8_t* tx_buff, uint8_t* rx_buff, uint32_t size)
+{
+    assert(type < SPI_TOTAL);
+    SPIData& data = s_spi_data[type];
+
+    bool ret = HAL_SPI_TransmitReceive_IT(&data.handler, tx_buff, rx_buff, size) == HAL_OK;
+
+    if (!ret)
+    {
+        HAL_SPI_Abort_IT(&data.handler);
+    }
+
+    return ret;
+}
+
+static void s_spi_tx_rx_complete(SPI_HandleTypeDef* hspi)
+{
+    for (int i = 0; i < SPI_TOTAL; i++)
+    {
+        SPIData& data = s_spi_data[i];
+
+        if (&data.handler == hspi)
+        {
+            if (data.cb != nullptr)
+            {
+                data.cb(data.param);
+            }
+            return;
+        }
+    }
+}
+
+static SPI_HandleTypeDef* s_get_handler(SPI_TypeDef* spi)
+{
+    for (int i = 0; i < SPI_TOTAL; i++)
+    {
+        if (spi == s_spi_data[i].handler.Instance)
+        {
+            return &s_spi_data[i].handler;
+        }
+    }
+    return nullptr;
+}
+
+extern "C"
+{
+
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    s_spi_tx_rx_complete(hspi);
+}
+
+void SPI1_IRQHandler(void)
+{
+    HAL_SPI_IRQHandler(s_get_handler(SPI1));
+}
+
+void SPI2_IRQHandler(void)
+{
+    HAL_SPI_IRQHandler(s_get_handler(SPI2));
+}
+
+
+}

@@ -95,6 +95,7 @@ CXXSRC+=system-version.cpp
 CXXSRC+=task-blinky.cpp
 CXXSRC+=task-display.cpp
 CXXSRC+=task-gscope.cpp
+CXXSRC+=task-imu.cpp
 CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
 
@@ -228,6 +229,13 @@ board_include_paths += -I$(bq25601_path)/include/
 all_source_path += $(bq25601_path)/src
 
 CXXSRC+=bq25601.cpp
+
+# Library - Submodule Files - Source and Include
+lsm6ds_path := $(library_path)/lsm6dsl
+board_include_paths += -I$(lsm6ds_path)/include/
+all_source_path += $(lsm6ds_path)/src
+
+CXXSRC+=lsm6dsl.cpp
 
 # ------------------------------------------------------------------------------------------
 # Library - Submodule Files - Source and Include

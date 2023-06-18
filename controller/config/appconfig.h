@@ -23,6 +23,9 @@
 #define PRI_PORTS                           5
 #define SIZE_PORTS                          256
 
+#define PRI_IMU                             6
+#define SIZE_IMU                            256
+
 // -------------------------- Hardware Interruptions -----------------------
 #define PRI_HARD_EXTI                       7   // External interruptions IO
 #define PRI_HARD_LPUART1                    8   // lpuart 1 for debug
