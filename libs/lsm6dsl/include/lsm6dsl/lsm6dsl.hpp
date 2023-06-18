@@ -34,7 +34,9 @@ class LSM6DS
         float m_acceleration[TOTAL_AXIS];
         float m_gyro[TOTAL_AXIS];
         bool m_init_success {false};
-        float m_val_to_nm2 {0.0};
+        float m_acel_val_to_nm2 {0.0};  // newton per square meter
+        float m_gyro_val_to_dps {0.0};  // degree per seconds
+
 
         bool read(uint8_t reg, uint8_t& data);
         bool write(uint8_t reg, uint8_t data);
