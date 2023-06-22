@@ -606,7 +606,6 @@ void BQ25601::update()
         get_charger_type(m_data.charger_type);
 
         m_data.timestamp = now;
-
         m_update_timestamp = now;
     }
 

@@ -2,6 +2,7 @@
 #include <stm-hal/hal-tim.hpp>
 #include <stm-hal/hal-gpio.hpp>
 #include <gscope/gscope.hpp>
+#include <system/system-battery.hpp>
 
 enum AdcSampleType
 {
@@ -16,8 +17,10 @@ enum AdcSampleType
 static uint16_t s_raw_adc[ADC_TYPE_TOTAL];
 static float s_rail_voltage[ADC_TYPE_TOTAL];
 static uint32_t s_timestamp;
+static BatteryConversion s_batery_conversion;
 
 GScopeChannel(s_voltage_debug, "voltage", float, ADC_TYPE_TOTAL)
+GScopeChannel(s_bat_charge, "battery_charge", float, 1)
 
 static void s_3v3_sample(uint16_t value, void*)
 {
@@ -73,7 +76,7 @@ void system_status_update()
     s_rail_voltage[ADC_TYPE_5V] = static_cast<float>(s_raw_adc[ADC_TYPE_5V]) / 620.45f;
     s_rail_voltage[ADC_TYPE_9V] = static_cast<float>(s_raw_adc[ADC_TYPE_9V]) / 314.9515f;
     s_rail_voltage[ADC_TYPE_VBUS] = static_cast<float>(s_raw_adc[ADC_TYPE_VBUS]) / 203.4277;
-    s_rail_voltage[ADC_TYPE_VBAT] = static_cast<float>(s_raw_adc[ADC_TYPE_VBAT]) / 818.27f;
+    s_rail_voltage[ADC_TYPE_VBAT] = static_cast<float>(s_raw_adc[ADC_TYPE_VBAT]) * 0.0012367556f;   // +1.2%
 
     uint32_t now = hal_timer_32_ms();
 
@@ -82,4 +85,8 @@ void system_status_update()
         s_timestamp = now;
         s_voltage_debug.produce(s_rail_voltage);
     }
+
+    s_batery_conversion.update_new_value(s_rail_voltage[ADC_TYPE_VBAT]);
+    float bat_charge = s_batery_conversion.get_charge();
+    s_bat_charge.produce(&bat_charge);
 }

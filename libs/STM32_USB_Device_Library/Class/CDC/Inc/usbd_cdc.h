@@ -78,7 +78,6 @@ extern "C" {
 #define CDC_GET_LINE_CODING                         0x21U
 #define CDC_SET_CONTROL_LINE_STATE                  0x22U
 #define CDC_SEND_BREAK                              0x23U
-
 /**
   * @}
   */
