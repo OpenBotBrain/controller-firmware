@@ -34,13 +34,13 @@ controller-firmware
 
 2. `$ sudo apt-get install build-essential && apt-get install git`
 
-3. Download ARM GCC toolchain from [here](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads). You should have this file or equivalent in the system ready to be installed or extracted **gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2**. `wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-win32.zip?revision=9b83e69c-e279-4d16-9401-990c836197b3?product=GNU%20Arm%20Embedded%20Toolchain,ZIP,,Windows,7-2018-q2-update`
+3. Download ARM GCC toolchain from [here](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads). You should have this file or equivalent in the system ready to be installed or extracted **gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2**. `wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2`
 
-4. Uncompressed file. `tar -xvjf gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2`
+4. Uncompressed file. `tar -xvjf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2`
 
 5. Make new dir where toolchain will live. `sudo mkdir /opt/arm-toolchain/`
 
-6. Copy toolchain to default project folder. `sudo mv ./gcc-arm-none-eabi-7-2018-q2-update /opt/arm-toolchain/gcc-arm-none-eabi-7-2018-q2-update`
+6. Copy toolchain to default project folder. `sudo mv ./gcc-arm-none-eabi-9-2019-q4-major /opt/arm-toolchain/gcc-arm-none-eabi-9-2019-q4-major`
 
 7. Congratulation!!!  You should be able to clone an compile this project by typing **make -j8** and clean by typing **make clean** on project root folder.
 
