@@ -90,6 +90,7 @@ CXXSRC+=system-freertos.cpp
 CXXSRC+=system-status.cpp
 CXXSRC+=system-safe-i2c.cpp
 CXXSRC+=system-version.cpp
+CXXSRC+=system-led-rgb.cpp
 
 # Task
 CXXSRC+=task-blinky.cpp
@@ -98,6 +99,7 @@ CXXSRC+=task-gscope.cpp
 CXXSRC+=task-imu.cpp
 CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
+CXXSRC+=task-rainbow.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp

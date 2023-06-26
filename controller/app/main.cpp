@@ -7,10 +7,13 @@
 #include <task/task-imu.hpp>
 #include <task/task-ports.hpp>
 #include <task/task-power-supply.hpp>
+#include <task/task-rainbow.hpp>
 
 int main(void)
 {
     board_rev_init();               // Init board revision, IOs and clock configuration
+    
+    task_rainbow_init();            // Init rainbow task.
 
     task_blinky_init();             // Init main blinky task.
 
