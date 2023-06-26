@@ -18,7 +18,8 @@ static SemaphoreHandle_t s_wait_tx_finish;
 static bool s_rtos_on = false;
 static uint8_t s_local_rx_buffer[128];
 static uint8_t s_fragmented_rx_buffer[128];
-static ConnectionType s_connection_type = ConnectionType::SERIAL;
+static ConnectionType s_connection_type = ConnectionType::USB;
+static bool s_send_data(const uint8_t* data, uint32_t size);
 
 static bool s_buffer_lock(void)
 {
@@ -38,19 +39,6 @@ static void s_finish_sending_data(void*)
     system_freertos_semaphore_give(s_wait_tx_finish);
 }
 
-static bool s_send_data(const uint8_t* data, uint32_t size)
-{
-    if (s_connection_type == ConnectionType::SERIAL)
-    {
-        hal_uart_write(UART_TYPE_DEBUG_SERIAL, data, size);
-        return system_freertos_semaphore_take(s_wait_tx_finish, 200);
-    }
-    else
-    {
-        return hal_usb_transmitte(data, size, nullptr, nullptr);
-    }
-}
-
 static constexpr uint32_t RING_BUFFER_SIZE = 4096;
 static uint8_t s_ring_buffer[RING_BUFFER_SIZE];
 static constexpr GScope::SerialConfig s_serial_config =
@@ -63,6 +51,30 @@ static constexpr GScope::SerialConfig s_serial_config =
 };
 
 static GScope s_gscope(s_serial_config, system_version_get_version);
+
+static bool s_send_data(const uint8_t* data, uint32_t size)
+{
+    if (s_connection_type == ConnectionType::SERIAL)
+    {
+        hal_uart_write(UART_TYPE_DEBUG_SERIAL, data, size);
+        return system_freertos_semaphore_take(s_wait_tx_finish, 200);
+    }
+    else
+    {
+        static int s_fail_counter = 0;
+        if (hal_usb_transmitte(data, size, nullptr, nullptr))
+        {
+            s_fail_counter = 0;
+            return true;
+        }
+        if (s_fail_counter++ >= 10)
+        {
+            s_fail_counter = 0;
+            s_gscope.enable_transmission(false);    // to many fail, shut down the lib now
+        }
+        return false;
+    }
+}
 
 static void s_gscope_thread(void*)
 {
@@ -92,10 +104,8 @@ static void s_gscope_thread(void*)
         }
 
         // Update main routine, if return true, we should keep updating information
-        if (!s_gscope.update())
-        {
-            vTaskDelay(5);
-        }
+        s_gscope.update();
+        vTaskDelay(5);
     }
 }
 
@@ -119,5 +129,34 @@ void task_gscope_init()
 
     hal_uart_init(UART_TYPE_DEBUG_SERIAL, s_finish_sending_data, nullptr);
 
-    s_gscope.enable_transmission(true);
+    s_gscope.enable_transmission(false);
+}
+
+
+#include <stdio.h>
+#include <stdarg.h>
+extern "C"
+{
+bool GSDebug2(const char* p_string, ...)
+{
+    static constexpr int PRINT_BUFFER_SIZE = 128;
+    bool ret;
+    va_list args;
+    va_start(args, p_string);
+
+    if (s_gscope.is_enabled())
+    {
+        ret = GSDebug(p_string, args);
+    }
+    else
+    {
+        uint8_t pbug[PRINT_BUFFER_SIZE + 2];
+        int size = vsnprintf((char*)pbug, PRINT_BUFFER_SIZE, p_string, args);
+        pbug[size++] = '\r';
+        pbug[size++] = '\n';
+        ret = s_send_data(pbug, size);
+    }
+    va_end(args);
+    return ret;
+}
 }

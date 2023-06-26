@@ -19,7 +19,7 @@ static float s_rail_voltage[ADC_TYPE_TOTAL];
 static uint32_t s_timestamp;
 static BatteryConversion s_batery_conversion;
 
-GScopeChannel(s_voltage_debug, "voltage", float, ADC_TYPE_TOTAL)
+GScopeChannel(s_voltage_debug, "board_voltage", float, ADC_TYPE_TOTAL)
 GScopeChannel(s_bat_charge, "battery_charge", float, 1)
 
 static void s_3v3_sample(uint16_t value, void*)

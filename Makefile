@@ -98,6 +98,7 @@ CXXSRC+=task-gscope.cpp
 CXXSRC+=task-imu.cpp
 CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
+CXXSRC+=task-update.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp

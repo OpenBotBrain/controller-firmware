@@ -7,6 +7,7 @@
 #include <task/task-imu.hpp>
 #include <task/task-ports.hpp>
 #include <task/task-power-supply.hpp>
+#include <task/task-update.hpp>
 
 int main(void)
 {
@@ -20,9 +21,11 @@ int main(void)
 
     task_ports_init();              // Init main task ports (motor pids, and regular work)
 
-    task_display_init();            // Init main display task
+    // task_display_init();            // Init main display task
 
     task_imu_init();                // Init Inertial measurement unit task
+
+    task_update_init();             // Init general system update
 
     vTaskStartScheduler();          // Start RTOS
 

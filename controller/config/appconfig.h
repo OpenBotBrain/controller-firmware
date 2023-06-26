@@ -23,7 +23,10 @@
 #define PRI_PORTS                           5
 #define SIZE_PORTS                          256
 
-#define PRI_IMU                             6
+#define PRI_UPDATE                          6
+#define SIZE_UPDATE                         256
+
+#define PRI_IMU                             7
 #define SIZE_IMU                            256
 
 // -------------------------- Hardware Interruptions -----------------------

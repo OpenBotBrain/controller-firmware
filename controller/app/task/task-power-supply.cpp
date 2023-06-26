@@ -9,6 +9,7 @@
 
 static TaskHandle_t s_task_handler;
 GScopeChannel(s_charger_status, "charger_status", uint8_t, 5)
+GScopeChannel(s_charger_connected, "charger_connected", uint8_t, 1)
 
 static void s_new_notification(BQ25601::Notification notification)
 {
@@ -17,7 +18,7 @@ static void s_new_notification(BQ25601::Notification notification)
     switch(notification)
     {
         default:
-            return;
+            break;
         case BQ25601::Notification::STATUS_INIT_SUCCESS:
             noty = "S: Init success";
             break;
@@ -101,6 +102,9 @@ static void s_charger_debug_produce()
             GSDebug("[CHARGER] Input power is %s", power_good ? "Connected" : "Disconnected");
         }
 
+        uint8_t data = power_good;
+        s_charger_connected.produce(&data);
+
         // indicate some charging states
         static uint8_t s_last_charging_status = 0;
         uint8_t chargin_status = (charger_data.system_status_register & BQ25601_REG_SS_CHRG_STAT_MASK) >> BQ25601_REG_SS_CHRG_STAT_SHIFT;
@@ -160,8 +164,6 @@ static void s_blinky_thread(void*)
         s_bq25601.update();
 
         s_charger_debug_produce();
-
-        system_status_update();
 
         s_check_shutdown_update();
 
