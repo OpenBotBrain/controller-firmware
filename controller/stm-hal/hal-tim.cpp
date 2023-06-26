@@ -20,6 +20,10 @@ static TIM_HandleTypeDef s_tim6;    // ADC Timer
 static TIM_HandleTypeDef s_tim7;    // us timer
 static uint16_t s_timer15_local_counter = 0;
 
+static TimerUpdateCb s_timer_neoled_update_cb = nullptr;
+static TIM_HandleTypeDef s_tim5;
+static void* s_neoled_param;
+
 static void adc_timer_init()
 {
     __HAL_RCC_TIM6_CLK_ENABLE();
@@ -72,6 +76,7 @@ void hal_tim_init_default(const BoardSpecificConfig* board_config)
     __HAL_RCC_TIM2_CLK_ENABLE();
     __HAL_RCC_TIM3_CLK_ENABLE();
     __HAL_RCC_TIM4_CLK_ENABLE();
+    __HAL_RCC_TIM5_CLK_ENABLE();
     __HAL_RCC_TIM7_CLK_ENABLE();
     __HAL_RCC_TIM8_CLK_ENABLE();
     __HAL_RCC_TIM15_CLK_ENABLE();
@@ -246,6 +251,52 @@ uint32_t hal_tim_encoder_get_tick(uint8_t type)
     return __HAL_TIM_GET_COUNTER(&data->handler);
 }
 
+static uint16_t s_period[2];
+void hal_tim_neoled_init(uint32_t frequency, TimerUpdateCb cb, void* param)
+{
+    s_timer_neoled_update_cb = cb;
+    s_neoled_param = param;
+
+    s_tim5.Instance = TIM5;
+    s_tim5.Init.Prescaler = 0;
+    s_tim5.Init.CounterMode = TIM_COUNTERMODE_UP;
+    s_tim5.Init.Period = HAL_RCC_GetPCLK1Freq() / frequency;
+    s_tim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    assert (HAL_TIM_Base_Init(&s_tim5) == HAL_OK);
+
+    s_period[1] = s_tim5.Init.Period * 0.3f;    // high
+    s_period[0] = s_tim5.Init.Period * 0.6f;    // low
+
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    assert(HAL_TIMEx_MasterConfigSynchronization(&s_tim5, &sMasterConfig) == HAL_OK);
+
+    assert(HAL_TIM_OC_Init(&s_tim5) == HAL_OK);
+
+    TIM_OC_InitTypeDef sConfigOC = {0};
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 0;
+    assert(HAL_TIM_OC_ConfigChannel(&s_tim5, &sConfigOC, TIM_CHANNEL_3) == HAL_OK);
+
+    hal_tim_neoled_set_reset();
+    HAL_TIM_OC_Start(&s_tim5, TIM_CHANNEL_3);
+
+    HAL_NVIC_SetPriority(TIM5_IRQn, PRI_HARD_TIM5, 0);    // High priority!
+    HAL_NVIC_EnableIRQ(TIM5_IRQn);
+    __HAL_TIM_ENABLE_IT(&s_tim5, TIM_IT_UPDATE);
+}
+
+void hal_tim_neoled_set_on(bool on)
+{
+    __HAL_TIM_SET_COMPARE(&s_tim5, TIM_CHANNEL_3, s_period[(int)on]);
+}
+
+void hal_tim_neoled_set_reset()
+{
+    __HAL_TIM_SET_COMPARE(&s_tim5, TIM_CHANNEL_3, 0);
+}
+
 uint32_t hal_timer_32_ms(void)
 {
     return s_timer_ms_cnt;
@@ -273,6 +324,20 @@ extern "C"
             __HAL_TIM_CLEAR_IT(&s_tim7, TIM_IT_UPDATE);
             __HAL_TIM_CLEAR_FLAG(&s_tim7, TIM_FLAG_UPDATE);
             s_timer_us_cnt += 65536;
+        }
+    }
+
+    void TIM5_IRQHandler()
+    {
+        if (__HAL_TIM_GET_FLAG(&s_tim5, TIM_FLAG_UPDATE) != RESET &&
+            __HAL_TIM_GET_IT_SOURCE(&s_tim5, TIM_IT_UPDATE) != RESET)
+        {
+            __HAL_TIM_CLEAR_IT(&s_tim5, TIM_IT_UPDATE);
+            __HAL_TIM_CLEAR_FLAG(&s_tim5, TIM_FLAG_UPDATE);
+            if (s_timer_neoled_update_cb != nullptr)
+            {
+                s_timer_neoled_update_cb(s_neoled_param);
+            }
         }
     }
 

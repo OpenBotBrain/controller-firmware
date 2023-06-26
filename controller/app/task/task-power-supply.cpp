@@ -183,8 +183,6 @@ void task_power_supply_init()
 
     system_safe_i2c_init();
 
-    system_status_init();
-
     hal_exti_init(BM_NIRQ_IO, TriggerType::FALLING, s_charger_irq_callback, nullptr);
 }
 
