@@ -182,7 +182,7 @@ static constexpr UartChannelConfig s_uart_config[UART_TYPE_TOTAL] =
     { UART_TYPE_PORT_INPUT_2, UART4,   115200, DMA2_Channel3, DMA_REQUEST_2, DMA2_Channel3_IRQn, nullptr,       0,             (IRQn_Type)0,       PRI_HARD_PORT_UART, UART4_IRQn   },
     { UART_TYPE_PORT_INPUT_3, USART2,  115200, DMA1_Channel7, DMA_REQUEST_2, DMA1_Channel7_IRQn, DMA1_Channel6, DMA_REQUEST_2, DMA1_Channel6_IRQn, PRI_HARD_PORT_UART, USART2_IRQn  },
     { UART_TYPE_PORT_INPUT_4, USART1,  115200, DMA1_Channel4, DMA_REQUEST_2, DMA1_Channel4_IRQn, DMA1_Channel5, DMA_REQUEST_2, DMA1_Channel5_IRQn, PRI_HARD_PORT_UART, USART1_IRQn  },
-    { UART_TYPE_PORT_RPI,     UART5,   921600, DMA2_Channel1, DMA_REQUEST_2, DMA2_Channel1_IRQn, DMA2_Channel2, DMA_REQUEST_2, DMA2_Channel2_IRQn, PRI_HARD_RPI_UART,  UART5_IRQn   },
+    { UART_TYPE_PORT_RPI,     UART5,   921600, DMA2_Channel1, DMA_REQUEST_2, DMA2_Channel1_IRQn, nullptr,       0,             (IRQn_Type)0,       PRI_HARD_RPI_UART,  UART5_IRQn   },
 };
 
 static constexpr TimerChannelConfig s_timer_config[TIMER_TYPE_TOTAL] =

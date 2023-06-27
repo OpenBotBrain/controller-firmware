@@ -1,38 +1,46 @@
 #include <stm-hal/hal-tim.hpp>
 #include <stm-hal/hal-gpio.hpp>
 #include <cstdlib>
+#include <gscope/gscope.hpp>
 
 // IN-PI554FCH - https://www.inolux-corp.com/datasheet/SMDLED/Addressable%20LED/IN-PI554FCH.pdf
-static uint32_t s_rgb[] = {5000, 8000, 9000};
-static int s_bit_cnt = 0;
 
-static void s_timer_update_callback(void*)
+static constexpr int TOTAL_BITS = 24 * 3;
+static uint8_t s_rgb_timer_on_off_periods[2];
+static uint8_t s_rgb_timer_data[24 * 4] = {0};
+
+static void s_timer_transfer_finish_callback(void*)
 {
-    int offset = s_bit_cnt / 24;
-    int bit = s_bit_cnt % 24;
-    if (offset >= 2)
-    {
-        if (bit >= 23)
-        {
-            s_bit_cnt = 0;
-        }
-        else
-        {
-            s_bit_cnt++;
-            hal_tim_neoled_set_reset();
-        }
-    }
-    else
-    {
-        bool enable = s_rgb[offset] & bit;
-        hal_tim_neoled_set_on(enable);
-        s_bit_cnt++;
-    }
+    // TODO
 }
+
+void system_neoled_load_rgb(float r, float g, float b)
+{
+    uint32_t rgb[3];
+    uint32_t max = (1<<23);
+
+    rgb[0] = max * r;
+    rgb[1] = max * g;
+    rgb[2] = max * b;
+
+    for (int bit_cnt = 0; bit_cnt < TOTAL_BITS; bit_cnt++)
+    {
+        int offset = bit_cnt / 24;
+        int bit = bit_cnt % 24;
+
+        uint8_t enable = (rgb[offset] & bit) != 0 ? 1 : 0;
+        s_rgb_timer_data[bit_cnt] = s_rgb_timer_on_off_periods[enable]; // TODO, THIS IS NOTSAFE
+    }
+
+    hal_timer_neoled_start_dma_transfer(s_rgb_timer_data, TOTAL_BITS);
+}
+GScopeCommand("set_led_pwm", system_neoled_load_rgb)
 
 void system_neoled_init()
 {
-    hal_tim_neoled_init(10000, s_timer_update_callback,  nullptr);
+    uint32_t timer_cnt_frequency = hal_tim_neoled_init(s_timer_transfer_finish_callback,  nullptr);
+    s_rgb_timer_on_off_periods[0] = timer_cnt_frequency * 0.0000003f;   // 0
+    s_rgb_timer_on_off_periods[1] = timer_cnt_frequency * 0.0000006f;   // 1
 }
 
 void system_neoled_update()
@@ -42,8 +50,7 @@ void system_neoled_update()
 
     if ((now - s_timestamp) >= 1000)
     {
-        s_rgb[0] = std::rand();
-        s_rgb[1] = std::rand();
-        s_rgb[2] = std::rand();
+        s_timestamp = now;
+        system_neoled_load_rgb(std::rand(), std::rand(), std::rand());
     }
 }

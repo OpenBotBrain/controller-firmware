@@ -24,7 +24,9 @@ void hal_tim_pwm_set_pwm(uint8_t type, float duty);
 void hal_tim_encoder_init(uint8_t type);
 uint32_t hal_tim_encoder_get_tick(uint8_t type);
 
-void hal_tim_neoled_init(uint32_t frequency, TimerUpdateCb cb, void* param);
+uint32_t hal_tim_neoled_init(TimerUpdateCb cb, void* param);
+void hal_timer_neoled_start_dma_transfer(uint8_t* data, uint32_t size);
+
 void hal_tim_neoled_set_on(bool on);
 void hal_tim_neoled_set_reset();
 

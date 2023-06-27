@@ -20,8 +20,9 @@ static TIM_HandleTypeDef s_tim6;    // ADC Timer
 static TIM_HandleTypeDef s_tim7;    // us timer
 static uint16_t s_timer15_local_counter = 0;
 
-static TimerUpdateCb s_timer_neoled_update_cb = nullptr;
 static TIM_HandleTypeDef s_tim5;
+DMA_HandleTypeDef s_hdma_tim5_ch3_up;
+static TimerUpdateCb s_timer_neoled_update_cb = nullptr;
 static void* s_neoled_param;
 
 static void adc_timer_init()
@@ -251,45 +252,67 @@ uint32_t hal_tim_encoder_get_tick(uint8_t type)
     return __HAL_TIM_GET_COUNTER(&data->handler);
 }
 
-static uint16_t s_period[2];
-void hal_tim_neoled_init(uint32_t frequency, TimerUpdateCb cb, void* param)
+static uint32_t s_timer_cnt_frequency;
+uint32_t hal_tim_neoled_init(TimerUpdateCb cb, void* param)
 {
     s_timer_neoled_update_cb = cb;
     s_neoled_param = param;
 
+    s_timer_cnt_frequency = HAL_RCC_GetPCLK1Freq();
     s_tim5.Instance = TIM5;
     s_tim5.Init.Prescaler = 0;
     s_tim5.Init.CounterMode = TIM_COUNTERMODE_UP;
-    s_tim5.Init.Period = HAL_RCC_GetPCLK1Freq() / frequency;
+    s_tim5.Init.Period = s_timer_cnt_frequency / 800000;
     s_tim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    assert (HAL_TIM_Base_Init(&s_tim5) == HAL_OK);
-
-    s_period[1] = s_tim5.Init.Period * 0.3f;    // high
-    s_period[0] = s_tim5.Init.Period * 0.6f;    // low
+    assert (HAL_TIM_PWM_Init(&s_tim5) == HAL_OK);
 
     TIM_MasterConfigTypeDef sMasterConfig = {0};
     sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     assert(HAL_TIMEx_MasterConfigSynchronization(&s_tim5, &sMasterConfig) == HAL_OK);
 
-    assert(HAL_TIM_OC_Init(&s_tim5) == HAL_OK);
-
     TIM_OC_InitTypeDef sConfigOC = {0};
     sConfigOC.OCMode = TIM_OCMODE_PWM1;
     sConfigOC.Pulse = 0;
-    assert(HAL_TIM_OC_ConfigChannel(&s_tim5, &sConfigOC, TIM_CHANNEL_3) == HAL_OK);
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    assert (HAL_TIM_PWM_ConfigChannel(&s_tim5, &sConfigOC, TIM_CHANNEL_3) == HAL_OK);
 
-    hal_tim_neoled_set_reset();
-    HAL_TIM_OC_Start(&s_tim5, TIM_CHANNEL_3);
+    s_hdma_tim5_ch3_up.Instance = DMA2_Channel2;
+    s_hdma_tim5_ch3_up.Init.Request = DMA_REQUEST_5;
+    s_hdma_tim5_ch3_up.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    s_hdma_tim5_ch3_up.Init.PeriphInc = DMA_PINC_DISABLE;
+    s_hdma_tim5_ch3_up.Init.MemInc = DMA_MINC_ENABLE;
+    s_hdma_tim5_ch3_up.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    s_hdma_tim5_ch3_up.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    s_hdma_tim5_ch3_up.Init.Mode = DMA_NORMAL;
+    s_hdma_tim5_ch3_up.Init.Priority = DMA_PRIORITY_LOW;
+    assert (HAL_DMA_Init(&s_hdma_tim5_ch3_up) == HAL_OK);
+
+    // Several peripheral DMA handle pointers point to the same DMA handle.
+    // Be aware that there is only one channel to perform all the requested DMAs.
+    __HAL_LINKDMA(&s_tim5, hdma[TIM_DMA_ID_CC3],s_hdma_tim5_ch3_up);
+    __HAL_LINKDMA(&s_tim5, hdma[TIM_DMA_ID_UPDATE],s_hdma_tim5_ch3_up);
+
+    HAL_TIM_PWM_Stop_DMA(&s_tim5, TIM_CHANNEL_3);
+
+    HAL_NVIC_SetPriority(DMA2_Channel2_IRQn, PRI_HARD_TIM5, 0);    // High priority!
+    HAL_NVIC_EnableIRQ(DMA2_Channel2_IRQn);
+    __HAL_DMA_ENABLE_IT(&s_hdma_tim5_ch3_up, DMA_IT_TC);
 
     HAL_NVIC_SetPriority(TIM5_IRQn, PRI_HARD_TIM5, 0);    // High priority!
     HAL_NVIC_EnableIRQ(TIM5_IRQn);
-    __HAL_TIM_ENABLE_IT(&s_tim5, TIM_IT_UPDATE);
+
+    return s_timer_cnt_frequency;
 }
 
-void hal_tim_neoled_set_on(bool on)
+void hal_timer_neoled_start_dma_transfer(uint8_t* data, uint32_t size)
 {
-    __HAL_TIM_SET_COMPARE(&s_tim5, TIM_CHANNEL_3, s_period[(int)on]);
+    HAL_TIM_PWM_Stop_DMA(&s_tim5, TIM_CHANNEL_3);
+    s_tim5.Init.Period = s_timer_cnt_frequency / 800000;
+    __HAL_TIM_SET_AUTORELOAD(&s_tim5, s_tim5.Init.Period);
+    __HAL_TIM_SET_COUNTER(&s_tim5, 0);
+    HAL_TIM_PWM_Start_DMA(&s_tim5, TIM_CHANNEL_3, (uint32_t*)data, size);
 }
 
 void hal_tim_neoled_set_reset()
@@ -334,12 +357,35 @@ extern "C"
         {
             __HAL_TIM_CLEAR_IT(&s_tim5, TIM_IT_UPDATE);
             __HAL_TIM_CLEAR_FLAG(&s_tim5, TIM_FLAG_UPDATE);
+            __HAL_TIM_DISABLE_IT(&s_tim5, TIM_IT_UPDATE);
+            HAL_TIM_PWM_Stop(&s_tim5, TIM_CHANNEL_3);
+
             if (s_timer_neoled_update_cb != nullptr)
             {
                 s_timer_neoled_update_cb(s_neoled_param);
             }
         }
     }
+
+    void DMA2_Channel2_IRQHandler(void)
+    {
+        HAL_DMA_IRQHandler(&s_hdma_tim5_ch3_up);
+    }
+
+    void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef*)
+    {
+        HAL_TIM_PWM_Stop_DMA(&s_tim5, TIM_CHANNEL_3);
+        // todo!
+        // hal_tim_neoled_set_reset();
+
+        // // Configure the timer to make a delay of 80uS
+        // s_tim5.Init.Period = s_timer_cnt_frequency * 0.00008f;
+        // __HAL_TIM_SET_AUTORELOAD(&s_tim5, s_tim5.Init.Period);
+        // __HAL_TIM_SET_COUNTER(&s_tim5, 0);
+        // __HAL_TIM_ENABLE_IT(&s_tim5, TIM_IT_UPDATE);
+        // HAL_TIM_PWM_Start(&s_tim5, TIM_CHANNEL_3);
+    }
+
 
     void HAL_IncTick(void)
     {
