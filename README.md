@@ -6,7 +6,9 @@ controller-firmware
 
 ## `Usage`
 
-### ***Windows***
+### ***Building***
+
+#### ***Windows***
 
 1. Download ARM GCC toolchain [9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads/9-2019-q4-major). [10.3-2021.10](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) You should get **gcc-arm-none-eabi-9-2019-q4-major-win32.zip** file or equivalent.
 
@@ -26,21 +28,21 @@ controller-firmware
 
 9. Congratulation!!! You should be able to clone an compile this project by typing **make -j8** and clean by typing **make clean** from the project root folder.
 
-### ***Linux***
+#### ***Linux***
 
-#### *Ubuntu / apt*
+##### *Ubuntu / apt*
 
 1. `$ sudo apt-get update && apt-get upgrade`
 
 2. `$ sudo apt-get install build-essential && apt-get install git`
 
-#### *Fedora / dnf*
+##### *Fedora / dnf*
 
 1. `$ sudo dnf check-update`
 
-2. `$ sudo dnf groupinstall "Development Tools" "Development Libraries" && dnf install git`
+2. `$ sudo dnf install make automake gcc gcc-c++ kernel-devel && sudo dnf install git`
 
-#### *Linux*
+##### *Linux*
 
 3. Download ARM GCC toolchain from [here](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads). You should have this file or equivalent in the system ready to be installed or extracted **gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2**. \
 `$ wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2`
@@ -55,3 +57,19 @@ controller-firmware
 `$ sudo mv ./gcc-arm-none-eabi-9-2019-q4-major /opt/arm-toolchain/gcc-arm-none-eabi-9-2019-q4-major`
 
 7. Congratulation!!!  You should be able to clone an compile this project by typing **make -j8** and clean by typing **make clean** on project root folder.
+
+### ***Flashing***
+
+#### *Windows*
+ 
+1. ...
+
+#### *Linux* 
+
+1. Install STLink package [here](https://github.com/stlink-org/stlink).
+
+2. Verify connection with: \
+`$ st-info --probe`
+
+3. Flash firmware with: \
+`$ st-flash write <example.bin> 0x8000000`
