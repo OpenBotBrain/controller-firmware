@@ -38,4 +38,4 @@
 #define PRI_HARD_PORT_I2C                   9   // I2C PORT 1 TO 4 interruption level
 #define PRI_HARD_SYS_I2C                    11  // System I2C IRQ (LCD, POWER DRIVER)
 #define PRI_HARD_SPI                        6   // SPI imu and flash
-#define PRI_HARD_TIM5                       12  // NEOPIXEL TIMER
+#define PRI_HARD_TIM5                       4   // NEOPIXEL TIMER
