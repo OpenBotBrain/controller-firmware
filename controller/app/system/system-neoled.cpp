@@ -43,6 +43,11 @@ void system_neoled_init()
     s_rgb_timer_on_off_periods[1] = timer_cnt_frequency * 0.0000006f;   // 1
 }
 
+float get_rand()
+{
+    return (float) std::rand() / (float) RAND_MAX;
+}
+
 void system_neoled_update()
 {
     uint32_t now = hal_timer_32_ms();
@@ -51,6 +56,6 @@ void system_neoled_update()
     if ((now - s_timestamp) >= 1000)
     {
         s_timestamp = now;
-        system_neoled_load_rgb(std::rand(), std::rand(), std::rand());
+        system_neoled_load_rgb(get_rand(),get_rand(),get_rand());
     }
 }
