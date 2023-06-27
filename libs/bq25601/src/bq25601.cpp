@@ -415,7 +415,7 @@ bool BQ25601::set_online(bool enable)
     bool ret = write_register_bits(BQ25601_REG_MOC, BQ25601_REG_MOC_BATFET_DISABLE_MASK,
         BQ25601_REG_MOC_BATFET_DISABLE_SHIFT, bat_fet_disable);
 
-    if (ret)
+    if (!ret)
     {
         notify(Notification::ERROR_SETING_ONLINE);
     }

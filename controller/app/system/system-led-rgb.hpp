@@ -34,7 +34,7 @@ class LEDRGB
 {
     public:
 
-        LEDRGB(uint16_t io);
+        LEDRGB(uint8_t timer, uint16_t io);
 
         void set_on(void);
 
@@ -50,9 +50,15 @@ class LEDRGB
 
         void write_io(bool bit);
 
-        void show();
+        void reset(void);
+
+        void render(void);
+
+        void show(void);
 
     private:
+
+        uint8_t m_timer;
 
         uint16_t m_io;
         

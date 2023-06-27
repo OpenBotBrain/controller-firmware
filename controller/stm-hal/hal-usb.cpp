@@ -27,7 +27,6 @@ static TaskHandle_t s_task_handler;
 static FinishTransmiteCallback s_finish_tx = nullptr;
 static void* s_tx_param;
 static bool s_busy = false;
-static bool s_com_is_up = false;
 
 extern USBD_DescriptorsTypeDef FS_Desc;
 
@@ -82,7 +81,6 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
         /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
         /*******************************************************************************/
         case CDC_SET_LINE_CODING:
-            s_com_is_up = true;
             tempbuf[0] = pbuf[0];
             tempbuf[1] = pbuf[1];
             tempbuf[2] = pbuf[2];
@@ -104,7 +102,6 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
             break;
 
         case CDC_SET_CONTROL_LINE_STATE:
-            s_com_is_up = false;
             break;
         case CDC_SEND_BREAK:break;
         default:  break;
@@ -234,6 +231,11 @@ void hal_usb_init()
 
 bool hal_usb_transmitte(const uint8_t* data, uint16_t size, FinishTransmiteCallback cb, void* param)
 {
+    if (!usbd_conf_get_is_up())
+    {
+        return true;
+    }
+
     bool ret = false;
     if (s_busy == false)
     {
@@ -243,7 +245,7 @@ bool hal_usb_transmitte(const uint8_t* data, uint16_t size, FinishTransmiteCallb
         ret = CDC_Transmit_FS((uint8_t*)data, size) == USBD_OK;
         s_busy = false;
     }
-    return ret || !s_com_is_up;
+    return ret;
 }
 
 uint32_t hal_usb_read(uint8_t* data, uint32_t max_data_size)

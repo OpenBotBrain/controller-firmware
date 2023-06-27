@@ -91,6 +91,11 @@ void hal_gpio_set_pin(uint16_t io)
     GPIO_PORT(io)->BSRR = static_cast<uint32_t>(GPIO_PIN(io));
 }
 
+void hal_gpio_toggle_pin(uint16_t io)
+{
+    HAL_GPIO_TogglePin(GPIO_PORT(io), GPIO_PIN(io));
+}
+
 uint16_t hal_gpio_get_pin(uint16_t io)
 {
     return GPIO_PIN(io);

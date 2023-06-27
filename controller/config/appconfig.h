@@ -18,7 +18,7 @@
 #define SIZE_GSCOPE                         256
 
 #define PRI_POWER_SUPPLY                    3
-#define SIZE_POWER_sUPPLY                   256
+#define SIZE_POWER_SUPPLY                   256
 
 #define PRI_DISPLAY                         4
 #define SIZE_DISPLAY                        256
@@ -26,7 +26,10 @@
 #define PRI_PORTS                           5
 #define SIZE_PORTS                          256
 
-#define PRI_IMU                             6
+#define PRI_UPDATE                          6
+#define SIZE_UPDATE                         256
+
+#define PRI_IMU                             7
 #define SIZE_IMU                            256
 
 // -------------------------- Hardware Interruptions -----------------------
@@ -37,4 +40,5 @@
 #define PRI_HARD_ADC                        10  // ADC Dma Priority
 #define PRI_HARD_PORT_I2C                   9   // I2C PORT 1 TO 4 interruption level
 #define PRI_HARD_SYS_I2C                    11  // System I2C IRQ (LCD, POWER DRIVER)
-#define PRI_HARD_SPI                        6   // SPI imu and flash
+#define PRI_HARD_SPI                        6   // SPI imu and flash2
+#define PRI_HARD_TIM5                       12  // NEOPIXEL TIMER

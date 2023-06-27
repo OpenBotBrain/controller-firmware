@@ -2,37 +2,36 @@
 #include <system/system-freertos.hpp>
 #include <stm-hal/hal-gpio.hpp>
 #include <system/system-led-rgb.hpp>
+#include <system/system-neoled.hpp>
 #include <cstdint>
 #include <stdbool.h>
 
 static TaskHandle_t s_task_handler;
-static bool led_on = true;
+static bool s_led_on = true;
 
 static void s_rainbow_thread(void*)
 {
-    LEDRGB led_rgb(ADDRESS_LED_RGB_IO);
-
     for( ;; )
     {
-        if (led_on)
+        // uint8_t cycles = 0;
+        
+        // if (cycles == 3)
+        // {
+        //     system_neoled_reset();
+        //     cycles = 0;
+        // }
+
+        if (s_led_on)
         {   
-            led_rgb.set_on();
+            system_neoled_update();
         }
         else
         {
-            led_rgb.set_off();
+            
         }
 
-        led_rgb.show();
-
-        // Try to reduce brightness by delaying this bit.
-        vTaskDelay(50); 
-        led_rgb.write_io(1);
-
-        vTaskDelay(250);
-
-        // Sometimes only turns on when given interrupt, 
-        // like from st-info --probe.
+        //cycles++;
+        vTaskDelay(20);
     }
 }
 
@@ -54,4 +53,6 @@ void task_rainbow_init()
         s_stack, 
         &s_task_buffer
     );
+
+    system_neoled_init();
 }

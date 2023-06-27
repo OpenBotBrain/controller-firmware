@@ -2,6 +2,7 @@
 #include <string>
 #include <system/system-led-rgb.hpp>
 #include <stm-hal/hal-gpio.hpp>
+#include <stm-hal/hal-tim.hpp>
 
 /**
  * Abstraction of Set and Reset pin.
@@ -19,10 +20,13 @@ static void write_pin(uint16_t io, bool on)
  * Colour defaults to White.
  * On defaults to Off.
  * 
- * @param io Pin of RGB LED 
+ * @param timer Timer channel for RGB LED.
+ * @param io Pin of RGB LED.
 */
-LEDRGB::LEDRGB(uint16_t io)
+LEDRGB::LEDRGB(uint8_t timer, uint16_t io)
 {
+    // Set Timer.
+    LEDRGB::m_timer = timer;
     // Set IO.
     LEDRGB::m_io = io;
     // Default colour to WHITE.
@@ -100,12 +104,26 @@ void LEDRGB::write_io(bool bit)
 }
 
 /**
- * Show RGB LED
+ * Send reset code to RGB LED.
 */
-void LEDRGB::show()
+void LEDRGB::reset()
 {
-    // Init pin.
-    write_pin(LEDRGB::m_io, 0);
+    static uint32_t s_timestamp;
+
+    uint32_t now = hal_timer_32_us();
+
+    if ((now - s_timestamp) >= 3000)
+    {
+        s_timestamp = now;
+    }
+}
+
+/**
+ * Send 24bit of data to RGB LED.
+*/
+void LEDRGB::render()
+{
+    //write_io(0);
 
     // When writing to the RGB LED
     //  - Sent in order of Green, Red, Blue.
@@ -118,21 +136,32 @@ void LEDRGB::show()
         std::bitset blue =  std::bitset<8>(LEDRGB::m_colour.blue);
 
         // Green
-        for (uint8_t i = 7; i >= 0; i--)
+        for (uint8_t i = 0; i < 8; i++)
         {
-            write_pin(LEDRGB::m_io, (bool)green[i]); 
+            write_pin(LEDRGB::m_io, (bool)green[8 - i]); 
         }
 
         // Red
-        for (uint8_t i = 7; i >= 0; i--)
+        for (uint8_t i = 0; i < 8; i++)
         {
-            write_pin(LEDRGB::m_io, (bool)red[i]); 
+            write_pin(LEDRGB::m_io, (bool)red[8 - i]); 
         }
 
         // Blue
-        for (uint8_t i = 7; i >= 0; i--)
+        for (uint8_t i = 0; i < 8; i++)
         {
-            write_pin(LEDRGB::m_io, (bool)blue[i]); 
+            write_pin(LEDRGB::m_io, (bool)blue[8 - i]); 
         }
+    }
+}
+
+/**
+ * Show RGB LED
+*/
+void LEDRGB::show()
+{
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        LEDRGB::render();
     }
 }

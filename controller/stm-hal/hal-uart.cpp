@@ -255,10 +255,10 @@ void DMA2_Channel1_IRQHandler(void)
     HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_RPI].tx_dma);        // uart5 tx
 }
 
-void DMA2_Channel2_IRQHandler(void)
-{
-    HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_RPI].rx_dma);        // uart5 rx
-}
+// void DMA2_Channel2_IRQHandler(void)
+// {
+//     HAL_DMA_IRQHandler(&s_uart_data[UART_TYPE_PORT_RPI].rx_dma);        // uart5 rx
+// }
 
 void DMA2_Channel3_IRQHandler(void)
 {
