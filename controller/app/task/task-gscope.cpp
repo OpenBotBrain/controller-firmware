@@ -148,7 +148,7 @@ bool GSDebug2(const char* p_string, ...)
     {
         ret = GSDebug(p_string, args);
     }
-    else
+    else if (s_connection_type == ConnectionType::USB)
     {
         uint8_t pbug[PRINT_BUFFER_SIZE + 2];
         int size = vsnprintf((char*)pbug, PRINT_BUFFER_SIZE, p_string, args);

@@ -1,7 +1,5 @@
 #include <config/appconfig.h>
 #include <system/system-freertos.hpp>
-#include <stm-hal/hal-gpio.hpp>
-#include <system/system-led-rgb.hpp>
 #include <system/system-neoled.hpp>
 #include <cstdint>
 #include <stdbool.h>
@@ -11,27 +9,27 @@ static bool s_led_on = true;
 
 static void s_rainbow_thread(void*)
 {
-    for( ;; )
+    float colours[3][3] = { 
+        { 1.0f, 0.0f, 0.0f }, 
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f },
+    }; 
+
+    for ( ;; )
     {
-        // uint8_t cycles = 0;
-        
-        // if (cycles == 3)
-        // {
-        //     system_neoled_reset();
-        //     cycles = 0;
-        // }
-
-        if (s_led_on)
+        for( int i = 0 ; i < 3; i++)
         {   
-            system_neoled_update();
-        }
-        else
-        {
-            
-        }
+            // Set Colour of RGB LED.
+            system_neoled_set_rgb(colours[i][0], colours[i][1], colours[i][2]);
 
-        //cycles++;
-        vTaskDelay(20);
+            // Set on state of RGB LED.
+            (s_led_on) ? system_neoled_on() : system_neoled_off();
+
+            // Update RGB LED.
+            system_neoled_update();
+
+            vTaskDelay(100);
+        }
     }
 }
 

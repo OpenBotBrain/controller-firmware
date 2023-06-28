@@ -253,6 +253,7 @@ uint32_t hal_tim_encoder_get_tick(uint8_t type)
 }
 
 static uint32_t s_timer_cnt_frequency;
+static constexpr uint32_t NEOPIXEL_FREQUENCY_HZ = 833000;
 uint32_t hal_tim_neoled_init(TimerUpdateCb cb, void* param)
 {
     s_timer_neoled_update_cb = cb;
@@ -262,7 +263,7 @@ uint32_t hal_tim_neoled_init(TimerUpdateCb cb, void* param)
     s_tim5.Instance = TIM5;
     s_tim5.Init.Prescaler = 0;
     s_tim5.Init.CounterMode = TIM_COUNTERMODE_UP;
-    s_tim5.Init.Period = s_timer_cnt_frequency / 800000;
+    s_tim5.Init.Period = s_timer_cnt_frequency / NEOPIXEL_FREQUENCY_HZ;
     s_tim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     assert (HAL_TIM_PWM_Init(&s_tim5) == HAL_OK);
 
@@ -286,7 +287,7 @@ uint32_t hal_tim_neoled_init(TimerUpdateCb cb, void* param)
     s_hdma_tim5_ch3_up.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     s_hdma_tim5_ch3_up.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     s_hdma_tim5_ch3_up.Init.Mode = DMA_NORMAL;
-    s_hdma_tim5_ch3_up.Init.Priority = DMA_PRIORITY_LOW;
+    s_hdma_tim5_ch3_up.Init.Priority = DMA_PRIORITY_MEDIUM;
     assert (HAL_DMA_Init(&s_hdma_tim5_ch3_up) == HAL_OK);
 
     // Several peripheral DMA handle pointers point to the same DMA handle.
@@ -309,9 +310,9 @@ uint32_t hal_tim_neoled_init(TimerUpdateCb cb, void* param)
 void hal_timer_neoled_start_dma_transfer(uint8_t* data, uint32_t size)
 {
     HAL_TIM_PWM_Stop_DMA(&s_tim5, TIM_CHANNEL_3);
-    s_tim5.Init.Period = s_timer_cnt_frequency / 800000;
+    s_tim5.Init.Period = s_timer_cnt_frequency / NEOPIXEL_FREQUENCY_HZ;
     __HAL_TIM_SET_AUTORELOAD(&s_tim5, s_tim5.Init.Period);
-    __HAL_TIM_SET_COUNTER(&s_tim5, 0);
+    __HAL_TIM_SET_COUNTER(&s_tim5, s_tim5.Init.Period);
     HAL_TIM_PWM_Start_DMA(&s_tim5, TIM_CHANNEL_3, (uint32_t*)data, size);
 }
 
@@ -375,17 +376,17 @@ extern "C"
     void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef*)
     {
         HAL_TIM_PWM_Stop_DMA(&s_tim5, TIM_CHANNEL_3);
-        // todo!
-        // hal_tim_neoled_set_reset();
 
-        // // Configure the timer to make a delay of 80uS
-        // s_tim5.Init.Period = s_timer_cnt_frequency * 0.00008f;
-        // __HAL_TIM_SET_AUTORELOAD(&s_tim5, s_tim5.Init.Period);
-        // __HAL_TIM_SET_COUNTER(&s_tim5, 0);
-        // __HAL_TIM_ENABLE_IT(&s_tim5, TIM_IT_UPDATE);
-        // HAL_TIM_PWM_Start(&s_tim5, TIM_CHANNEL_3);
+        __HAL_TIM_SET_COMPARE(&s_tim5, TIM_CHANNEL_3, 0);
+        __HAL_TIM_SET_COUNTER(&s_tim5, 0);
+
+        // Configure the timer to make a delay of > 80uS
+        s_tim5.Init.Period = s_timer_cnt_frequency * 0.0005f;   // 500us (no need faster...)
+        __HAL_TIM_SET_AUTORELOAD(&s_tim5, s_tim5.Init.Period);
+        __HAL_TIM_ENABLE_IT(&s_tim5, TIM_IT_UPDATE);
+
+        HAL_TIM_PWM_Start(&s_tim5, TIM_CHANNEL_3);
     }
-
 
     void HAL_IncTick(void)
     {
