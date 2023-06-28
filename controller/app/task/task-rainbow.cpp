@@ -9,18 +9,17 @@ static bool s_led_on = true;
 
 static void s_rainbow_thread(void*)
 {
-    float colours[3][3] = { 
-        { 1.0f, 0.0f, 0.0f }, 
-        { 0.0f, 1.0f, 0.0f },
-        { 0.0f, 0.0f, 1.0f },
-    }; 
+    Neoled_Colour colours[3] = { NEO_RED, NEO_GREEN, NEO_BLUE };
 
     for ( ;; )
     {
-        for( int i = 0 ; i < 3; i++)
+        // Set lowest Brightness - still bright.
+        system_neoled_set_brightness(NEO_BRI_1);
+
+        for(int i = 0 ; i < 3; i++)
         {   
             // Set Colour of RGB LED.
-            system_neoled_set_rgb(colours[i][0], colours[i][1], colours[i][2]);
+            system_neoled_set_colour(colours[i]);
 
             // Set on state of RGB LED.
             (s_led_on) ? system_neoled_on() : system_neoled_off();
