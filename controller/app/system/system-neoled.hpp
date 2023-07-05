@@ -2,16 +2,14 @@
 
 #include <cstdint>
 
-/**
- * DO NOT USE UNDEFINED.
- * 
+/** 
  * MAX is NEO_BRI_10, MIN is NEO_BRI_1.
  * 
  * MIN brightness will not turn off LED.
 */
-typedef enum
+enum Neoled_Brightness
 {
-    UNDEFINED = 0,
+    NEO_BRI_UNDEFINED = 0,
     NEO_BRI_10,
     NEO_BRI_9,
     NEO_BRI_8,
@@ -22,7 +20,7 @@ typedef enum
     NEO_BRI_3,
     NEO_BRI_2,
     NEO_BRI_1,
-} Neoled_Brightness;
+};
 
 /**
  * Store Colour values for RGB LED.
@@ -38,10 +36,13 @@ struct Neoled_Colour
     uint8_t blue;
 };
 
-#define NEO_WHITE   Neoled_Colour{ .red = 255, .green = 255,   .blue = 255 }
-#define NEO_RED     Neoled_Colour{ .red = 255, .green = 0,     .blue = 0   }
-#define NEO_GREEN   Neoled_Colour{ .red = 0,   .green = 255,   .blue = 0   }
-#define NEO_BLUE    Neoled_Colour{ .red = 0,   .green = 0,     .blue = 255 }
+#define NEO_WHITE   Neoled_Colour{ .red = 255,  .green = 255,   .blue = 255 }
+#define NEO_RED     Neoled_Colour{ .red = 255,  .green = 0,     .blue = 0   }
+#define NEO_GREEN   Neoled_Colour{ .red = 0,    .green = 255,   .blue = 0   }
+#define NEO_BLUE    Neoled_Colour{ .red = 0,    .green = 0,     .blue = 255 }
+#define NEO_YELLOW  Neoled_Colour{ .red = 255,  .green = 255,   .blue = 0   }
+#define NEO_PURPLE  Neoled_Colour{ .red = 255,  .green = 0,     .blue = 255 }
+#define NEO_TEAL    Neoled_Colour{ .red = 0,    .green = 255,   .blue = 255 }
 
 void system_neoled_init(void);
 
@@ -59,4 +60,4 @@ void system_neoled_set_rgb(uint8_t r, uint8_t g, uint8_t b);
 
 void system_neoled_set_colour(Neoled_Colour colour);
 
-Neoled_Colour system_get_neoled_colour(void);
+Neoled_Colour system_neoled_get_colour(void);

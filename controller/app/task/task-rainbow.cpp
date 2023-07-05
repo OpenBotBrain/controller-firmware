@@ -9,14 +9,18 @@ static bool s_led_on = true;
 
 static void s_rainbow_thread(void*)
 {
-    Neoled_Colour colours[3] = { NEO_RED, NEO_GREEN, NEO_BLUE };
+    Neoled_Colour colours[6] = 
+    { 
+        NEO_RED, NEO_GREEN, NEO_BLUE, 
+        NEO_YELLOW, NEO_PURPLE, NEO_TEAL,
+    };
 
     for ( ;; )
     {
         // Set lowest Brightness - still bright.
         system_neoled_set_brightness(NEO_BRI_1);
 
-        for(int i = 0 ; i < 3; i++)
+        for(int i = 0 ; i < 6; i++)
         {   
             // Set Colour of RGB LED.
             system_neoled_set_colour(colours[i]);
@@ -27,7 +31,8 @@ static void s_rainbow_thread(void*)
             // Update RGB LED.
             system_neoled_update();
 
-            vTaskDelay(100);
+            // Wait for each light interval.
+            vTaskDelay(33);
         }
     }
 }

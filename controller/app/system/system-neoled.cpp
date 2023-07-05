@@ -69,7 +69,7 @@ void system_neoled_init()
 }
 
 /**
- * Update the RGB LED, calls the load method based on state of s_rgb_on.
+ * Update the RGB LED, calls the load method based on state whether RGB is on.
 */
 void system_neoled_update()
 {
@@ -126,7 +126,7 @@ void system_neoled_set_brightness(Neoled_Brightness brightness)
  * 
  * @return Neoled Brightness
 */
-Neoled_Brightness system_get_neoled_brightness()
+Neoled_Brightness system_neoled_get_brightness()
 {
     return s_brightness;
 }
@@ -160,7 +160,7 @@ void system_neoled_set_colour(Neoled_Colour colour)
  * 
  * @return Neoled Colour
 */
-Neoled_Colour system_get_neoled_colour()
+Neoled_Colour system_neoled_get_colour()
 {
     return s_colour;
 }
