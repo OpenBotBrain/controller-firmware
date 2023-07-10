@@ -73,3 +73,113 @@ controller-firmware
 
 3. Flash firmware with: \
 `$ st-flash write <example>.bin 0x8000000`
+
+## `Hardware Manager`
+
+### ***Usage***
+
+### ***Actuators***
+
+Actuator interfaces.
+
+```cpp
+class Actuator
+{
+    public:
+
+        Actuator(void) {};
+
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
+};
+
+class LegoMotor
+{
+    public:
+
+        LegoMotor(void) {};
+
+        virtual void forward(int32_t rotation) = 0;
+        
+        virtual void backward(int32_t rotation) = 0;
+        
+        virtual void stop(void) = 0;
+
+        virtual void start_sync(LegoMotor *motor) = 0;
+
+        virtual void end_sync(void) = 0;
+        
+        virtual bool is_stalled(void) = 0;
+        
+        virtual int32_t get_tacho_count(void) = 0;
+
+        virtual void set_motor_pwm(uint8_t motor_pwm) = 0;
+
+        virtual uint8_t get_motor_pwm(void) = 0;
+
+        virtual void set_motor_encoder(uint8_t motor_encoder) = 0;
+
+        virtual uint8_t get_motor_encoder(void) = 0;
+
+        virtual void set_motor_speed(uint32_t motor_speed) = 0;
+
+        virtual uint32_t get_motor_speed(void) = 0;
+
+    private:
+
+        virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) = 0;
+};
+
+```
+
+#### *Neoled*
+
+
+#### *EV3 Large Motor*
+
+#### *EV3 Medium Motor*
+
+#### *NXT Motor*
+
+### ***Devices***
+
+Device interface.
+
+```cpp
+class Device
+{
+    public:
+
+        Device(void) {};
+
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
+};
+```
+
+unknown if needed.
+
+### ***Sensors***
+
+Sensor interface.
+
+```cpp
+class Sensor
+{
+    public:
+
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
+
+        virtual float fetch_sample(void) = 0;
+};
+```
+
+#### *Inertial Measurement Unit (IMU)*
+
+#### *EV3 Colour Sensor*
+
+#### *EV3 Sound Sensor*

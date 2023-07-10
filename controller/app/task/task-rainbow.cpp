@@ -1,6 +1,6 @@
 #include <config/appconfig.h>
 #include <system/system-freertos.hpp>
-#include <system/system-neoled.hpp>
+#include <actuator/board-neoled.hpp>
 #include <cstdint>
 #include <stdbool.h>
 
@@ -9,6 +9,9 @@ static bool s_led_on = true;
 
 static void s_rainbow_thread(void*)
 {
+    Neoled rgb_led;
+    rgb_led.init();
+
     Neoled_Colour colours[6] = 
     { 
         NEO_RED, NEO_GREEN, NEO_BLUE, 
@@ -18,18 +21,18 @@ static void s_rainbow_thread(void*)
     for ( ;; )
     {
         // Set lowest Brightness - still bright.
-        system_neoled_set_brightness(NEO_BRI_1);
+        rgb_led.set_brightness(NEO_BRI_1);
 
         for(int i = 0 ; i < 6; i++)
         {   
             // Set Colour of RGB LED.
-            system_neoled_set_colour(colours[i]);
+            rgb_led.set_colour(colours[i]);
 
             // Set on state of RGB LED.
-            (s_led_on) ? system_neoled_on() : system_neoled_off();
+            (s_led_on) ? rgb_led.on() : rgb_led.off();
 
             // Update RGB LED.
-            system_neoled_update();
+            rgb_led.update();
 
             // Wait for each light interval.
             vTaskDelay(33);
@@ -40,6 +43,7 @@ static void s_rainbow_thread(void*)
 // ------------------------------------------------------------------------------------
 //                                      PUBLIC API
 // ------------------------------------------------------------------------------------
+
 void task_rainbow_init()
 {
     // Create rainbow task
@@ -55,6 +59,4 @@ void task_rainbow_init()
         s_stack, 
         &s_task_buffer
     );
-
-    system_neoled_init();
 }
