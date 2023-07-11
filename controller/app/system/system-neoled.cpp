@@ -1,10 +1,12 @@
+#include <bitset>
+#include <cstdlib>
+#include <cstring>
+#include <limits>
 #include <stm-hal/hal-tim.hpp>
 #include <stm-hal/hal-gpio.hpp>
 #include <system/system-neoled.hpp>
-#include <cstdlib>
 #include <gscope/gscope.hpp>
-#include <bitset>
-#include <cstring>
+#include <gscope/gscope.hpp>
 
 // IN-PI554FCH - https://www.inolux-corp.com/datasheet/SMDLED/Addressable%20LED/IN-PI554FCH.pdf
 
@@ -22,7 +24,7 @@ static void s_timer_transfer_finish_callback(void*)
 
 /**
  * Load float values of rgb into DMA.
- * 
+ *
  * @param r Red (0 - 255)
  * @param g Green (0 - 255)
  * @param b Blue (0 - 255)
@@ -44,12 +46,11 @@ static void system_neoled_load_rgb(uint8_t r, uint8_t g, uint8_t b)
     {
         s_rgb_timer_data[i] = s_rgb_timer_on_off_periods[green[7 - i]];
         s_rgb_timer_data[i + 8] = s_rgb_timer_on_off_periods[red[7 - i]];
-        s_rgb_timer_data[i + 16] = s_rgb_timer_on_off_periods[blue[7 - i]]; 
+        s_rgb_timer_data[i + 16] = s_rgb_timer_on_off_periods[blue[7 - i]];
     }
 
     hal_timer_neoled_start_dma_transfer(s_rgb_timer_data, TOTAL_BITS + 1);
 }
-//GScopeCommand("set_led_pwm", system_neoled_load_rgb)
 
 /**
  * Init the RGB LED timings and default Colour & Brightness.
@@ -75,3 +76,9 @@ void system_neoled_update(uint8_t r, uint8_t g, uint8_t b)
         system_neoled_load_rgb(r, g, b);
     }
 }
+
+static void set_led_pwm_callback(int r, int g, int b)
+{
+    system_neoled_load_rgb(r, g, b);
+}
+GScopeCommand("set_led_pwm", set_led_pwm_callback)

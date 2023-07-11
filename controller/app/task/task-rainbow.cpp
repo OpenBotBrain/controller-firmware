@@ -12,9 +12,9 @@ static void s_rainbow_thread(void*)
     Neoled rgb_led;
     rgb_led.init();
 
-    Neoled_Colour colours[6] = 
-    { 
-        NEO_RED, NEO_GREEN, NEO_BLUE, 
+    Neoled_Colour colours[6] =
+    {
+        NEO_RED, NEO_GREEN, NEO_BLUE,
         NEO_YELLOW, NEO_PURPLE, NEO_TEAL,
     };
 
@@ -24,7 +24,7 @@ static void s_rainbow_thread(void*)
         rgb_led.set_brightness(NEO_BRI_1);
 
         for(int i = 0 ; i < 6; i++)
-        {   
+        {
             // Set Colour of RGB LED.
             rgb_led.set_colour(colours[i]);
 
@@ -51,12 +51,12 @@ void task_rainbow_init()
     static StackType_t s_stack[SIZE_RAINBOW];
 
     s_task_handler = xTaskCreateStatic(
-        s_rainbow_thread, 
-        "Rainbow", 
+        s_rainbow_thread,
+        "Rainbow",
         SIZE_RAINBOW,
-        0, 
-        PRI_RAINBOW, 
-        s_stack, 
+        0,
+        PRI_RAINBOW,
+        s_stack,
         &s_task_buffer
     );
 }
