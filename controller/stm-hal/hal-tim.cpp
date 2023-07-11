@@ -316,11 +316,6 @@ void hal_timer_neoled_start_dma_transfer(uint8_t* data, uint32_t size)
     HAL_TIM_PWM_Start_DMA(&s_tim5, TIM_CHANNEL_3, (uint32_t*)data, size);
 }
 
-void hal_tim_neoled_set_reset()
-{
-    __HAL_TIM_SET_COMPARE(&s_tim5, TIM_CHANNEL_3, 0);
-}
-
 uint32_t hal_timer_32_ms(void)
 {
     return s_timer_ms_cnt;

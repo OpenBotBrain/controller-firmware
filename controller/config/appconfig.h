@@ -11,11 +11,14 @@
 #define PRI_BLINKY                          1
 #define SIZE_BLINKY                         128
 
+#define PRI_RAINBOW                         1
+#define SIZE_RAINBOW                        128
+
 #define PRI_GSCOPE                          2
 #define SIZE_GSCOPE                         256
 
 #define PRI_POWER_SUPPLY                    3
-#define SIZE_POWER_sUPPLY                   256
+#define SIZE_POWER_SUPPLY                   256
 
 #define PRI_DISPLAY                         4
 #define SIZE_DISPLAY                        256

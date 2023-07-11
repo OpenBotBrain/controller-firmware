@@ -27,8 +27,5 @@ uint32_t hal_tim_encoder_get_tick(uint8_t type);
 uint32_t hal_tim_neoled_init(TimerUpdateCb cb, void* param);
 void hal_timer_neoled_start_dma_transfer(uint8_t* data, uint32_t size);
 
-void hal_tim_neoled_set_on(bool on);
-void hal_tim_neoled_set_reset();
-
 uint32_t hal_timer_32_ms(void);
 uint32_t hal_timer_32_us(void);
