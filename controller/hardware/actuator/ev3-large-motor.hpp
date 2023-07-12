@@ -7,24 +7,24 @@
 /**
  * Uses interface of Lego Motor.
 */
-class EV3LargeMotor : public LegoMotor 
+class EV3LargeMotor : public LegoMotor
 {
     public:
 
         EV3LargeMotor(OutputPort *port, TimerType motor_pwm, TimerType motor_encoder);
-        
+
         void forward(int32_t rotation);
-        
+
         void backward(int32_t rotation);
-        
+
         void stop(void);
 
         void start_sync(EV3LargeMotor *motor);
 
         void end_sync(void);
-        
+
         bool is_stalled(void);
-        
+
         int32_t get_tacho_count(void);
 
         void set_motor_pwm(uint8_t motor_pwm);
@@ -43,7 +43,7 @@ class EV3LargeMotor : public LegoMotor
 
         void drive_motor(float speed, int32_t rotation, bool immediate_return);
 
-    private:        
+    private:
 
         OutputPort *m_port;
 

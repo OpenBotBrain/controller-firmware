@@ -15,8 +15,6 @@ enum Lego_Device_Type
 class LegoDevice : public Device
 {
     public :
-        
-        LegoDevice(void) {};
 
         virtual void init(void) = 0;
 

@@ -7,7 +7,7 @@
 
 /**
  * Create an NXT Motor.
- * 
+ *
  * @param *port pointer to motors port.
  * @param motor_pmw Timer Type value for motor pwm.
  * @param motor_encoder Timer Type value for motor encoder.
@@ -25,7 +25,7 @@ NXTMotor::NXTMotor(OutputPort *port, TimerType motor_pwm, TimerType motor_encode
 
 /**
  * Drive the motor forward.
- * 
+ *
  * @param rotation amount forward for the motor.
 */
 void NXTMotor::forward(int32_t rotation)
@@ -37,7 +37,7 @@ void NXTMotor::forward(int32_t rotation)
 
 /**
  * Drive the motor backward.
- * 
+ *
  * @param rotation amount backward for the motor.
 */
 void NXTMotor::backward(int32_t rotation)
@@ -57,7 +57,7 @@ void NXTMotor::stop()
 
 /**
  * Sync with another Motor.
- * 
+ *
  * @param motor address of other motor that is being synced with.
 */
 void NXTMotor::start_sync(NXTMotor *motor)
@@ -69,7 +69,7 @@ void NXTMotor::start_sync(NXTMotor *motor)
     }
 
     stop();
-    motor->stop(); 
+    motor->stop();
 
     m_sync_motor = motor;
     m_synced = true;
@@ -95,7 +95,7 @@ void NXTMotor::end_sync()
 
 /**
  * Checks if the motor is currently stalled.
- * 
+ *
  * @return boolean - stalled value.
 */
 bool NXTMotor::is_stalled()
@@ -106,9 +106,9 @@ bool NXTMotor::is_stalled()
 /**
  * Get the tacho count of the motor.
  * Uses the encoder of the motor.
- * 
- * @return int32_t - tacho count. 
-*/       
+ *
+ * @return int32_t - tacho count.
+*/
 int32_t NXTMotor::get_tacho_count()
 {
     return 0;
@@ -116,7 +116,7 @@ int32_t NXTMotor::get_tacho_count()
 
 /**
  * Set the motor pwm
- * 
+ *
  * @param motor_pwm
 */
 void NXTMotor::set_motor_pwm(uint8_t motor_pwm)
@@ -126,7 +126,7 @@ void NXTMotor::set_motor_pwm(uint8_t motor_pwm)
 
 /**
  * Get the motor pwm
- * 
+ *
  * @return motor_pwm
 */
 uint8_t NXTMotor::get_motor_pwm()
@@ -136,7 +136,7 @@ uint8_t NXTMotor::get_motor_pwm()
 
 /**
  * Set the motor encoder
- * 
+ *
  * @param motor_encoder
 */
 void NXTMotor::set_motor_encoder(uint8_t motor_encoder)
@@ -147,7 +147,7 @@ void NXTMotor::set_motor_encoder(uint8_t motor_encoder)
 
 /**
  * Get the motor encoder
- * 
+ *
  * @return motor_encoder
 */
 uint8_t NXTMotor::get_motor_encoder()
@@ -157,9 +157,9 @@ uint8_t NXTMotor::get_motor_encoder()
 
 /**
  * Set the motor speed.
- * 
+ *
  * If motor speed is greater than the maximum motor speed then it is set to the max speed.
- * 
+ *
  * @param motor_speed
 */
 void NXTMotor::set_motor_speed(uint32_t motor_speed)
@@ -169,7 +169,7 @@ void NXTMotor::set_motor_speed(uint32_t motor_speed)
 
 /**
  * Get the motor speed.
- * 
+ *
  * @return motor_speed
 */
 uint32_t NXTMotor::get_motor_speed(void)
@@ -183,7 +183,7 @@ uint32_t NXTMotor::get_motor_speed(void)
 
 /**
  * Drive a motor.
- * 
+ *
  * @param speed float value containing speed of motor.
  * @param rotation amount of rotation of the motor.
  * @param immediate_return should we immediately return to program after telling the motor to run?

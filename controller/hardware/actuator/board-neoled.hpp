@@ -3,9 +3,9 @@
 #include <actuator/hardware-actuator.hpp>
 #include <cstdint>
 
-/** 
+/**
  * MAX is NEO_BRI_10, MIN is NEO_BRI_1.
- * 
+ *
  * MIN brightness will not turn off LED.
 */
 enum Neoled_Brightness
@@ -25,7 +25,7 @@ enum Neoled_Brightness
 
 /**
  * Store Colour values for RGB LED.
- * 
+ *
  * @param red Red value (0 - 255).
  * @param green Green value (0 - 255).
  * @param blue Blue value (0 - 255).
@@ -44,12 +44,13 @@ struct Neoled_Colour
 #define NEO_YELLOW  Neoled_Colour{ .red = 255,  .green = 255,   .blue = 0   }
 #define NEO_PURPLE  Neoled_Colour{ .red = 255,  .green = 0,     .blue = 255 }
 #define NEO_TEAL    Neoled_Colour{ .red = 0,    .green = 255,   .blue = 255 }
+#define NEO_BLACK   Neoled_Colour{ .red = 0,    .green = 0,     .blue = 0   }
 
-class Neoled : public Actuator
+class Neoled
 {
     public:
 
-        Neoled(void);
+        Neoled(void) {};
 
         void init(void);
 
@@ -70,10 +71,10 @@ class Neoled : public Actuator
         Neoled_Colour get_colour(void);
 
     private:
-        
+
         bool m_rgb_on;
 
         Neoled_Colour m_rgb_colour;
 
-        Neoled_Brightness m_rgb_brightness;  
+        Neoled_Brightness m_rgb_brightness;
 };

@@ -6,9 +6,9 @@
 
 /**
  * Create an instance of EV3 Sound Sensor.
- * 
- * sensor mode is defaulted to DB when one is not given.
- * 
+ *
+ * Sensor mode is defaulted to DB when one is not given.
+ *
  * @param *port pointer to Input port.
 */
 EV3SoundSensor::EV3SoundSensor(InputPort *port)
@@ -19,7 +19,7 @@ EV3SoundSensor::EV3SoundSensor(InputPort *port)
 
 /**
  * Create an instance of EV3 Sound Sensor.
- * 
+ *
  * @param *port pointer to Input port.
  * @param sensor_mode set the sensor mode here.
 */
@@ -31,7 +31,7 @@ EV3SoundSensor::EV3SoundSensor(InputPort *port, EV3_Sound_Sensor_Mode sensor_mod
 
 /**
  * Fetch a sample from the EV3 Sound Sensor.
- * 
+ *
  * @param *sample pointer to float value that stores the sample.
 */
 float EV3SoundSensor::fetch_sample()
@@ -41,7 +41,7 @@ float EV3SoundSensor::fetch_sample()
 
 /**
  * Set the sensor mode of the EV3 Sound Sensor.
- * 
+ *
  * @param sensor_mode
 */
 void EV3SoundSensor::set_mode(uint8_t sensor_mode)
@@ -51,7 +51,7 @@ void EV3SoundSensor::set_mode(uint8_t sensor_mode)
 
 /**
  * Get the sensor mode of the EV3 Sound Sensor.
- * 
+ *
  * @return sensor_mode
 */
 uint8_t EV3SoundSensor::get_mode()

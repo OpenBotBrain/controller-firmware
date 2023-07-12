@@ -6,9 +6,9 @@
 
 /**
  * Create an instance of EV3 Colour Sensor.
- * 
- * sensor mode is defaulted to WHITE when one is not given.
- * 
+ *
+ * Sensor mode is defaulted to WHITE when one is not given.
+ *
  * @param *port pointer to Input Port.
 */
 EV3ColourSensor::EV3ColourSensor(InputPort *port)
@@ -19,7 +19,7 @@ EV3ColourSensor::EV3ColourSensor(InputPort *port)
 
 /**
  * Create an instance of EV3 Colour Sensor.
- * 
+ *
  * @param *port pointer to Input port.
  * @param sensor_mode set the sensor mode here.
 */
@@ -31,7 +31,7 @@ EV3ColourSensor::EV3ColourSensor(InputPort *port, EV3_Colour_Sensor_Mode sensor_
 
 /**
  * Fetch a sample from the EV3 Colour Sensor.
- * 
+ *
  * @param *sample pointer to float value that stores the sample.
 */
 float EV3ColourSensor::fetch_sample()
@@ -41,7 +41,7 @@ float EV3ColourSensor::fetch_sample()
 
 /**
  * Set the sensor mode of the EV3 Colour Sensor.
- * 
+ *
  * @param sensor_mode
 */
 void EV3ColourSensor::set_mode(uint8_t sensor_mode)
@@ -51,7 +51,7 @@ void EV3ColourSensor::set_mode(uint8_t sensor_mode)
 
 /**
  * Get the sensor mode of the EV3 Colour Sensor.
- * 
+ *
  * @return sensor_mode
 */
 uint8_t EV3ColourSensor::get_mode()

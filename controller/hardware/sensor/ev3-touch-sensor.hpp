@@ -6,7 +6,7 @@
 
 /**
  * EV3 Touch Sensor modes.
- * 
+ *
  * - EV3_TOUCH_SENSOR_UNDEFINED: undefined mode.
  * - EV3_TOUCH_SENSOR_TOUCH: regular touch mode.
 */
@@ -33,6 +33,6 @@ class EV3TouchSensor : public LegoSensor
     private:
 
         InputPort *m_port;
-        
+
         EV3_Touch_Sensor_Mode m_sensor_mode;
 };

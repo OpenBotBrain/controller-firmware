@@ -6,7 +6,7 @@
 
 /**
  * EV3 Sound Sensor modes.
- * 
+ *
  * - EV3_SOUND_SENSOR_UNDEFINED: undefined mode.
  * - EV3_SOUND_SENSOR_DB: db mode.
  * - EV3_SOUND_SENSOR_DBA: dba mode, closer to human perception.

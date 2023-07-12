@@ -31,6 +31,6 @@ class EV3ColourSensor : public LegoSensor
     private:
 
         InputPort *m_port;
-        
+
         EV3_Colour_Sensor_Mode m_sensor_mode;
 };

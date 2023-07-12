@@ -6,7 +6,7 @@ class IMU : public Sensor
 {
     public:
 
-        IMU(void);
+        IMU(void) {};
 
         void init(void);
 
@@ -14,6 +14,9 @@ class IMU : public Sensor
 
         float fetch_sample(void);
 
-    private:
-    
+        float* fetch_accel(void);
+
+        float* fetch_gyro(void);
+
+        float* fetch_roll_pitch(void);
 };

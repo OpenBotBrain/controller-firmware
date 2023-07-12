@@ -98,6 +98,7 @@ CXXSRC+=system-status.cpp
 CXXSRC+=system-safe-i2c.cpp
 CXXSRC+=system-version.cpp
 CXXSRC+=system-neoled.cpp
+CXXSRC+=system-imu.cpp
 
 # Module folder
 CXXSRC+=module-input.cpp
@@ -113,6 +114,7 @@ CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
 CXXSRC+=task-rainbow.cpp
 CXXSRC+=task-update.cpp
+CXXSRC+=task-hardware-manager.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
@@ -132,6 +134,7 @@ CXXSRC+=ev3-medium-motor.cpp
 CXXSRC+=nxt-motor.cpp
 # misc
 CXXSRC+=board-neoled.cpp
+CXXSRC+=board-led.cpp
 
 # Device folder
 CXXSRC+=hardware-device.cpp

@@ -1,8 +1,12 @@
 #pragma once
 
 #include <actuator/hardware-actuator.hpp>
+#include <actuator/lego-motor.hpp>
+#include <actuator/board-neoled.hpp>
+#include <actuator/board-led.hpp>
 #include <sensor/hardware-sensor.hpp>
-#include <mutex>
+#include <sensor/lego-sensor.hpp>
+#include <sensor/board-imu.hpp>
 
 class HardwareManager
 {
@@ -10,47 +14,53 @@ class HardwareManager
 
         HardwareManager(void);
 
-        ~HardwareManager(void);
+        void init(void);
 
-        Actuator *get_actuator_a(void);
+        void update(void);
 
-        Actuator *get_actuator_b(void);
+        LegoMotor *get_actuator_a(void);
 
-        Actuator *get_actuator_c(void);
+        LegoMotor *get_actuator_b(void);
 
-        Actuator *get_actuator_d(void);
+        LegoMotor *get_actuator_c(void);
 
-        Actuator *get_neoled(void);
+        LegoMotor *get_actuator_d(void);
 
-        Sensor *get_sensor_a(void);
+        Neoled *get_neoled(void);
 
-        Sensor *get_sensor_b(void);
+        Led *get_led(void);
 
-        Sensor *get_sensor_c(void);
+        LegoSensor *get_sensor_a(void);
 
-        Sensor *get_sensor_d(void);
+        LegoSensor *get_sensor_b(void);
 
-        Sensor *get_imu(void);
+        LegoSensor *get_sensor_c(void);
+
+        LegoSensor *get_sensor_d(void);
+
+        IMU *get_imu(void);
 
     private:
 
-        Actuator *m_actuator_a;
+        LegoMotor *m_actuator_a;
 
-        Actuator *m_actuator_b;
-        
-        Actuator *m_actuator_c;
+        LegoMotor *m_actuator_b;
 
-        Actuator *m_actuator_d;        
+        LegoMotor *m_actuator_c;
 
-        Actuator *m_neoled;
+        LegoMotor *m_actuator_d;
 
-        Sensor *m_sensor_a;
+        Neoled *m_neoled;
 
-        Sensor *m_sensor_b;
-        
-        Sensor *m_sensor_c;
+        Led *m_led;
 
-        Sensor *m_sensor_d;        
+        LegoSensor *m_sensor_a;
 
-        Sensor *m_imu;
+        LegoSensor *m_sensor_b;
+
+        LegoSensor *m_sensor_c;
+
+        LegoSensor *m_sensor_d;
+
+        IMU *m_imu;
 };

@@ -4,24 +4,24 @@
 #include <module/module-output.hpp>
 #include <stm-hal/hal-tim.hpp>
 
-class EV3MediumMotor : public LegoMotor 
+class EV3MediumMotor : public LegoMotor
 {
     public:
 
         EV3MediumMotor(OutputPort *port, TimerType motor_pwm, TimerType motor_encoder);
 
         void forward(int32_t rotation);
-        
+
         void backward(int32_t rotation);
-        
+
         void stop(void);
 
         void start_sync(EV3MediumMotor *motor);
 
         void end_sync(void);
-        
+
         bool is_stalled(void);
-        
+
         int32_t get_tacho_count(void);
 
         void set_motor_pwm(uint8_t motor_pwm);

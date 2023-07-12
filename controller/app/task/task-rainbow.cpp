@@ -7,6 +7,11 @@
 static TaskHandle_t s_task_handler;
 static bool s_led_on = true;
 
+static Neoled rgb_led;
+
+/**
+ * Task rainbow thread.
+*/
 static void s_rainbow_thread(void*)
 {
     Neoled rgb_led;

@@ -6,46 +6,41 @@
 // ------------------------------------------------------------------------------------
 
 /**
- * Neoled Constructor.
- * 
+ * Init Neoled.
+ *
+ * Calls system_neoled_init()
+ *
  * defaults:
  * - rgb_on         = false
  * - rgb_colour     = NEO_WHITE
  * - rgb_brightness = NEO_BRI_10
 */
-Neoled::Neoled()
-{
-    m_rgb_on = false;
-    m_rgb_colour = NEO_WHITE;
-    m_rgb_brightness = NEO_BRI_10;
-}
-
-/**
- * Init Neoled.
- * 
- * Calls system_neoled_init()
-*/
 void Neoled::init()
 {
     system_neoled_init();
+
+    m_rgb_on = false;
+    m_rgb_colour = NEO_WHITE;
+    m_rgb_brightness = NEO_BRI_1;
 }
 
 /**
  * Update Neoled.
- * 
+ *
  * If RGB is on then sends set colour, otherwise sends 0, 0, 0.
 */
 void Neoled::update()
 {
     if (m_rgb_on)
     {
-        system_neoled_update(
+        system_neoled_update
+        (
             m_rgb_colour.red / m_rgb_brightness,
             m_rgb_colour.green / m_rgb_brightness,
             m_rgb_colour.blue / m_rgb_brightness
         );
     }
-    else 
+    else
     {
         system_neoled_update(0, 0, 0);
     }
@@ -69,7 +64,7 @@ void Neoled::off(void)
 
 /**
  * Set the Brightness value of the RGB LED.
- * 
+ *
  * @param brightness Neoled_Brightness enum value.
 */
 void Neoled::set_brightness(Neoled_Brightness brightness)
@@ -79,7 +74,7 @@ void Neoled::set_brightness(Neoled_Brightness brightness)
 
 /**
  * Get the Brightness value of the RGB LED.
- * 
+ *
  * @return Neoled Brightness
 */
 Neoled_Brightness Neoled::get_brightness(void)
@@ -89,7 +84,7 @@ Neoled_Brightness Neoled::get_brightness(void)
 
 /**
  * Set RGB values of LED
- * 
+ *
  * @param r Red (0 - 255)
  * @param g Green (0 - 255)
  * @param b Blue (0 - 255)
@@ -103,7 +98,7 @@ void Neoled::set_rgb(uint8_t r, uint8_t g, uint8_t b)
 
 /**
  * Set the Colour value of the RGB LED.
- * 
+ *
  * @param colour Neoled_Colour struct that colour is being changed to.
 */
 void Neoled::set_colour(Neoled_Colour colour)
@@ -113,7 +108,7 @@ void Neoled::set_colour(Neoled_Colour colour)
 
 /**
  * Get the current Colour of the RGB LED.
- * 
+ *
  * @return Neoled Colour
 */
 Neoled_Colour Neoled::get_colour(void)
