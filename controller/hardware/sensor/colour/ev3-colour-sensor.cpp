@@ -1,4 +1,4 @@
-#include <sensor/ev3-colour-sensor.hpp>
+#include <colour/ev3-colour-sensor.hpp>
 
 // ------------------------------------------------------------------------------------
 //                                      PUBLIC API

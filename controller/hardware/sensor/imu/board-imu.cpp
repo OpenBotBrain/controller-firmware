@@ -1,4 +1,4 @@
-#include <sensor/board-imu.hpp>
+#include <imu/board-imu.hpp>
 #include <system/system-imu.hpp>
 
 // ------------------------------------------------------------------------------------

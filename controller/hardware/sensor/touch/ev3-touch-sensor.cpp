@@ -1,4 +1,4 @@
-#include <sensor/ev3-touch-sensor.hpp>
+#include <touch/ev3-touch-sensor.hpp>
 
 // ------------------------------------------------------------------------------------
 //                                      PUBLIC API

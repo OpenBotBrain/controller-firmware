@@ -2,11 +2,11 @@
 
 #include <actuator/hardware-actuator.hpp>
 #include <actuator/lego-motor.hpp>
-#include <actuator/board-neoled.hpp>
-#include <actuator/board-led.hpp>
+#include <led/board-neoled.hpp>
+#include <led/board-led.hpp>
 #include <sensor/hardware-sensor.hpp>
 #include <sensor/lego-sensor.hpp>
-#include <sensor/board-imu.hpp>
+#include <imu/board-imu.hpp>
 
 class HardwareManager
 {

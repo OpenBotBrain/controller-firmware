@@ -1,4 +1,4 @@
-#include <device/nxt-i2c-device.hpp>
+#include <i2c/nxt-i2c-device.hpp>
 
 void NXTI2CDevice::init()
 {

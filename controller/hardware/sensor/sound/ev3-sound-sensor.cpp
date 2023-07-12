@@ -1,4 +1,4 @@
-#include <sensor/ev3-sound-sensor.hpp>
+#include <sound/ev3-sound-sensor.hpp>
 
 // ------------------------------------------------------------------------------------
 //                                      PUBLIC API

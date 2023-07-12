@@ -1,4 +1,4 @@
-#include <actuator/ev3-medium-motor.hpp>
+#include <motor/ev3-medium-motor.hpp>
 #include <cstdint>
 
 // ------------------------------------------------------------------------------------

@@ -1,7 +1,4 @@
 #include <hardware/hardware-manager.hpp>
-#include <actuator/board-neoled.hpp>
-#include <actuator/board-led.hpp>
-#include <sensor/board-imu.hpp>
 
 // ------------------------------------------------------------------------------------
 //                                      PUBLIC API
