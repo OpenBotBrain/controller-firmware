@@ -2,7 +2,7 @@
 
 #include <sensor/hardware-sensor.hpp>
 
-class IMU : public Sensor
+class IMU
 {
     public:
 

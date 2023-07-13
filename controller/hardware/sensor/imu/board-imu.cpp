@@ -1,5 +1,6 @@
 #include <imu/board-imu.hpp>
-#include <system/system-imu.hpp>
+//#include <system/system-imu.hpp>
+#include <task/task-imu.hpp>
 
 // ------------------------------------------------------------------------------------
 //                                      PUBLIC API
@@ -10,7 +11,7 @@
 */
 void IMU::init()
 {
-    system_imu_init();
+    //system_imu_init();
 }
 
 /**
@@ -18,7 +19,7 @@ void IMU::init()
 */
 void IMU::update()
 {
-    system_imu_update();
+    //system_imu_update();
 }
 
 /**
@@ -38,7 +39,7 @@ float IMU::fetch_sample()
 */
 float* IMU::fetch_accel()
 {
-    return system_imu_accel();
+    return task_imu_get_accel();
 }
 
 /**
@@ -48,7 +49,7 @@ float* IMU::fetch_accel()
 */
 float* IMU::fetch_gyro()
 {
-    return system_imu_gyro();
+    return task_imu_get_gyro();
 }
 
 /**
@@ -58,7 +59,7 @@ float* IMU::fetch_gyro()
 */
 float* IMU::fetch_roll_pitch()
 {
-    return system_imu_roll_pitch();
+    return task_imu_get_roll_pitch();
 }
 
 // ------------------------------------------------------------------------------------

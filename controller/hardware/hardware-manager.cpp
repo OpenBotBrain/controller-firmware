@@ -15,7 +15,8 @@ HardwareManager::HardwareManager(void)
     Led led;
     m_led = &led;
 
-    m_imu = nullptr;
+    IMU imu;
+    m_imu = &imu;
 }
 
 /**

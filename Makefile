@@ -104,7 +104,6 @@ CXXSRC+=system-status.cpp
 CXXSRC+=system-safe-i2c.cpp
 CXXSRC+=system-version.cpp
 CXXSRC+=system-neoled.cpp
-CXXSRC+=system-imu.cpp
 
 # Module folder
 CXXSRC+=module-input.cpp

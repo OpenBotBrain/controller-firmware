@@ -3,8 +3,9 @@
 #include <hardware/hardware-manager.hpp>
 #include <cstdint>
 #include <stdbool.h>
+#include <gscope/gscope-debug.hpp>
 
-static const TickType_t c_tick_delay = 33;
+static const TickType_t c_tick_delay = 5;
 
 static TaskHandle_t s_task_handler;
 static bool s_led_on = false;
@@ -13,13 +14,12 @@ static bool s_rgb_on = true;
 static HardwareManager s_manager;
 static Neoled *s_neoled;
 static Led *s_led;
+static IMU *s_imu;
 
-static Neoled_Colour colours[6] =
-{
-    NEO_RED, NEO_GREEN, NEO_BLUE,
-    NEO_YELLOW, NEO_PURPLE, NEO_TEAL,
-};
+static Neoled_Colour s_colour = NEO_WHITE;
+static float* s_imu_out;
 
+static float s_roll_threshold = 25.0f;
 /**
  * Hardware manager task.
  *
@@ -32,27 +32,32 @@ static void s_hardware_manager_thread(void*)
 
     s_manager.init();
 
-    for ( ;; )
+    for ( int i = 0 ;; i++ )
     {
-        for (int i = 0; i < 6; i++)
+        s_imu->update();
+        s_imu_out = s_imu->fetch_roll_pitch();
+
+        if (i % 7 == 0)
         {
             s_neoled->set_brightness(NEO_BRI_1);
-            s_neoled->set_colour(colours[i]);
-
             (s_rgb_on) ? s_neoled->on() : s_neoled->off();
-
+            s_colour = (s_imu_out[0] > s_roll_threshold || s_imu_out[0] < -s_roll_threshold) ? NEO_GREEN : NEO_RED;
+            s_neoled->set_colour(s_colour);
             s_neoled->update();
-
-            vTaskDelay(c_tick_delay);
         }
 
-        s_led->set_led_1(!s_led_on);
-        s_led->set_led_2(s_led_on);
-        s_led->set_led_3(s_led_on);
+        if (i % 50 == 0)
+        {
+            s_led->set_led_2(!s_led_on);                // top led
+            s_led->set_led_1((s_imu_out[0] > -s_roll_threshold));   // middle led
+            s_led->set_led_3((s_imu_out[0] < s_roll_threshold));    // bottom led
 
-        s_led_on = !s_led_on;
+            s_led_on = !s_led_on;
+            s_led->update();
+            i = 0;
+        }
 
-        s_led->update();
+        vTaskDelay(c_tick_delay);
     }
 }
 
