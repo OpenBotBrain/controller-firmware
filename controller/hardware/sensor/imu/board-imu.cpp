@@ -7,22 +7,6 @@
 // ------------------------------------------------------------------------------------
 
 /**
- * Init the IMU.
-*/
-void IMU::init()
-{
-    //system_imu_init();
-}
-
-/**
- * Update the IMU.
-*/
-void IMU::update()
-{
-    //system_imu_update();
-}
-
-/**
  * Fetch a sample from the IMU.
  *
  * @return float

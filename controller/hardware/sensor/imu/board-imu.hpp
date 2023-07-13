@@ -8,9 +8,9 @@ class IMU
 
         IMU(void) {};
 
-        void init(void);
+        void init(void) {};
 
-        void update(void);
+        void update(void) {};
 
         float fetch_sample(void);
 

@@ -6,6 +6,7 @@
 #include <gscope/gscope-debug.hpp>
 
 static const TickType_t c_tick_delay = 5;
+static const float s_roll_threshold = 25.0f;
 
 static TaskHandle_t s_task_handler;
 static bool s_led_on = false;
@@ -17,13 +18,12 @@ static Led *s_led;
 static IMU *s_imu;
 
 static Neoled_Colour s_colour = NEO_WHITE;
-static float* s_imu_out;
+static float *s_imu_out;
 
-static float s_roll_threshold = 25.0f;
 /**
  * Hardware manager task.
  *
- * Flashes the regular LED and cycles the RGB LED.
+ * The colour of the RGB LED changes depending on roll pitch from imu.
 */
 static void s_hardware_manager_thread(void*)
 {
@@ -31,11 +31,11 @@ static void s_hardware_manager_thread(void*)
     s_led = s_manager.get_led();
 
     s_manager.init();
+    s_imu_out = s_imu->fetch_roll_pitch();
 
     for ( int i = 0 ;; i++ )
     {
         s_imu->update();
-        s_imu_out = s_imu->fetch_roll_pitch();
 
         if (i % 7 == 0)
         {
@@ -48,7 +48,7 @@ static void s_hardware_manager_thread(void*)
 
         if (i % 50 == 0)
         {
-            s_led->set_led_2(!s_led_on);                // top led
+            s_led->set_led_2(!s_led_on);                            // top led
             s_led->set_led_1((s_imu_out[0] > -s_roll_threshold));   // middle led
             s_led->set_led_3((s_imu_out[0] < s_roll_threshold));    // bottom led
 
