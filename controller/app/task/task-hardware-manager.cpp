@@ -13,6 +13,7 @@ static bool s_led_on = false;
 static bool s_rgb_on = true;
 
 static HardwareManager s_manager;
+static Hardware_Config s_hardware_config;
 static Neoled *s_neoled;
 static Led *s_led;
 static IMU *s_imu;
@@ -27,8 +28,12 @@ static float *s_imu_out;
 */
 static void s_hardware_manager_thread(void*)
 {
+    s_hardware_config = s_manager.get_hardware_config();
     s_neoled = s_manager.get_neoled();
     s_led = s_manager.get_led();
+
+    uint16_t update_neoled_time = s_hardware_config.neoled_update_interval / c_tick_delay;
+    uint16_t update_led_time = s_hardware_config.led_update_interval / c_tick_delay;
 
     s_manager.init();
     s_imu_out = s_imu->fetch_roll_pitch();
@@ -37,7 +42,7 @@ static void s_hardware_manager_thread(void*)
     {
         s_imu->update();
 
-        if (i % 7 == 0)
+        if (i % update_neoled_time == 0)
         {
             s_neoled->set_brightness(NEO_BRI_1);
             (s_rgb_on) ? s_neoled->on() : s_neoled->off();
@@ -46,7 +51,7 @@ static void s_hardware_manager_thread(void*)
             s_neoled->update();
         }
 
-        if (i % 50 == 0)
+        if (i % update_led_time == 0)
         {
             s_led->set_led_2(!s_led_on);                            // top led
             s_led->set_led_1((s_imu_out[0] > -s_roll_threshold));   // middle led

@@ -78,9 +78,56 @@ controller-firmware
 
 ### ***Usage***
 
+Example task for blinking LEDs.
+
+```cpp
+#include <hardware/hardware-manager.hpp>
+
+static HardwareManager s_manager;
+static Led *s_led;
+
+static bool s_led_on = false;
+
+void task_blink_thread(void*)
+{
+    s_led = s_manager.get_led();
+    s_manager.init();
+
+    for ( ;; )
+    {
+        s_led->set_led_1(s_led_on);
+        s_led->set_led_2(!s_led_on);
+        s_led->set_led_3(s_led_on);
+
+        s_led_on = !s_led_on;
+        s_manager.update();
+
+        vTaskDelay(250);
+    }
+}
+```
+
+Hardware Manager Config.
+
+```cpp
+struct Hardware_Config
+{
+    uint16_t neoled_update_interval;
+    uint16_t led_update_interval;
+    uint16_t imu_update_interval;
+};
+
+Hardware_Config example_config
+{
+    .neoled_update_interval = 40,
+    .led_update_interval = 250,
+    .imu_update_interval = 5,
+}
+```
+
 ### ***Actuators***
 
-Actuator interfaces.
+Actuator interface.
 
 ```cpp
 class Actuator
@@ -91,7 +138,11 @@ class Actuator
 
         virtual void update(void) = 0;
 };
+```
 
+Lego Motor interface.
+
+```cpp
 class LegoMotor
 {
     public:
@@ -126,17 +177,7 @@ class LegoMotor
 
         virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) = 0;
 };
-
 ```
-
-#### *Neoled*
-
-
-#### *EV3 Large Motor*
-
-#### *EV3 Medium Motor*
-
-#### *NXT Motor*
 
 ### ***Devices***
 

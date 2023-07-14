@@ -8,6 +8,13 @@
 #include <sensor/lego-sensor.hpp>
 #include <imu/board-imu.hpp>
 
+struct Hardware_Config
+{
+    uint16_t neoled_update_interval;
+    uint16_t led_update_interval;
+    uint16_t imu_update_interval;
+};
+
 class HardwareManager
 {
     public:
@@ -17,6 +24,8 @@ class HardwareManager
         void init(void);
 
         void update(void);
+
+        Hardware_Config get_hardware_config();
 
         LegoMotor *get_actuator_a(void);
 
@@ -41,6 +50,8 @@ class HardwareManager
         IMU *get_imu(void);
 
     private:
+
+        Hardware_Config m_hardware_config;
 
         LegoMotor *m_actuator_a;
 

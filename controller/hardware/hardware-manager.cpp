@@ -17,6 +17,13 @@ HardwareManager::HardwareManager(void)
 
     IMU imu;
     m_imu = &imu;
+
+    m_hardware_config = Hardware_Config
+    {
+        .neoled_update_interval = 35,
+        .led_update_interval = 250,
+        .imu_update_interval = 5,
+    };
 }
 
 /**
@@ -59,6 +66,16 @@ void HardwareManager::update()
     {
         m_imu->update();
     }
+}
+
+/**
+ * Gets the config of the hardware manager.
+ *
+ * @return Hardware_Config
+*/
+Hardware_Config HardwareManager::get_hardware_config()
+{
+    return m_hardware_config;
 }
 
 /**
