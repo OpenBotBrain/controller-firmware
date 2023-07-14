@@ -20,9 +20,13 @@ enum Lego_Sensor_Type
     LEGO_SENSOR_TYPE_TOTAL
 };
 
-class LegoSensor : public Sensor
+class LegoSensor
 {
     public:
+
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
 
         virtual float fetch_sample(void) = 0;
 

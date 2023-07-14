@@ -12,9 +12,9 @@ enum Lego_Device_Type
     LEGO_DEVICE_TYPE_TOTAL
 };
 
-class LegoDevice : public Device
+class LegoDevice
 {
-    public :
+    public:
 
         virtual void init(void) = 0;
 

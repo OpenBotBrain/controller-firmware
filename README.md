@@ -194,6 +194,19 @@ class Device
 };
 ```
 
+Lego Device interface.
+
+```cpp
+class LegoDevice
+{
+    public:
+
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
+};
+```
+
 unknown if needed.
 
 ### ***Sensors***
@@ -213,8 +226,21 @@ class Sensor
 };
 ```
 
-#### *Inertial Measurement Unit (IMU)*
+Lego Sensor interface.
 
-#### *EV3 Colour Sensor*
+```cpp
+class LegoSensor
+{
+    public:
 
-#### *EV3 Sound Sensor*
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
+
+        virtual float fetch_sample(void) = 0;
+
+        virtual void set_mode(uint8_t mode) = 0;
+
+        virtual uint8_t get_mode(void) = 0;
+};
+```
