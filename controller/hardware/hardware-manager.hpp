@@ -4,13 +4,38 @@
 #include <sensor/hardware-sensor.hpp>
 #include <mutex>
 
+static constexpr uint16_t ACTUATOR_COUNT = 5;
+static constexpr uint16_t SENSOR_COUNT   = 5;
+
+enum Acuator_Type
+{
+    ACTUATOR_A = 0,
+    ACTUATOR_B,
+    ACTUATOR_C,
+    ACTUATOR_D,
+    NEOLED
+};
+
+enum Sensor_Type
+{
+    SENSOR_1 = 0,
+    SENSOR_2,
+    SENSOR_3,
+    SENSOR_4,
+    IMU
+};
+
 class HardwareManager
 {
     public:
 
-        HardwareManager(void);
+        HardwareManager(void) {};
 
-        ~HardwareManager(void);
+        void init(void);
+
+        void update(void);
+
+        Actuator *get_actuator(Acuator_Type actuator);
 
         Actuator *get_actuator_a(void);
 
@@ -22,35 +47,35 @@ class HardwareManager
 
         Actuator *get_neoled(void);
 
-        Sensor *get_sensor_a(void);
+        Sensor *get_sensor(Sensor_Type sensor);
 
-        Sensor *get_sensor_b(void);
+        Sensor *get_sensor_1(void);
 
-        Sensor *get_sensor_c(void);
+        Sensor *get_sensor_2(void);
 
-        Sensor *get_sensor_d(void);
+        Sensor *get_sensor_3(void);
+
+        Sensor *get_sensor_4(void);
 
         Sensor *get_imu(void);
 
     private:
 
-        Actuator *m_actuator_a;
+        std::array<Actuator* , ACTUATOR_COUNT> m_actuators =
+        {
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr
+        };
 
-        Actuator *m_actuator_b;
-        
-        Actuator *m_actuator_c;
-
-        Actuator *m_actuator_d;        
-
-        Actuator *m_neoled;
-
-        Sensor *m_sensor_a;
-
-        Sensor *m_sensor_b;
-        
-        Sensor *m_sensor_c;
-
-        Sensor *m_sensor_d;        
-
-        Sensor *m_imu;
+        std::array<Sensor* , ACTUATOR_COUNT> m_sensors =
+        {
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr
+        };
 };

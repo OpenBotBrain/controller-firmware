@@ -7,7 +7,7 @@
 
 /**
  * Create an EV3 Large Motor.
- * 
+ *
  * @param *port pointer to motors port.
  * @param motor_pmw Timer Type value for motor pwm.
  * @param motor_encoder Timer Type value for motor encoder.
@@ -27,7 +27,7 @@ EV3LargeMotor::EV3LargeMotor(OutputPort *port, TimerType motor_pwm, TimerType mo
 
 /**
  * Drive the motor forward.
- * 
+ *
  * @param rotation amount forward for the motor.
 */
 void EV3LargeMotor::forward(int32_t rotation)
@@ -49,7 +49,7 @@ void EV3LargeMotor::forward(int32_t rotation)
 
 /**
  * Drive the motor backward.
- * 
+ *
  * @param rotation amount backward for the motor.
 */
 void EV3LargeMotor::backward(int32_t rotation)
@@ -84,7 +84,7 @@ void EV3LargeMotor::stop()
 
 /**
  * Sync with another Large Motor.
- * 
+ *
  * @param motor address of other motor that is being synced with.
 */
 void EV3LargeMotor::start_sync(EV3LargeMotor *motor)
@@ -121,7 +121,7 @@ void EV3LargeMotor::end_sync()
 
 /**
  * Checks if the motor is currently stalled.
- * 
+ *
  * @return boolean - stalled value.
 */
 bool EV3LargeMotor::is_stalled()
@@ -132,9 +132,9 @@ bool EV3LargeMotor::is_stalled()
 /**
  * Get the tacho count of the motor.
  * Uses the encoder of the motor.
- * 
- * @return int32_t - tacho count. 
-*/       
+ *
+ * @return int32_t - tacho count.
+*/
 int32_t EV3LargeMotor::get_tacho_count()
 {
     return 0;
@@ -142,7 +142,7 @@ int32_t EV3LargeMotor::get_tacho_count()
 
 /**
  * Set the motor pwm
- * 
+ *
  * @param motor_pwm
 */
 void EV3LargeMotor::set_motor_pwm(uint8_t motor_pwm)
@@ -152,7 +152,7 @@ void EV3LargeMotor::set_motor_pwm(uint8_t motor_pwm)
 
 /**
  * Get the motor pwm
- * 
+ *
  * @return motor_pwm
 */
 uint8_t EV3LargeMotor::get_motor_pwm()
@@ -162,7 +162,7 @@ uint8_t EV3LargeMotor::get_motor_pwm()
 
 /**
  * Set the motor encoder
- * 
+ *
  * @param motor_encoder
 */
 void EV3LargeMotor::set_motor_encoder(uint8_t motor_encoder)
@@ -173,7 +173,7 @@ void EV3LargeMotor::set_motor_encoder(uint8_t motor_encoder)
 
 /**
  * Get the motor encoder
- * 
+ *
  * @return motor_encoder
 */
 uint8_t EV3LargeMotor::get_motor_encoder()
@@ -183,9 +183,9 @@ uint8_t EV3LargeMotor::get_motor_encoder()
 
 /**
  * Set the motor speed.
- * 
+ *
  * If motor speed is greater than the maximum motor speed then it is set to the max speed.
- * 
+ *
  * @param motor_speed
 */
 void EV3LargeMotor::set_motor_speed(uint32_t motor_speed)
@@ -196,7 +196,7 @@ void EV3LargeMotor::set_motor_speed(uint32_t motor_speed)
 
 /**
  * Get the motor speed.
- * 
+ *
  * @return motor_speed
 */
 uint32_t EV3LargeMotor::get_motor_speed(void)
@@ -210,7 +210,7 @@ uint32_t EV3LargeMotor::get_motor_speed(void)
 
 /**
  * Drive a motor.
- * 
+ *
  * @param speed float value containing speed of motor.
  * @param rotation amount of rotation of the motor.
  * @param immediate_return should we immediately return to program after telling the motor to run?
@@ -232,7 +232,7 @@ void EV3LargeMotor::drive_motor(float speed, int32_t rotation, bool immediate_re
 
             now = m_port->get_encoder_ticks();
         }
-    } 
+    }
     else
     {
         m_port->set_pwm_duty(speed);

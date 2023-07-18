@@ -35,17 +35,17 @@ class LegoMotor
         LegoMotor(void) {};
 
         virtual void forward(int32_t rotation) = 0;
-        
+
         virtual void backward(int32_t rotation) = 0;
-        
+
         virtual void stop(void) = 0;
 
         virtual void start_sync(LegoMotor *motor) = 0;
 
         virtual void end_sync(void) = 0;
-        
+
         virtual bool is_stalled(void) = 0;
-        
+
         virtual int32_t get_tacho_count(void) = 0;
 
         virtual void set_motor_pwm(uint8_t motor_pwm) = 0;

@@ -1,7 +1,6 @@
 #include <config/appconfig.h>
 #include <system/system-freertos.hpp>
 #include <system/system-status.hpp>
-#include <system/system-neoled.hpp>
 #include <gscope/gscope.hpp>
 #include <stm-hal/hal-tim.hpp>
 

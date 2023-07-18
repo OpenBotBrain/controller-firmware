@@ -1,61 +1,71 @@
 #include <hardware/hardware-manager.hpp>
 
-HardwareManager::HardwareManager(void)
+void HardwareManager::init()
 {
-    return;
+
 }
 
-HardwareManager::~HardwareManager(void)
+void HardwareManager::update()
 {
-    return;
+
 }
 
-Actuator HardwareManager::*get_actuator_a(void)
+Actuator *HardwareManager::get_actuator(Acuator_Type actuator)
 {
-    return nullptr;
+    return m_actuators[actuator];
 }
 
-Actuator HardwareManager::*get_actuator_b(void)
+Actuator *HardwareManager::get_actuator_a(void)
 {
-    return nullptr;
+    return m_actuators[0];
 }
 
-Actuator HardwareManager::*get_actuator_c(void)
+Actuator *HardwareManager::get_actuator_b(void)
 {
-    return nullptr;
+    return m_actuators[1];
 }
 
-Actuator HardwareManager::*get_actuator_d(void)
+Actuator *HardwareManager::get_actuator_c(void)
 {
-    return nullptr;
+    return m_actuators[2];
 }
 
-Actuator HardwareManager::*get_neoled(void)
+Actuator *HardwareManager::get_actuator_d(void)
 {
-    return nullptr;
+    return m_actuators[3];
 }
 
-Sensor HardwareManager::*get_sensor_a(void)
+Actuator *HardwareManager::get_neoled(void)
 {
-    return nullptr;
+    return m_actuators[4];
 }
 
-Sensor HardwareManager::*get_sensor_b(void)
+Sensor *HardwareManager::get_sensor(Sensor_Type sensor)
 {
-    return nullptr;
+    return m_sensors[sensor];
 }
 
-Sensor HardwareManager::*get_sensor_c(void)
+Sensor *HardwareManager::get_sensor_1(void)
 {
-    return nullptr;
+    return m_sensors[0];
 }
 
-Sensor HardwareManager::*get_sensor_d(void)
+Sensor *HardwareManager::get_sensor_2(void)
 {
-    return nullptr;
+    return m_sensors[1];
 }
 
-Sensor HardwareManager::*get_imu(void)
+Sensor *HardwareManager::get_sensor_3(void)
 {
-    return nullptr;
+    return m_sensors[2];
+}
+
+Sensor *HardwareManager::get_sensor_4(void)
+{
+    return m_sensors[3];
+}
+
+Sensor *HardwareManager::get_imu(void)
+{
+    return m_sensors[4];
 }
