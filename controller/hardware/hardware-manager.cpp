@@ -45,6 +45,17 @@ void HardwareManager::init()
     {
         m_imu->init();
     }
+
+    if (m_battery != nullptr)
+    {
+        m_battery->init();
+    }
+
+    // If no battery connected do not init any ports.
+    if (!m_battery->battery_connected())
+    {
+        return;
+    }
 }
 
 /**
@@ -65,6 +76,17 @@ void HardwareManager::update()
     if (m_imu != nullptr)
     {
         m_imu->update();
+    }
+
+    if (m_battery != nullptr)
+    {
+        m_battery->update();
+    }
+
+    // If no battery connected do not update any ports.
+    if (!m_battery->battery_connected())
+    {
+        return;
     }
 }
 
@@ -201,6 +223,22 @@ IMU *HardwareManager::get_imu(void)
     if (m_imu != nullptr)
     {
         return m_imu;
+    }
+
+    // error?
+    return nullptr;
+}
+
+/**
+ * Get pointer of the IMU.
+ *
+ * @return IMU*
+*/
+Battery *HardwareManager::get_battery(void)
+{
+    if (m_battery != nullptr)
+    {
+        return m_battery;
     }
 
     // error?

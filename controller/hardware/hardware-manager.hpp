@@ -7,6 +7,7 @@
 #include <sensor/hardware-sensor.hpp>
 #include <sensor/lego-sensor.hpp>
 #include <imu/board-imu.hpp>
+#include <battery/board-battery.hpp>
 
 struct Hardware_Config
 {
@@ -49,9 +50,15 @@ class HardwareManager
 
         IMU *get_imu(void);
 
+        Battery *get_battery(void);
+
     private:
 
+        // Config
+
         Hardware_Config m_hardware_config;
+
+        // Actuators
 
         LegoMotor *m_actuator_a;
 
@@ -65,6 +72,8 @@ class HardwareManager
 
         Led *m_led;
 
+        // Sensors
+
         LegoSensor *m_sensor_a;
 
         LegoSensor *m_sensor_b;
@@ -74,4 +83,8 @@ class HardwareManager
         LegoSensor *m_sensor_d;
 
         IMU *m_imu;
+
+        Battery *m_battery;
+
+        // Devices
 };
