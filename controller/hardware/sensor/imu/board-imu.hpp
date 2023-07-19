@@ -6,17 +6,17 @@ class IMU
 {
     public:
 
-        IMU(void) {};
+        IMU() {};
 
-        void init(void) {};
+        void init() {};
 
-        void update(void) {};
+        void update() {};
 
-        float fetch_sample(void);
+        float fetch_sample();
 
-        float* fetch_accel(void);
+        float* fetch_accel();
 
-        float* fetch_gyro(void);
+        float* fetch_gyro();
 
-        float* fetch_roll_pitch(void);
+        float* fetch_roll_pitch();
 };

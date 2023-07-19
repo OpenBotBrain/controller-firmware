@@ -5,7 +5,28 @@
 #include <led/board-neoled.hpp>
 #include <led/board-led.hpp>
 #include <sensor/hardware-sensor.hpp>
+#include <sensor/lego-sensor.hpp>
+#include <imu/board-imu.hpp>
+#include <battery/board-battery.hpp>
 #include <mutex>
+
+static constexpr uint16_t PORT_COUNT = 4;
+
+enum class Lego_Motor_Port
+{
+    ACTUATOR_A  = 0,
+    ACTUATOR_B  = 1,
+    ACTUATOR_C  = 2,
+    ACTUATOR_D  = 3
+};
+
+enum class Lego_Sensor_Port
+{
+    SENSOR_1    = 0,
+    SENSOR_2    = 1,
+    SENSOR_3    = 2,
+    SENSOR_4    = 3
+};
 
 struct Hardware_Config
 {
@@ -18,61 +39,47 @@ class HardwareManager
 {
     public:
 
-        HardwareManager(void) {};
+        HardwareManager() {};
 
-        void init(void);
+        void init();
 
-        void update(void);
-
-        Actuator *get_actuator(Acuator_Type actuator);
-
-        void update(void);
+        void update();
 
         Hardware_Config get_hardware_config();
 
-        LegoMotor *get_actuator_a(void);
+        LegoMotor* get_lego_motor(Lego_Motor_Port actuator);
 
-        LegoMotor *get_actuator_b(void);
+        Neoled* get_neoled();
 
-        LegoMotor *get_actuator_c(void);
+        Led* get_led();
 
-        Sensor *get_sensor(Sensor_Type sensor);
+        LegoSensor* get_lego_sensor(Lego_Sensor_Port sensor);
 
-        Sensor *get_sensor_1(void);
-
-        Sensor *get_sensor_2(void);
-
-        Sensor *get_sensor_3(void);
-
-        Sensor *get_sensor_4(void);
-
-        LegoSensor *get_sensor_b(void);
-
-        LegoSensor *get_sensor_c(void);
-
-        LegoSensor *get_sensor_d(void);
-
-        IMU *get_imu(void);
-
-        Battery *get_battery(void);
+        IMU* get_imu();
 
     private:
 
-        std::array<Actuator* , ACTUATOR_COUNT> m_actuators =
+        Hardware_Config m_hardware_config;
+
+        std::array<LegoMotor* , PORT_COUNT> m_lego_motors =
         {
-            nullptr,
             nullptr,
             nullptr,
             nullptr,
             nullptr
         };
 
-        std::array<Sensor* , ACTUATOR_COUNT> m_sensors =
+        std::array<LegoSensor* , PORT_COUNT> m_lego_sensors =
         {
-            nullptr,
             nullptr,
             nullptr,
             nullptr,
             nullptr
         };
+
+        Neoled* m_neoled;
+
+        Led* m_led;
+
+        IMU* m_imu;
 };

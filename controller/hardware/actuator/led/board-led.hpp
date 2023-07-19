@@ -7,13 +7,13 @@ class Led
 {
     public:
 
-        Led(void) {};
+        Led() {};
 
-        void init(void);
+        void init();
 
-        void update(void);
+        void update();
 
-        void reset(void);
+        void reset();
 
         void set_led_1(bool state);
 

@@ -15,11 +15,11 @@ int main(void)
 {
     board_rev_init();               // Init board revision, IOs and clock configuration
 
-    task_hardware_manager_init();   // Init hardware manager task.
+    //task_hardware_manager_init();   // Init hardware manager task.
 
-    //task_rainbow_init();            // Init rainbow task.
+    task_rainbow_init();            // Init rainbow task.
 
-    //task_blinky_init();             // Init main blinky task.
+    task_blinky_init();             // Init main blinky task.
 
     task_gscope_init();             // Init gscope debug app
 

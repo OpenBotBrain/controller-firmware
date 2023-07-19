@@ -6,7 +6,7 @@
 
 Lego_Sensor_Type get_lego_sensor_type(InputPort *port)
 {
-    if (port);
+    (void) port;
 
     return UNDEFINED_LEGO_SENSOR;
 }

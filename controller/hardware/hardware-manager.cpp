@@ -5,18 +5,18 @@
 // ------------------------------------------------------------------------------------
 
 /**
- * Creates the HardwareManager object, inits its members.
+ * Init everything within the hardware manager.
 */
-HardwareManager::HardwareManager(void)
+void HardwareManager::init()
 {
     Neoled neoled;
-    m_actuators[NEOLED] = &neoled;
+    m_neoled = &neoled;
 
     Led led;
-    m_actuators[LED] = &led;
+    m_led = &led;
 
     IMU imu;
-    m_sensors[GYRO] = &imu;
+    m_imu = &imu;
 
     m_hardware_config = Hardware_Config
     {
@@ -27,67 +27,11 @@ HardwareManager::HardwareManager(void)
 }
 
 /**
- * Init everything within the hardware manager.
-*/
-void HardwareManager::init()
-{
-    if (m_neoled != nullptr)
-    {
-        m_neoled->init();
-    }
-
-    if (m_led != nullptr)
-    {
-        m_led->init();
-    }
-
-    if (m_imu != nullptr)
-    {
-        m_imu->init();
-    }
-
-    if (m_battery != nullptr)
-    {
-        m_battery->init();
-    }
-
-    // If no battery connected do not init any ports.
-    if (!m_battery->battery_connected())
-    {
-        return;
-    }
-}
-
-/**
  * Update everything within the hardware manager.
 */
 void HardwareManager::update()
 {
-    if (m_neoled != nullptr)
-    {
-        m_neoled->update();
-    }
 
-    if (m_led != nullptr)
-    {
-        m_led->update();
-    }
-
-    if (m_imu != nullptr)
-    {
-        m_imu->update();
-    }
-
-    if (m_battery != nullptr)
-    {
-        m_battery->update();
-    }
-
-    // If no battery connected do not update any ports.
-    if (!m_battery->battery_connected())
-    {
-        return;
-    }
 }
 
 /**
@@ -101,21 +45,41 @@ Hardware_Config HardwareManager::get_hardware_config()
 }
 
 /**
- * Get pointer of actuator a.
+ * Get pointer of given actuator type.
  *
- * @return LegoMotor*
+ * @return Actuator*
 */
-Actuator *HardwareManager::get_actuator(Acuator_Type actuator)
+LegoMotor* HardwareManager::get_lego_motor(Lego_Motor_Port actuator_type)
 {
-    return m_actuators[actuator];
+    uint8_t actuator = static_cast<uint8_t>(actuator_type);
+    return m_lego_motors[actuator];
 }
 
-
-Sensor *HardwareManager::get_sensor(Sensor_Type sensor)
+Neoled* HardwareManager::get_neoled()
 {
-    return m_sensors[sensor];
+    return m_neoled;
 }
 
+Led* HardwareManager::get_led()
+{
+    return m_led;
+}
+
+/**
+ * Get pointer of given sensor type.
+ *
+ * @return Sensor*
+*/
+LegoSensor* HardwareManager::get_lego_sensor(Lego_Sensor_Port sensor_type)
+{
+    uint8_t sensor = static_cast<uint8_t>(sensor_type);
+    return m_lego_sensors[sensor];
+}
+
+IMU* HardwareManager::get_imu()
+{
+    return m_imu;
+}
 
 // ------------------------------------------------------------------------------------
 //                                      PRIVATE API

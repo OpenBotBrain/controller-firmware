@@ -3,7 +3,8 @@
 #include <actuator/hardware-actuator.hpp>
 #include <cstdint>
 
-static constexpr uint8_t COLOUR_SIZE = 8;
+static constexpr uint8_t COLOUR_SIZE        = 8;  // Size of one colour.
+static constexpr uint8_t COLOUR_BUFFER_SIZE = 25; // 3 * COLOUR_SIZE + 1.
 
 /**
  * MAX is NEO_BRI_10, MIN is NEO_BRI_1.
@@ -52,29 +53,29 @@ class Neoled
 {
     public:
 
-        Neoled(void) {};
+        Neoled() {};
 
-        void init(void) override;
+        void init();
 
-        void update(void) override;
+        void update();
 
         void set_enable(bool enable);
 
         void set_brightness(Neoled_Brightness brightness);
 
-        Neoled_Brightness get_brightness(void);
+        Neoled_Brightness get_brightness();
 
         void set_rgb(uint8_t r, uint8_t g, uint8_t b);
 
         void set_colour(Neoled_Colour colour);
 
-        Neoled_Colour get_colour(void);
+        Neoled_Colour get_colour();
 
     private:
 
-        void load_rgb(void);
+        void load_rgb();
 
-        bool colour_changed(void);
+        bool colour_changed();
 
     private:
 
@@ -84,11 +85,11 @@ class Neoled
 
         Neoled_Colour m_last_colour {NEO_BLACK};
 
-        Neoled_Brightness m_rgb_brightness {NEO_BRI_10};
+        Neoled_Brightness m_rgb_brightness {NEO_BRI_1};
 
         uint8_t m_rgb_timer_on_off_periods[2] = {0};
 
-        uint8_t m_rgb_timer_data[3 * COLOUR_SIZE + 1] = {0};
+        uint8_t m_rgb_timer_data[COLOUR_BUFFER_SIZE] = {0};
 
         uint32_t m_timestamp;
 };

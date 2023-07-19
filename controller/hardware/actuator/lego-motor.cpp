@@ -6,7 +6,7 @@
 
 Lego_Motor_Type get_lego_motor_type(OutputPort *port)
 {
-    if (port);
+    (void) port;
 
     return UNDEFINED_LEGO_MOTOR;
 }

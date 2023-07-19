@@ -1,6 +1,6 @@
 #include <config/appconfig.h>
 #include <system/system-freertos.hpp>
-#include <actuator/led/board-neoled.hpp>
+#include <led/board-neoled.hpp>
 #include <cstdint>
 #include <stdbool.h>
 
@@ -14,11 +14,6 @@ static Neoled_Colour colours[6] =
     NEO_YELLOW, NEO_PURPLE, NEO_TEAL,
 };
 
-static Neoled rgb_led;
-
-/**
- * Task rainbow thread.
-*/
 static void s_rainbow_thread(void*)
 {
     s_rgb_led.init();
