@@ -133,4 +133,5 @@ bool hal_gpio_read_pin(uint16_t io);
 void hal_gpio_reset_pin(uint16_t io);
 void hal_gpio_set_pin(uint16_t io);
 uint16_t hal_gpio_get_pin(uint16_t io);
+void hal_gpio_toggle_pin(uint16_t io);
 void hal_gpio_configure_io(uint8_t type);

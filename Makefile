@@ -54,8 +54,10 @@ root_folder_path := $(PROJECT_DIR)/controller
 
 application_path := $(root_folder_path)/app
 config_path := $(root_folder_path)/config
+hardware_path := $(root_folder_path)/hardware
 startup_linker_path := $(root_folder_path)/startup-linker
 stm_hal_library_path := $(root_folder_path)/stm-hal
+
 library_path := $(PROJECT_DIR)/libs
 
 # Linker File
@@ -70,6 +72,7 @@ board_include_paths := \
 	-I$(root_folder_path)/ \
 	-I$(application_path)/ \
 	-I$(config_path)/ \
+	-I$(hardware_path)/ \
 	-I$(stm_hal_library_path)/usb \
 
 all_source_path := \
@@ -77,6 +80,10 @@ all_source_path := \
 	$(application_path)/system \
 	$(application_path)/task \
 	$(application_path)/module \
+	$(hardware_path)/ \
+	$(hardware_path)/actuator \
+	$(hardware_path)/device \
+	$(hardware_path)/sensor \
 	$(config_path) \
 	$(stm_hal_library_path) \
 	$(stm_hal_library_path)/usb
@@ -90,7 +97,11 @@ CXXSRC+=system-freertos.cpp
 CXXSRC+=system-status.cpp
 CXXSRC+=system-safe-i2c.cpp
 CXXSRC+=system-version.cpp
-CXXSRC+=system-neoled.cpp
+
+# Module folder
+CXXSRC+=module-input.cpp
+CXXSRC+=module-output.cpp
+CXXSRC+=module-ports.cpp
 
 # Task
 CXXSRC+=task-blinky.cpp
@@ -99,16 +110,53 @@ CXXSRC+=task-gscope.cpp
 CXXSRC+=task-imu.cpp
 CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
+CXXSRC+=task-rainbow.cpp
 CXXSRC+=task-update.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
 CXXSRC+=board-rev-a.cpp
 
-# Module folder
-CXXSRC+=module-input.cpp
-CXXSRC+=module-output.cpp
-CXXSRC+=module-ports.cpp
+# Hardware folder
+CXXSRC+=hardware-config.cpp
+CXXSRC+=hardware-manager.cpp
+
+# Actuator folder
+CXXSRC+=hardware-actuator.cpp
+CXXSRC+=lego-motor.cpp
+# ev3
+CXXSRC+=ev3-large-motor.cpp
+CXXSRC+=ev3-medium-motor.cpp
+# nxt
+CXXSRC+=nxt-motor.cpp
+# misc
+CXXSRC+=board-neoled.cpp
+
+# Device folder
+CXXSRC+=hardware-device.cpp
+CXXSRC+=lego-device.cpp
+# nxt
+CXXSRC+=nxt-i2c-device.cpp
+# misc
+CXXSRC+=new-dumb-device.cpp
+CXXSRC+=new-uart-device.cpp
+
+# Sensor folder
+CXXSRC+=hardware-sensor.cpp
+CXXSRC+=lego-sensor.cpp
+# ev3
+CXXSRC+=ev3-colour-sensor.cpp
+CXXSRC+=ev3-sound-sensor.cpp
+CXXSRC+=ev3-touch-sensor.cpp
+CXXSRC+=ev3-ultrasonic-sensor.cpp
+# nxt
+CXXSRC+=nxt-colour-sensor.cpp
+CXXSRC+=nxt-light-sensor.cpp
+CXXSRC+=nxt-sound-sensor.cpp
+CXXSRC+=nxt-temp-sensor.cpp
+CXXSRC+=nxt-touch-sensor.cpp
+# misc
+CXXSRC+=board-imu.cpp
 
 # ------------------------------------------------------------------------------------------
 # stm-hal low level config files APP - Source and Include

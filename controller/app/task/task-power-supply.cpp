@@ -176,9 +176,9 @@ void task_power_supply_init()
 {
     // Create task for Blinky App
     static StaticTask_t s_task_buffer;
-    static StackType_t s_stack[SIZE_POWER_sUPPLY];
+    static StackType_t s_stack[SIZE_POWER_SUPPLY];
 
-    s_task_handler = xTaskCreateStatic(s_blinky_thread, "Power Supply", SIZE_POWER_sUPPLY,
+    s_task_handler = xTaskCreateStatic(s_blinky_thread, "Power Supply", SIZE_POWER_SUPPLY,
         0, PRI_POWER_SUPPLY, s_stack, &s_task_buffer);
 
     system_safe_i2c_init();
