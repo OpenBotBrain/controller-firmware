@@ -12,7 +12,7 @@
  * @param motor_pmw Timer Type value for motor pwm.
  * @param motor_encoder Timer Type value for motor encoder.
 */
-EV3LargeMotor::EV3LargeMotor(OutputPort *port, TimerType motor_pwm, TimerType motor_encoder)
+EV3LargeMotor::EV3LargeMotor(OutputPort* port, TimerType motor_pwm, TimerType motor_encoder)
 {
     m_port = port;
     m_motor_pwm = motor_pwm;
@@ -87,7 +87,7 @@ void EV3LargeMotor::stop()
  *
  * @param motor address of other motor that is being synced with.
 */
-void EV3LargeMotor::start_sync(EV3LargeMotor *motor)
+void EV3LargeMotor::start_sync(EV3LargeMotor* motor)
 {
     if (m_synced)
     {

@@ -16,6 +16,9 @@
 
 static bool s_sending_data = false;
 
+/**
+ * Call back for Neoled timer.
+*/
 static void s_timer_transfer_finish_callback(void*)
 {
     // after this time, timer is ready to send a new color
@@ -152,6 +155,8 @@ void Neoled::load_rgb()
 
 /**
  * Checks to see if the colour has been changed.
+ *
+ * @return bool
 */
 bool Neoled::colour_changed()
 {

@@ -11,7 +11,7 @@
  *
  * @param *port pointer to Input port.
 */
-EV3SoundSensor::EV3SoundSensor(InputPort *port)
+EV3SoundSensor::EV3SoundSensor(InputPort* port)
 {
     m_port = port;
     m_sensor_mode = EV3_SOUND_SENSOR_DB;
@@ -23,7 +23,7 @@ EV3SoundSensor::EV3SoundSensor(InputPort *port)
  * @param *port pointer to Input port.
  * @param sensor_mode set the sensor mode here.
 */
-EV3SoundSensor::EV3SoundSensor(InputPort *port, EV3_Sound_Sensor_Mode sensor_mode)
+EV3SoundSensor::EV3SoundSensor(InputPort* port, EV3_Sound_Sensor_Mode sensor_mode)
 {
     m_port = port;
     m_sensor_mode = sensor_mode;

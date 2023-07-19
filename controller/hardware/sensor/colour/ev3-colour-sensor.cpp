@@ -11,7 +11,7 @@
  *
  * @param *port pointer to Input Port.
 */
-EV3ColourSensor::EV3ColourSensor(InputPort *port)
+EV3ColourSensor::EV3ColourSensor(InputPort* port)
 {
     m_port = port;
     m_sensor_mode = EV3_COLOUR_SENSOR_WHITE;
@@ -23,7 +23,7 @@ EV3ColourSensor::EV3ColourSensor(InputPort *port)
  * @param *port pointer to Input port.
  * @param sensor_mode set the sensor mode here.
 */
-EV3ColourSensor::EV3ColourSensor(InputPort *port, EV3_Colour_Sensor_Mode sensor_mode)
+EV3ColourSensor::EV3ColourSensor(InputPort* port, EV3_Colour_Sensor_Mode sensor_mode)
 {
     m_port = port;
     m_sensor_mode = sensor_mode;

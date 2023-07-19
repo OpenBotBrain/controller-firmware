@@ -35,4 +35,4 @@ class LegoSensor
         virtual uint8_t get_mode(void) = 0;
 };
 
-Lego_Sensor_Type get_lego_sensor_type(InputPort *port);
+Lego_Sensor_Type get_lego_sensor_type(InputPort* port);

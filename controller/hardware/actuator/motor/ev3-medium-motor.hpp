@@ -8,7 +8,7 @@ class EV3MediumMotor : public LegoMotor
 {
     public:
 
-        EV3MediumMotor(OutputPort *port, TimerType motor_pwm, TimerType motor_encoder);
+        EV3MediumMotor(OutputPort* port, TimerType motor_pwm, TimerType motor_encoder);
 
         void forward(int32_t rotation) override;
 
@@ -42,7 +42,7 @@ class EV3MediumMotor : public LegoMotor
 
     private:
 
-        OutputPort *m_port;
+        OutputPort* m_port;
 
         TimerType m_motor_pwm;
 

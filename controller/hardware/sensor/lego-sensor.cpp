@@ -4,7 +4,7 @@
 //                                      PUBLIC API
 // ------------------------------------------------------------------------------------
 
-Lego_Sensor_Type get_lego_sensor_type(InputPort *port)
+Lego_Sensor_Type get_lego_sensor_type(InputPort* port)
 {
     (void) port;
 

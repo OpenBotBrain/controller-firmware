@@ -19,7 +19,7 @@ static Led s_led;
 static IMU s_imu;
 
 static Neoled_Colour s_colour = NEO_WHITE;
-static float *s_imu_out;
+static float* s_imu_out;
 
 /**
  * Hardware manager task.

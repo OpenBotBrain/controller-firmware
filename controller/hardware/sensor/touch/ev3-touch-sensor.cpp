@@ -11,7 +11,7 @@
  *
  * @param *port pointer to Input port.
 */
-EV3TouchSensor::EV3TouchSensor(InputPort *port)
+EV3TouchSensor::EV3TouchSensor(InputPort* port)
 {
     m_port = port;
     m_sensor_mode = EV3_TOUCH_SENSOR_TOUCH;
@@ -23,7 +23,7 @@ EV3TouchSensor::EV3TouchSensor(InputPort *port)
  * @param *port pointer to Input port.
  * @param sensor_mode set the sensor mode here.
 */
-EV3TouchSensor::EV3TouchSensor(InputPort *port, EV3_Touch_Sensor_Mode sensor_mode)
+EV3TouchSensor::EV3TouchSensor(InputPort* port, EV3_Touch_Sensor_Mode sensor_mode)
 {
     m_port = port;
     m_sensor_mode = sensor_mode;

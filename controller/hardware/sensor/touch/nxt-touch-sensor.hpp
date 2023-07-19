@@ -20,9 +20,9 @@ class NXTTouchSensor : public LegoSensor
 {
     public:
 
-        NXTTouchSensor(InputPort *port);
+        NXTTouchSensor(InputPort* port);
 
-        NXTTouchSensor(InputPort *port, NXT_Touch_Sensor_Mode sensor_mode);
+        NXTTouchSensor(InputPort* port, NXT_Touch_Sensor_Mode sensor_mode);
 
         float fetch_sample(void);
 
@@ -32,7 +32,7 @@ class NXTTouchSensor : public LegoSensor
 
     private:
 
-        InputPort *m_port;
+        InputPort* m_port;
 
         NXT_Touch_Sensor_Mode m_sensor_mode;
 };

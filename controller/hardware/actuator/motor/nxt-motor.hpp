@@ -8,7 +8,7 @@ class NXTMotor : public LegoMotor
 {
     public:
 
-        NXTMotor(OutputPort *port, TimerType motor_pwm, TimerType motor_encoder);
+        NXTMotor(OutputPort* port, TimerType motor_pwm, TimerType motor_encoder);
 
         void forward(int32_t rotation);
 
@@ -16,7 +16,7 @@ class NXTMotor : public LegoMotor
 
         void stop(void);
 
-        void start_sync(NXTMotor *motor);
+        void start_sync(NXTMotor* motor);
 
         void end_sync(void);
 
@@ -42,7 +42,7 @@ class NXTMotor : public LegoMotor
 
     private:
 
-        OutputPort *m_port;
+        OutputPort* m_port;
 
         TimerType m_motor_pwm;
 

@@ -12,7 +12,7 @@
  * @param motor_pmw Timer Type value for motor pwm.
  * @param motor_encoder Timer Type value for motor encoder.
 */
-NXTMotor::NXTMotor(OutputPort *port, TimerType motor_pwm, TimerType motor_encoder)
+NXTMotor::NXTMotor(OutputPort* port, TimerType motor_pwm, TimerType motor_encoder)
 {
     m_port = port;
     m_motor_pwm = motor_pwm;
@@ -60,7 +60,7 @@ void NXTMotor::stop()
  *
  * @param motor address of other motor that is being synced with.
 */
-void NXTMotor::start_sync(NXTMotor *motor)
+void NXTMotor::start_sync(NXTMotor* motor)
 {
     if (m_synced)
     {

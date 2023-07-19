@@ -63,4 +63,4 @@ class LegoMotor
         virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) = 0;
 };
 
-Lego_Motor_Type get_lego_motor_type(OutputPort *port);
+Lego_Motor_Type get_lego_motor_type(OutputPort* port);

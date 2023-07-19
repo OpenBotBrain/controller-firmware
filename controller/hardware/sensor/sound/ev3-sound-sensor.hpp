@@ -22,9 +22,9 @@ class EV3SoundSensor : public LegoSensor
 {
     public:
 
-        EV3SoundSensor(InputPort *port);
+        EV3SoundSensor(InputPort* port);
 
-        EV3SoundSensor(InputPort *port, EV3_Sound_Sensor_Mode sensor_mode);
+        EV3SoundSensor(InputPort* port, EV3_Sound_Sensor_Mode sensor_mode);
 
         float fetch_sample(void);
 
@@ -34,7 +34,7 @@ class EV3SoundSensor : public LegoSensor
 
     private:
 
-        InputPort *m_port;
+        InputPort* m_port;
 
         EV3_Sound_Sensor_Mode m_sensor_mode;
 };

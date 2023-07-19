@@ -6,7 +6,7 @@ class NXTI2CDevice
 
         NXTI2CDevice(void) {};
 
-        void init(void);
+        void init(void) {};
 
-        void update(void);
+        void update(void) {};
 };

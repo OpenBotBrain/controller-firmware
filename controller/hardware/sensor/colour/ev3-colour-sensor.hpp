@@ -18,9 +18,9 @@ class EV3ColourSensor : public LegoSensor
 {
     public:
 
-        EV3ColourSensor(InputPort *port);
+        EV3ColourSensor(InputPort* port);
 
-        EV3ColourSensor(InputPort *port, EV3_Colour_Sensor_Mode sensor_mode);
+        EV3ColourSensor(InputPort* port, EV3_Colour_Sensor_Mode sensor_mode);
 
         float fetch_sample(void);
 
@@ -30,7 +30,7 @@ class EV3ColourSensor : public LegoSensor
 
     private:
 
-        InputPort *m_port;
+        InputPort* m_port;
 
         EV3_Colour_Sensor_Mode m_sensor_mode;
 };

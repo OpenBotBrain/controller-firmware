@@ -20,9 +20,9 @@ class EV3TouchSensor : public LegoSensor
 {
     public:
 
-        EV3TouchSensor(InputPort *port);
+        EV3TouchSensor(InputPort* port);
 
-        EV3TouchSensor(InputPort *port, EV3_Touch_Sensor_Mode sensor_mode);
+        EV3TouchSensor(InputPort* port, EV3_Touch_Sensor_Mode sensor_mode);
 
         float fetch_sample(void);
 
@@ -32,7 +32,7 @@ class EV3TouchSensor : public LegoSensor
 
     private:
 
-        InputPort *m_port;
+        InputPort* m_port;
 
         EV3_Touch_Sensor_Mode m_sensor_mode;
 };

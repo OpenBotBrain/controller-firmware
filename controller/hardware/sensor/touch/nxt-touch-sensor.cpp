@@ -11,7 +11,7 @@
  *
  * @param *port pointer to Input port.
 */
-NXTTouchSensor::NXTTouchSensor(InputPort *port)
+NXTTouchSensor::NXTTouchSensor(InputPort* port)
 {
     m_port = port;
     m_sensor_mode = NXT_TOUCH_SENSOR_TOUCH;
@@ -23,7 +23,7 @@ NXTTouchSensor::NXTTouchSensor(InputPort *port)
  * @param *port pointer to Input port.
  * @param sensor_mode set the sensor mode here.
 */
-NXTTouchSensor::NXTTouchSensor(InputPort *port, NXT_Touch_Sensor_Mode sensor_mode)
+NXTTouchSensor::NXTTouchSensor(InputPort* port, NXT_Touch_Sensor_Mode sensor_mode)
 {
     m_port = port;
     m_sensor_mode = sensor_mode;
