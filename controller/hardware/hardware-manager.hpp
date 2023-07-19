@@ -5,9 +5,7 @@
 #include <led/board-neoled.hpp>
 #include <led/board-led.hpp>
 #include <sensor/hardware-sensor.hpp>
-#include <sensor/lego-sensor.hpp>
-#include <imu/board-imu.hpp>
-#include <battery/board-battery.hpp>
+#include <mutex>
 
 struct Hardware_Config
 {
@@ -20,9 +18,13 @@ class HardwareManager
 {
     public:
 
-        HardwareManager(void);
+        HardwareManager(void) {};
 
         void init(void);
+
+        void update(void);
+
+        Actuator *get_actuator(Acuator_Type actuator);
 
         void update(void);
 
@@ -34,13 +36,15 @@ class HardwareManager
 
         LegoMotor *get_actuator_c(void);
 
-        LegoMotor *get_actuator_d(void);
+        Sensor *get_sensor(Sensor_Type sensor);
 
-        Neoled *get_neoled(void);
+        Sensor *get_sensor_1(void);
 
-        Led *get_led(void);
+        Sensor *get_sensor_2(void);
 
-        LegoSensor *get_sensor_a(void);
+        Sensor *get_sensor_3(void);
+
+        Sensor *get_sensor_4(void);
 
         LegoSensor *get_sensor_b(void);
 
@@ -54,37 +58,21 @@ class HardwareManager
 
     private:
 
-        // Config
+        std::array<Actuator* , ACTUATOR_COUNT> m_actuators =
+        {
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr
+        };
 
-        Hardware_Config m_hardware_config;
-
-        // Actuators
-
-        LegoMotor *m_actuator_a;
-
-        LegoMotor *m_actuator_b;
-
-        LegoMotor *m_actuator_c;
-
-        LegoMotor *m_actuator_d;
-
-        Neoled *m_neoled;
-
-        Led *m_led;
-
-        // Sensors
-
-        LegoSensor *m_sensor_a;
-
-        LegoSensor *m_sensor_b;
-
-        LegoSensor *m_sensor_c;
-
-        LegoSensor *m_sensor_d;
-
-        IMU *m_imu;
-
-        Battery *m_battery;
-
-        // Devices
+        std::array<Sensor* , ACTUATOR_COUNT> m_sensors =
+        {
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr
+        };
 };

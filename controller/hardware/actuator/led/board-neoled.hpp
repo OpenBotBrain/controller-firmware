@@ -3,6 +3,8 @@
 #include <actuator/hardware-actuator.hpp>
 #include <cstdint>
 
+static constexpr uint8_t COLOUR_SIZE = 8;
+
 /**
  * MAX is NEO_BRI_10, MIN is NEO_BRI_1.
  *
@@ -37,14 +39,14 @@ struct Neoled_Colour
     uint8_t blue;
 };
 
-#define NEO_WHITE   Neoled_Colour{ .red = 255,  .green = 255,   .blue = 255 }
-#define NEO_RED     Neoled_Colour{ .red = 255,  .green = 0,     .blue = 0   }
-#define NEO_GREEN   Neoled_Colour{ .red = 0,    .green = 255,   .blue = 0   }
-#define NEO_BLUE    Neoled_Colour{ .red = 0,    .green = 0,     .blue = 255 }
-#define NEO_YELLOW  Neoled_Colour{ .red = 255,  .green = 255,   .blue = 0   }
-#define NEO_PURPLE  Neoled_Colour{ .red = 255,  .green = 0,     .blue = 255 }
-#define NEO_TEAL    Neoled_Colour{ .red = 0,    .green = 255,   .blue = 255 }
-#define NEO_BLACK   Neoled_Colour{ .red = 0,    .green = 0,     .blue = 0   }
+static constexpr Neoled_Colour NEO_WHITE    { .red = 255,  .green = 255,   .blue = 255  };
+static constexpr Neoled_Colour NEO_RED      { .red = 255,  .green = 0,     .blue = 0    };
+static constexpr Neoled_Colour NEO_GREEN    { .red = 0,    .green = 255,   .blue = 0    };
+static constexpr Neoled_Colour NEO_BLUE     { .red = 0,    .green = 0,     .blue = 255  };
+static constexpr Neoled_Colour NEO_YELLOW   { .red = 255,  .green = 255,   .blue = 0    };
+static constexpr Neoled_Colour NEO_PURPLE   { .red = 255,  .green = 0,     .blue = 255  };
+static constexpr Neoled_Colour NEO_TEAL     { .red = 0,    .green = 255,   .blue = 255  };
+static constexpr Neoled_Colour NEO_BLACK    { .red = 0,    .green = 0,     .blue = 0    };
 
 class Neoled
 {
@@ -52,13 +54,11 @@ class Neoled
 
         Neoled(void) {};
 
-        void init(void);
+        void init(void) override;
 
-        void update(void);
+        void update(void) override;
 
-        void on(void);
-
-        void off(void);
+        void set_enable(bool enable);
 
         void set_brightness(Neoled_Brightness brightness);
 
@@ -72,9 +72,23 @@ class Neoled
 
     private:
 
-        bool m_rgb_on;
+        void load_rgb(void);
 
-        Neoled_Colour m_rgb_colour;
+        bool colour_changed(void);
 
-        Neoled_Brightness m_rgb_brightness;
+    private:
+
+        bool m_rgb_on {false};
+
+        Neoled_Colour m_rgb_colour {NEO_WHITE};
+
+        Neoled_Colour m_last_colour {NEO_BLACK};
+
+        Neoled_Brightness m_rgb_brightness {NEO_BRI_10};
+
+        uint8_t m_rgb_timer_on_off_periods[2] = {0};
+
+        uint8_t m_rgb_timer_data[3 * COLOUR_SIZE + 1] = {0};
+
+        uint32_t m_timestamp;
 };

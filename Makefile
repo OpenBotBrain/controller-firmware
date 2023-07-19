@@ -103,7 +103,6 @@ CXXSRC+=system-freertos.cpp
 CXXSRC+=system-status.cpp
 CXXSRC+=system-safe-i2c.cpp
 CXXSRC+=system-version.cpp
-CXXSRC+=system-neoled.cpp
 
 # Module folder
 CXXSRC+=module-input.cpp
