@@ -9,18 +9,15 @@
 */
 void HardwareManager::init()
 {
-    Neoled neoled;
-    m_neoled = &neoled;
+    Neoled m_neoled;
 
-    Led led;
-    m_led = &led;
+    Led m_led;
 
-    IMU imu;
-    m_imu = &imu;
+    IMU m_imu;
 
     m_hardware_config = Hardware_Config
     {
-        .neoled_update_interval = 35,
+        .neoled_update_interval = 10,
         .led_update_interval = 250,
         .imu_update_interval = 5,
     };
@@ -55,16 +52,6 @@ LegoMotor* HardwareManager::get_lego_motor(Lego_Motor_Port actuator_type)
     return m_lego_motors[actuator];
 }
 
-Neoled* HardwareManager::get_neoled()
-{
-    return m_neoled;
-}
-
-Led* HardwareManager::get_led()
-{
-    return m_led;
-}
-
 /**
  * Get pointer of given sensor type.
  *
@@ -76,7 +63,32 @@ LegoSensor* HardwareManager::get_lego_sensor(Lego_Sensor_Port sensor_type)
     return m_lego_sensors[sensor];
 }
 
-IMU* HardwareManager::get_imu()
+/**
+ * Returns a reference to a Neoled.
+ *
+ * @return Neoled&
+*/
+Neoled& HardwareManager::get_neoled()
+{
+    return m_neoled;
+}
+
+/**
+ * Returns a reference to a Led.
+ *
+ * @return Led&
+*/
+Led& HardwareManager::get_led()
+{
+    return m_led;
+}
+
+/**
+ * Returns a reference to a IMU.
+ *
+ * @return IMU&
+*/
+IMU& HardwareManager::get_imu()
 {
     return m_imu;
 }

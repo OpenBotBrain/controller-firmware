@@ -49,19 +49,19 @@ class HardwareManager
 
         LegoMotor* get_lego_motor(Lego_Motor_Port actuator);
 
-        Neoled* get_neoled();
-
-        Led* get_led();
-
         LegoSensor* get_lego_sensor(Lego_Sensor_Port sensor);
 
-        IMU* get_imu();
+        Neoled& get_neoled();
+
+        Led& get_led();
+
+        IMU& get_imu();
 
     private:
 
         Hardware_Config m_hardware_config;
 
-        std::array<LegoMotor* , PORT_COUNT> m_lego_motors =
+        std::array<LegoMotor*, PORT_COUNT> m_lego_motors =
         {
             nullptr,
             nullptr,
@@ -69,7 +69,7 @@ class HardwareManager
             nullptr
         };
 
-        std::array<LegoSensor* , PORT_COUNT> m_lego_sensors =
+        std::array<LegoSensor*, PORT_COUNT> m_lego_sensors =
         {
             nullptr,
             nullptr,
@@ -77,9 +77,9 @@ class HardwareManager
             nullptr
         };
 
-        Neoled* m_neoled;
+        Neoled m_neoled;
 
-        Led* m_led;
+        Led m_led;
 
-        IMU* m_imu;
+        IMU m_imu;
 };
