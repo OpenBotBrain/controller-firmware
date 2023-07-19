@@ -46,11 +46,10 @@ void Neoled::init()
 void Neoled::update()
 {
     uint32_t now = hal_timer_32_ms();
-    static uint32_t s_timestamp;
 
-    if ((now - s_timestamp) >= 1000)
+    if ((now - m_timestamp) >= 1000)
     {
-        s_timestamp = now;
+        m_timestamp = now;
         if (colour_changed())
         {
             m_last_colour = m_rgb_colour;

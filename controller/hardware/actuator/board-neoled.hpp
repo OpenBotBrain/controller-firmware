@@ -89,4 +89,6 @@ class Neoled : public Actuator
         uint8_t m_rgb_timer_on_off_periods[2] = {0};
 
         uint8_t m_rgb_timer_data[3 * COLOUR_SIZE + 1] = {0};
+
+        uint32_t m_timestamp;
 };
