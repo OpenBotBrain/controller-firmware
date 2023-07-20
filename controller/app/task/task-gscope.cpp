@@ -18,7 +18,7 @@ static SemaphoreHandle_t s_wait_tx_finish;
 static bool s_rtos_on = false;
 static uint8_t s_local_rx_buffer[128];
 static uint8_t s_fragmented_rx_buffer[128];
-static ConnectionType s_connection_type = ConnectionType::USB;
+static ConnectionType s_connection_type = ConnectionType::SERIAL;
 static bool s_send_data(const uint8_t* data, uint32_t size);
 
 static bool s_buffer_lock(void)
@@ -129,34 +129,5 @@ void task_gscope_init()
 
     hal_uart_init(UART_TYPE_DEBUG_SERIAL, s_finish_sending_data, nullptr);
 
-    s_gscope.enable_transmission(false);
-}
-
-
-#include <stdio.h>
-#include <stdarg.h>
-extern "C"
-{
-bool GSDebug2(const char* p_string, ...)
-{
-    static constexpr int PRINT_BUFFER_SIZE = 128;
-    bool ret;
-    va_list args;
-    va_start(args, p_string);
-
-    if (s_gscope.is_enabled())
-    {
-        ret = GSDebug(p_string, args);
-    }
-    else if (s_connection_type == ConnectionType::USB)
-    {
-        uint8_t pbug[PRINT_BUFFER_SIZE + 2];
-        int size = vsnprintf((char*)pbug, PRINT_BUFFER_SIZE, p_string, args);
-        pbug[size++] = '\r';
-        pbug[size++] = '\n';
-        ret = s_send_data(pbug, size);
-    }
-    va_end(args);
-    return ret;
-}
+    s_gscope.enable_transmission(true);
 }

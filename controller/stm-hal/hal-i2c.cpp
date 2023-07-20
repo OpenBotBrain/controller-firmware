@@ -79,6 +79,7 @@ void hal_i2c_init(uint8_t type)
     __HAL_I2C_ENABLE_IT(&i2c->handler, I2C_IT_RXI);
 
     HAL_NVIC_SetPriority(config->irq_type, config->irq_priority, 0);
+    HAL_NVIC_SetPriority(config->irq_er_type, config->irq_priority, 0);
     HAL_NVIC_EnableIRQ(config->irq_type);
 }
 
@@ -100,9 +101,9 @@ bool hal_i2c_read(uint8_t type, uint8_t address, uint8_t reg, uint16_t data_size
         data->param = param;
 
         // send the command first
+        data->state = I2CState::RX_MODE_CMD;
         if (HAL_I2C_Master_Transmit_IT(handler, address, data->buf, 1) == HAL_OK)
         {
-            data->state = I2CState::RX_MODE_CMD;
             return true;
         }
         else
@@ -133,9 +134,9 @@ bool hal_i2c_write(uint8_t type, uint8_t address, uint8_t reg, uint8_t* buf, uin
 
         std::memcpy(data->buf + 1, buf, data_size);
 
+        data->state = I2CState::TX_MODE;
         if (HAL_I2C_Master_Transmit_IT(handler, address, data->buf, data_size + 1) == HAL_OK)
         {
-            data->state = I2CState::TX_MODE;
             return true;
         }
         else
