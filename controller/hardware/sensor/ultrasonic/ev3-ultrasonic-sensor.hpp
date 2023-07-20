@@ -4,5 +4,5 @@ class EV3UltrasonicSensor
 {
     public:
 
-        EV3UltrasonicSensor(void) {};
+        EV3UltrasonicSensor() {};
 };

@@ -87,7 +87,7 @@ void EV3LargeMotor::stop()
  *
  * @param motor address of other motor that is being synced with.
 */
-void EV3LargeMotor::start_sync(EV3LargeMotor* motor)
+void EV3LargeMotor::start_sync(LegoMotor* motor)
 {
     if (m_synced)
     {
@@ -236,7 +236,7 @@ void EV3LargeMotor::drive_motor(float speed, int32_t rotation, bool immediate_re
     else
     {
         m_port->set_pwm_duty(speed);
-        m_sync_motor->m_port->set_pwm_duty(speed);
+        //m_sync_motor->m_port->set_pwm_duty(speed);
 
         uint16_t now = m_port->get_encoder_ticks();
         uint16_t encoder_ticks = now;
@@ -244,7 +244,7 @@ void EV3LargeMotor::drive_motor(float speed, int32_t rotation, bool immediate_re
         while(encoder_ticks + rotation < now)
         {
             m_port->update();
-            m_sync_motor->m_port->update();
+            //m_sync_motor->m_port->update();
 
             now = m_port->get_encoder_ticks();
         }

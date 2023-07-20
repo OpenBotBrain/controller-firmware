@@ -2,17 +2,17 @@
 
 #include <sensor/hardware-sensor.hpp>
 
-class IMU
+class IMU : public Sensor
 {
     public:
 
         IMU() {};
 
-        void init() {};
+        virtual void init() override {};
 
-        void update() {};
+        virtual void update() override {};
 
-        float fetch_sample();
+        virtual float fetch_sample() override;
 
         float* fetch_accel();
 

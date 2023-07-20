@@ -1,20 +1,23 @@
 #pragma once
 
 #include <cstdint>
+#include <sensor/hardware-sensor.hpp>
 
-class Battery
+class Battery : public Sensor
 {
     public:
 
-        Battery(void) {};
+        Battery() {};
 
-        void init(void);
+        virtual void init() override;
 
-        void update(void);
+        virtual void update() override;
 
-        bool battery_connected(void);
+        virtual float fetch_sample() override;
 
-        float battery_voltage(void);
+        bool battery_connected();
+
+        float battery_voltage();
 
     private:
 

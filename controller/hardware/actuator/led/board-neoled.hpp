@@ -49,15 +49,15 @@ static constexpr Neoled_Colour NEO_PURPLE   { .red = 255,  .green = 0,     .blue
 static constexpr Neoled_Colour NEO_TEAL     { .red = 0,    .green = 255,   .blue = 255  };
 static constexpr Neoled_Colour NEO_BLACK    { .red = 0,    .green = 0,     .blue = 0    };
 
-class Neoled
+class Neoled : public Actuator
 {
     public:
 
         Neoled() {};
 
-        void init();
+        virtual void init() override;
 
-        void update();
+        virtual void update() override;
 
         void set_enable(bool enable);
 

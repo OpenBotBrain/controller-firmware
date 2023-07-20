@@ -4,5 +4,5 @@ class NXTSoundSensor
 {
     public:
 
-        NXTSoundSensor(void) {};
+        NXTSoundSensor() {};
 };

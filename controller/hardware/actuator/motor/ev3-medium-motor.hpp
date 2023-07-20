@@ -10,35 +10,35 @@ class EV3MediumMotor : public LegoMotor
 
         EV3MediumMotor(OutputPort* port, TimerType motor_pwm, TimerType motor_encoder);
 
-        void forward(int32_t rotation) override;
+        virtual void forward(int32_t rotation) override;
 
-        void backward(int32_t rotation) override;
+        virtual void backward(int32_t rotation) override;
 
-        void stop(void) override;
+        virtual void stop() override;
 
-        void start_sync(EV3MediumMotor *motor);
+        virtual void start_sync(LegoMotor* motor) override;
 
-        void end_sync(void) override;
+        virtual void end_sync() override;
 
-        bool is_stalled(void) override;
+        virtual bool is_stalled();
 
-        int32_t get_tacho_count(void) override;
+        virtual int32_t get_tacho_count() override;
 
-        void set_motor_pwm(uint8_t motor_pwm) override;
+        virtual void set_motor_pwm(uint8_t motor_pwm) override;
 
-        uint8_t get_motor_pwm(void) override;
+        virtual uint8_t get_motor_pwm() override;
 
-        void set_motor_encoder(uint8_t motor_encoder) override;
+        virtual void set_motor_encoder(uint8_t motor_encoder) override;
 
-        uint8_t get_motor_encoder(void) override;
+        virtual uint8_t get_motor_encoder() override;
 
-        void set_motor_speed(uint32_t motor_speed) override;
+        virtual void set_motor_speed(uint32_t motor_speed) override;
 
-        uint32_t get_motor_speed(void) override;
+        virtual uint32_t get_motor_speed() override;
 
     private:
 
-        void drive_motor(float speed, int32_t rotation, bool immediate_return) override;
+        virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) override;
 
     private:
 
@@ -48,7 +48,7 @@ class EV3MediumMotor : public LegoMotor
 
         TimerType m_motor_encoder;
 
-        EV3MediumMotor *m_sync_motor;
+        LegoMotor* m_sync_motor;
 
         bool m_synced;
 

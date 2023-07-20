@@ -10,35 +10,35 @@ class NXTMotor : public LegoMotor
 
         NXTMotor(OutputPort* port, TimerType motor_pwm, TimerType motor_encoder);
 
-        void forward(int32_t rotation);
+        virtual void forward(int32_t rotation) override;
 
-        void backward(int32_t rotation);
+        virtual void backward(int32_t rotation) override;
 
-        void stop(void);
+        virtual void stop() override;
 
-        void start_sync(NXTMotor* motor);
+        virtual void start_sync(LegoMotor* motor) override;
 
-        void end_sync(void);
+        virtual void end_sync() override;
 
-        bool is_stalled(void);
+        virtual bool is_stalled();
 
-        int32_t get_tacho_count(void);
+        virtual int32_t get_tacho_count() override;
 
-        void set_motor_pwm(uint8_t motor_pwm);
+        virtual void set_motor_pwm(uint8_t motor_pwm) override;
 
-        uint8_t get_motor_pwm(void);
+        virtual uint8_t get_motor_pwm() override;
 
-        void set_motor_encoder(uint8_t motor_encoder);
+        virtual void set_motor_encoder(uint8_t motor_encoder) override;
 
-        uint8_t get_motor_encoder(void);
+        virtual uint8_t get_motor_encoder() override;
 
-        void set_motor_speed(uint32_t motor_speed);
+        virtual void set_motor_speed(uint32_t motor_speed) override;
 
-        uint32_t get_motor_speed(void);
+        virtual uint32_t get_motor_speed() override;
 
     private:
 
-        void drive_motor(float speed, int32_t rotation, bool immediate_return);
+        virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) override;
 
     private:
 
@@ -48,7 +48,7 @@ class NXTMotor : public LegoMotor
 
         TimerType m_motor_encoder;
 
-        NXTMotor *m_sync_motor;
+        LegoMotor* m_sync_motor;
 
         bool m_synced;
 

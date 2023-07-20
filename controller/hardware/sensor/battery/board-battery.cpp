@@ -17,6 +17,14 @@ void Battery::update()
 }
 
 /**
+ * Fetch battery sample.
+*/
+float Battery::fetch_sample()
+{
+    return 0.0f;
+}
+
+/**
  * Get whether a battery is connected or not.
  *
  * @return bool

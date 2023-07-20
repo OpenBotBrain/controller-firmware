@@ -4,7 +4,7 @@ class Actuator
 {
     public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
+        virtual void update() = 0;
 };

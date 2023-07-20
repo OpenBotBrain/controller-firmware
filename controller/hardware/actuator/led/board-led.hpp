@@ -3,15 +3,15 @@
 #include <actuator/hardware-actuator.hpp>
 #include <cstdint>
 
-class Led
+class Led : public Actuator
 {
     public:
 
         Led() {};
 
-        void init();
+        virtual void init() override;
 
-        void update();
+        virtual void update() override;
 
         void reset();
 

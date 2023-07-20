@@ -1,8 +1,10 @@
 #pragma once
 
-class NXTLightSensor
+#include <sensor/lego-sensor.hpp>
+
+class NXTLightSensor : public LegoSensor
 {
     public:
 
-        NXTLightSensor(void) {};
+        NXTLightSensor() {};
 };

@@ -80,7 +80,7 @@ void EV3MediumMotor::stop()
  *
  * @param motor address of other motor that is being synced with.
 */
-void EV3MediumMotor::start_sync(EV3MediumMotor* motor)
+void EV3MediumMotor::start_sync(LegoMotor* motor)
 {
     if (m_synced)
     {

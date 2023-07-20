@@ -1,12 +1,14 @@
 #pragma once
 
-class NXTI2CDevice
+#include <device/lego-device.hpp>
+
+class NXTI2CDevice : public LegoDevice
 {
     public:
 
-        NXTI2CDevice(void) {};
+        NXTI2CDevice() {};
 
-        void init(void) {};
+        virtual void init() override {};
 
-        void update(void) {};
+        virtual void update() override {};
 };

@@ -60,7 +60,7 @@ void NXTMotor::stop()
  *
  * @param motor address of other motor that is being synced with.
 */
-void NXTMotor::start_sync(NXTMotor* motor)
+void NXTMotor::start_sync(LegoMotor* motor)
 {
     if (m_synced)
     {

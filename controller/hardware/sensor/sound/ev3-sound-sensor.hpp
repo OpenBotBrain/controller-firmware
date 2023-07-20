@@ -26,11 +26,11 @@ class EV3SoundSensor : public LegoSensor
 
         EV3SoundSensor(InputPort* port, EV3_Sound_Sensor_Mode sensor_mode);
 
-        float fetch_sample(void);
+        float fetch_sample();
 
         void set_mode(uint8_t sensor_mode);
 
-        uint8_t get_mode(void);
+        uint8_t get_mode();
 
     private:
 
