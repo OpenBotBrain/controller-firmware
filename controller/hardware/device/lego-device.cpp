@@ -6,5 +6,5 @@
 
 Lego_Device_Type get_lego_device_type()
 {
-    return UNDEFINED_LEGO_DEVICE;
+    return Lego_Device_Type::LEGO_DEVICE_TYPE_TOTAL;
 }

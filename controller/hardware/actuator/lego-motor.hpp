@@ -18,7 +18,7 @@
 #define DEFAULT_MOTOR_SPEED 500
 #define MIN_MOTOR_SPEED     0
 
-enum Lego_Motor_Type
+enum class Lego_Motor_Type
 {
     UNDEFINED_LEGO_MOTOR = 0,
     EV3_LARGE_MOTOR,

@@ -4,7 +4,7 @@
 #include <sensor/hardware-sensor.hpp>
 #include <cstdint>
 
-enum Lego_Sensor_Type
+enum class Lego_Sensor_Type
 {
     UNDEFINED_LEGO_SENSOR = 0,
     EV3_COLOUR_SENSOR,

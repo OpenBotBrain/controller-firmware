@@ -28,7 +28,7 @@ void HardwareManager::init()
 */
 void HardwareManager::update()
 {
-
+    // will update all devices within the hardware manager.
 }
 
 /**

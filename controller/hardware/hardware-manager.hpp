@@ -14,18 +14,18 @@ static constexpr uint16_t PORT_COUNT = 4;
 
 enum class Lego_Motor_Port
 {
-    ACTUATOR_A  = 0,
-    ACTUATOR_B  = 1,
-    ACTUATOR_C  = 2,
-    ACTUATOR_D  = 3
+    ACTUATOR_A = 0,
+    ACTUATOR_B,
+    ACTUATOR_C,
+    ACTUATOR_D
 };
 
 enum class Lego_Sensor_Port
 {
-    SENSOR_1    = 0,
-    SENSOR_2    = 1,
-    SENSOR_3    = 2,
-    SENSOR_4    = 3
+    SENSOR_1 = 0,
+    SENSOR_2,
+    SENSOR_3,
+    SENSOR_4
 };
 
 struct Hardware_Config

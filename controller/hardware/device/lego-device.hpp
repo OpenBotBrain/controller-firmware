@@ -2,7 +2,7 @@
 
 #include <device/hardware-device.hpp>
 
-enum Lego_Device_Type
+enum class Lego_Device_Type
 {
     UNDEFINED_LEGO_DEVICE = 0,
     NXT_I2C_DEVICE,
