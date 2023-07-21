@@ -9,12 +9,10 @@ bool GSDebugColor(GSColor color, const char* p_string, ...);
 
 extern "C" {
 bool GSDebug(const char* p_string, ...);
-bool GSDebug2(const char* p_string, ...);
 }
 
 #else
 
 #include <stdbool.h>
 bool GSDebug(const char* p_string, ...);
-bool GSDebug2(const char* p_string, ...);
 #endif

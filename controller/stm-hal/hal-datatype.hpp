@@ -41,6 +41,7 @@ struct I2CChannelConfig
     I2C_TypeDef* i2c_instance;
     uint32_t timing;
     IRQn_Type irq_type;
+    IRQn_Type irq_er_type;
     uint8_t irq_priority;
 };
 
