@@ -13,8 +13,6 @@ class Battery : public Sensor
 
         virtual void update() override;
 
-        virtual float fetch_sample() override;
-
         bool battery_connected();
 
         float battery_voltage();

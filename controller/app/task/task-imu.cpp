@@ -8,6 +8,7 @@
 #include <stm-hal/hal-spi.hpp>
 #include <system/system-freertos.hpp>
 #include <complementary-filter/complementary-filter.hpp>
+#include <imu/board-imu.hpp>
 
 static TaskHandle_t s_task_handler;
 static SemaphoreHandle_t s_wait_tx_finish;
@@ -72,11 +73,7 @@ static constexpr LSM6DS::Config s_imu_config =
 
 static LSM6DS s_imu(s_imu_config);
 static ComplementaryFilter s_complementary_filter;
-
-
-static float* s_accel_out;
-static float* s_gyro_out;
-static float* s_roll_pitch_out;
+static IMU_data s_imu_data;
 
 static void s_imu_thread(void*)
 {
@@ -111,9 +108,9 @@ static void s_imu_thread(void*)
         s_complementary_filter.get_roll_pitch(roll_pitch);
         s_imu_roll_pitch.produce(roll_pitch);
 
-        s_accel_out = accel;
-        s_gyro_out = gyro;
-        s_roll_pitch_out = roll_pitch;
+        std::memcpy(s_imu_data.accel, accel,        ACCEL_SIZE * sizeof(float));
+        std::memcpy(s_imu_data.gyro,  gyro,         ACCEL_SIZE * sizeof(float));
+        std::memcpy(s_imu_data.roll,  roll_pitch,   ROLL_SIZE  * sizeof(float));
 
         vTaskDelay(5);
     }
@@ -139,17 +136,7 @@ void task_imu_init()
     s_complementary_filter.init();
 }
 
-float* task_imu_get_accel()
+IMU_data task_get_imu_data()
 {
-    return s_accel_out;
-}
-
-float* task_imu_get_gyro()
-{
-    return s_gyro_out;
-}
-
-float* task_imu_get_roll_pitch()
-{
-    return s_roll_pitch_out;
+    return s_imu_data;
 }

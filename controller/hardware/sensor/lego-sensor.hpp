@@ -24,15 +24,13 @@ class LegoSensor
 {
     public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
-
-        virtual float fetch_sample(void) = 0;
+        virtual void update() = 0;
 
         virtual void set_mode(uint8_t mode) = 0;
 
-        virtual uint8_t get_mode(void) = 0;
+        virtual uint8_t get_mode() = 0;
 };
 
 Lego_Sensor_Type get_lego_sensor_type(InputPort* port);

@@ -6,43 +6,34 @@
 // ------------------------------------------------------------------------------------
 
 /**
- * Fetch a sample from the IMU.
- *
- * @return float
+ * Inits the member IMU data.
 */
-float IMU::fetch_sample()
+void IMU::init()
 {
-    return 0.0f;
+    m_imu_data = IMU_data
+    {
+        .accel = { 0.0f, 0.0f, 0.0f },
+        .gyro  = { 0.0f, 0.0f, 0.0f },
+        .roll  = { 0.0f, 0.0f }
+    };
 }
 
 /**
- * Fetch an acceleration sample from the IMU.
- *
- * @return float*
+ * Updates the IMU data.
 */
-float* IMU::fetch_accel()
+void IMU::update()
 {
-    return task_imu_get_accel();
+    m_imu_data = task_get_imu_data();
 }
 
 /**
- * Fetch an gyroscopic sample from the IMU.
+ * Gets the IMU data.
  *
- * @return float*
+ * @return IMU_data
 */
-float* IMU::fetch_gyro()
+IMU_data IMU::get_imu_data()
 {
-    return task_imu_get_gyro();
-}
-
-/**
- * Fetch a roll pitch sample from the IMU.
- *
- * @return float*
-*/
-float* IMU::fetch_roll_pitch()
-{
-    return task_imu_get_roll_pitch();
+    return m_imu_data;
 }
 
 // ------------------------------------------------------------------------------------

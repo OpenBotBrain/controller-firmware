@@ -3,9 +3,10 @@
 #include <hardware/hardware-manager.hpp>
 #include <cstdint>
 #include <stdbool.h>
+#include <stm-hal/hal-tim.hpp>
 #include <gscope/gscope-debug.hpp>
 
-static const TickType_t c_tick_delay = 5;
+static const TickType_t s_tick_delay = 5;
 static const float s_roll_threshold = 25.0f;
 
 static TaskHandle_t s_task_handler;
@@ -19,7 +20,7 @@ static Led s_led;
 static IMU s_imu;
 
 static Neoled_Colour s_colour = NEO_WHITE;
-static float* s_imu_out;
+static IMU_data s_imu_out;
 
 /**
  * Hardware manager task.
@@ -39,37 +40,43 @@ static void s_hardware_manager_thread(void*)
     s_led.init();
     s_imu.init();
 
-    uint16_t update_neoled_time = s_hardware_config.neoled_update_interval / c_tick_delay;
-    uint16_t update_led_time = s_hardware_config.led_update_interval / c_tick_delay;
-
-    s_imu_out = s_imu.fetch_roll_pitch();
     s_neoled.set_enable(s_rgb_on);
 
     for ( int i = 0 ;; i++ )
     {
         s_imu.update();
+        s_imu_out = s_imu.get_imu_data();
 
-        if (i % update_neoled_time == 0)
+        uint32_t now = hal_timer_32_ms();
+        static uint32_t s_neo_timestamp;
+
+        if ((now - s_neo_timestamp) >= s_hardware_config.neoled_update_interval)
         {
-            s_colour = (s_imu_out[0] > s_roll_threshold || s_imu_out[0] < -s_roll_threshold) ? NEO_GREEN : NEO_RED;
+            s_neo_timestamp = now;
+
+            s_colour = (s_imu_out.roll[0] > s_roll_threshold || s_imu_out.roll[0] < -s_roll_threshold) ? NEO_GREEN : NEO_RED;
 
             s_neoled.set_brightness(NEO_BRI_1);
             s_neoled.set_colour(s_colour);
             s_neoled.update();
         }
 
-        if (i % update_led_time == 0)
+        static uint32_t s_led_timestamp;
+
+        if ((now - s_led_timestamp) >= s_hardware_config.led_update_interval)
         {
+            s_led_timestamp = now;
+
             s_led.set_led_2(!s_led_on);                            // top led
-            s_led.set_led_1((s_imu_out[0] > -s_roll_threshold));   // middle led
-            s_led.set_led_3((s_imu_out[0] < s_roll_threshold));    // bottom led
+            s_led.set_led_1((s_imu_out.roll[0] > -s_roll_threshold));   // middle led
+            s_led.set_led_3((s_imu_out.roll[0] < s_roll_threshold));    // bottom led
 
             s_led_on = !s_led_on;
             s_led.update();
             i = 0;
         }
 
-        vTaskDelay(c_tick_delay);
+        vTaskDelay(s_tick_delay);
     }
 }
 

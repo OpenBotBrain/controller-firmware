@@ -1,9 +1,7 @@
 #pragma once
 
+#include <imu/board-imu.hpp>
+
 void task_imu_init();
 
-float* task_imu_get_accel();
-
-float* task_imu_get_gyro();
-
-float* task_imu_get_roll_pitch();
+IMU_data task_get_imu_data();
