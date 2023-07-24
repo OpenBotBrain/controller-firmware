@@ -2,7 +2,7 @@
 
 #include <device/hardware-device.hpp>
 
-enum Lego_Device_Type
+enum class Lego_Device_Type
 {
     UNDEFINED_LEGO_DEVICE = 0,
     NXT_I2C_DEVICE,
@@ -12,15 +12,13 @@ enum Lego_Device_Type
     LEGO_DEVICE_TYPE_TOTAL
 };
 
-class LegoDevice : public Device
+class LegoDevice
 {
-    public :
-        
-        LegoDevice(void) {};
+    public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
+        virtual void update() = 0;
 };
 
 Lego_Device_Type get_lego_device_type();

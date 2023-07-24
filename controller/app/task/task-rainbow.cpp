@@ -1,6 +1,6 @@
 #include <config/appconfig.h>
 #include <system/system-freertos.hpp>
-#include <actuator/board-neoled.hpp>
+#include <led/board-neoled.hpp>
 #include <cstdint>
 #include <stdbool.h>
 

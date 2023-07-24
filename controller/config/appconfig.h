@@ -14,6 +14,9 @@
 #define PRI_RAINBOW                         1
 #define SIZE_RAINBOW                        128
 
+#define PRI_HARDWARE_MAN                    1
+#define SIZE_HARDWARE_MAN                   256
+
 #define PRI_GSCOPE                          2
 #define SIZE_GSCOPE                         256
 

@@ -4,9 +4,9 @@
 //                                      PUBLIC API
 // ------------------------------------------------------------------------------------
 
-Lego_Motor_Type get_lego_motor_type(OutputPort *port)
+Lego_Motor_Type get_lego_motor_type(OutputPort* port)
 {
-    if (port);
+    (void) port;
 
-    return UNDEFINED_LEGO_MOTOR;
+    return Lego_Motor_Type::UNDEFINED_LEGO_MOTOR;
 }

@@ -55,6 +55,9 @@ root_folder_path := $(PROJECT_DIR)/controller
 application_path := $(root_folder_path)/app
 config_path := $(root_folder_path)/config
 hardware_path := $(root_folder_path)/hardware
+actuator_path := $(hardware_path)/actuator
+device_path := $(hardware_path)/device
+sensor_path := $(hardware_path)/sensor
 startup_linker_path := $(root_folder_path)/startup-linker
 stm_hal_library_path := $(root_folder_path)/stm-hal
 
@@ -73,6 +76,9 @@ board_include_paths := \
 	-I$(application_path)/ \
 	-I$(config_path)/ \
 	-I$(hardware_path)/ \
+	-I$(actuator_path)/ \
+	-I$(device_path)/ \
+	-I$(sensor_path)/ \
 	-I$(stm_hal_library_path)/usb \
 
 all_source_path := \
@@ -80,10 +86,10 @@ all_source_path := \
 	$(application_path)/system \
 	$(application_path)/task \
 	$(application_path)/module \
-	$(hardware_path)/ \
-	$(hardware_path)/actuator \
-	$(hardware_path)/device \
-	$(hardware_path)/sensor \
+	$(hardware_path) \
+	$(actuator_path) \
+	$(device_path) \
+	$(sensor_path) \
 	$(config_path) \
 	$(stm_hal_library_path) \
 	$(stm_hal_library_path)/usb
@@ -112,6 +118,7 @@ CXXSRC+=task-ports.cpp
 CXXSRC+=task-power-supply.cpp
 CXXSRC+=task-rainbow.cpp
 CXXSRC+=task-update.cpp
+CXXSRC+=task-hardware-manager.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
@@ -120,6 +127,36 @@ CXXSRC+=board-rev-a.cpp
 # Hardware folder
 CXXSRC+=hardware-config.cpp
 CXXSRC+=hardware-manager.cpp
+
+# ------------------------------------------------------------------------------------------
+# hardware source and includes, including submodules.
+driver_include_paths := \
+	-I$(actuator_path)/led \
+	-I$(actuator_path)/motor \
+	-I$(device_path)/dumb \
+	-I$(device_path)/i2c \
+	-I$(device_path)/uart \
+	-I$(sensor_path)/battery \
+	-I$(sensor_path)/colour \
+	-I$(sensor_path)/imu \
+	-I$(sensor_path)/light \
+	-I$(sensor_path)/sound \
+	-I$(sensor_path)/touch \
+	-I$(sensor_path)/ultrasonic \
+
+all_source_path += \
+	$(actuator_path)/led/ \
+	$(actuator_path)/motor/ \
+	$(device_path)/dumb/ \
+	$(device_path)/i2c/ \
+	$(device_path)/uart/ \
+	$(sensor_path)/battery \
+	$(sensor_path)/colour/ \
+	$(sensor_path)/imu/ \
+	$(sensor_path)/light/ \
+	$(sensor_path)/sound/ \
+	$(sensor_path)/touch/ \
+	$(sensor_path)/ultrasonic/ \
 
 # Actuator folder
 CXXSRC+=hardware-actuator.cpp
@@ -131,6 +168,7 @@ CXXSRC+=ev3-medium-motor.cpp
 CXXSRC+=nxt-motor.cpp
 # misc
 CXXSRC+=board-neoled.cpp
+CXXSRC+=board-led.cpp
 
 # Device folder
 CXXSRC+=hardware-device.cpp
@@ -153,10 +191,10 @@ CXXSRC+=ev3-ultrasonic-sensor.cpp
 CXXSRC+=nxt-colour-sensor.cpp
 CXXSRC+=nxt-light-sensor.cpp
 CXXSRC+=nxt-sound-sensor.cpp
-CXXSRC+=nxt-temp-sensor.cpp
 CXXSRC+=nxt-touch-sensor.cpp
 # misc
 CXXSRC+=board-imu.cpp
+CXXSRC+=board-battery.cpp
 
 # ------------------------------------------------------------------------------------------
 # stm-hal low level config files APP - Source and Include

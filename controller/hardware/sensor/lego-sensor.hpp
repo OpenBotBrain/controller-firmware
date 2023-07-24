@@ -4,7 +4,7 @@
 #include <sensor/hardware-sensor.hpp>
 #include <cstdint>
 
-enum Lego_Sensor_Type
+enum class Lego_Sensor_Type
 {
     UNDEFINED_LEGO_SENSOR = 0,
     EV3_COLOUR_SENSOR,
@@ -20,15 +20,17 @@ enum Lego_Sensor_Type
     LEGO_SENSOR_TYPE_TOTAL
 };
 
-class LegoSensor : public Sensor
+class LegoSensor
 {
     public:
 
-        virtual float fetch_sample(void) = 0;
+        virtual void init() = 0;
+
+        virtual void update() = 0;
 
         virtual void set_mode(uint8_t mode) = 0;
 
-        virtual uint8_t get_mode(void) = 0;
+        virtual uint8_t get_mode() = 0;
 };
 
-Lego_Sensor_Type get_lego_sensor_type(InputPort *port);
+Lego_Sensor_Type get_lego_sensor_type(InputPort* port);

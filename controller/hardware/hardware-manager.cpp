@@ -1,71 +1,98 @@
 #include <hardware/hardware-manager.hpp>
 
+// ------------------------------------------------------------------------------------
+//                                      PUBLIC API
+// ------------------------------------------------------------------------------------
+
+/**
+ * Init everything within the hardware manager.
+*/
 void HardwareManager::init()
 {
+    Neoled m_neoled;
 
+    Led m_led;
+
+    IMU m_imu;
+
+    m_hardware_config = Hardware_Config
+    {
+        .neoled_update_interval = 10,
+        .led_update_interval = 250,
+        .imu_update_interval = 5,
+    };
 }
 
+/**
+ * Update everything within the hardware manager.
+*/
 void HardwareManager::update()
 {
-
+    // will update all devices within the hardware manager.
 }
 
-Actuator *HardwareManager::get_actuator(Acuator_Type actuator)
+/**
+ * Gets the config of the hardware manager.
+ *
+ * @return Hardware_Config
+*/
+Hardware_Config HardwareManager::get_hardware_config()
 {
-    return m_actuators[actuator];
+    return m_hardware_config;
 }
 
-Actuator *HardwareManager::get_actuator_a(void)
+/**
+ * Get pointer of given actuator type.
+ *
+ * @return Actuator*
+*/
+LegoMotor* HardwareManager::get_lego_motor(Lego_Motor_Port actuator_type)
 {
-    return m_actuators[0];
+    uint8_t actuator = static_cast<uint8_t>(actuator_type);
+    return m_lego_motors[actuator];
 }
 
-Actuator *HardwareManager::get_actuator_b(void)
+/**
+ * Get pointer of given sensor type.
+ *
+ * @return Sensor*
+*/
+LegoSensor* HardwareManager::get_lego_sensor(Lego_Sensor_Port sensor_type)
 {
-    return m_actuators[1];
+    uint8_t sensor = static_cast<uint8_t>(sensor_type);
+    return m_lego_sensors[sensor];
 }
 
-Actuator *HardwareManager::get_actuator_c(void)
+/**
+ * Returns a reference to a Neoled.
+ *
+ * @return Neoled&
+*/
+Neoled& HardwareManager::get_neoled()
 {
-    return m_actuators[2];
+    return m_neoled;
 }
 
-Actuator *HardwareManager::get_actuator_d(void)
+/**
+ * Returns a reference to a Led.
+ *
+ * @return Led&
+*/
+Led& HardwareManager::get_led()
 {
-    return m_actuators[3];
+    return m_led;
 }
 
-Actuator *HardwareManager::get_neoled(void)
+/**
+ * Returns a reference to a IMU.
+ *
+ * @return IMU&
+*/
+IMU& HardwareManager::get_imu()
 {
-    return m_actuators[4];
+    return m_imu;
 }
 
-Sensor *HardwareManager::get_sensor(Sensor_Type sensor)
-{
-    return m_sensors[sensor];
-}
-
-Sensor *HardwareManager::get_sensor_1(void)
-{
-    return m_sensors[0];
-}
-
-Sensor *HardwareManager::get_sensor_2(void)
-{
-    return m_sensors[1];
-}
-
-Sensor *HardwareManager::get_sensor_3(void)
-{
-    return m_sensors[2];
-}
-
-Sensor *HardwareManager::get_sensor_4(void)
-{
-    return m_sensors[3];
-}
-
-Sensor *HardwareManager::get_imu(void)
-{
-    return m_sensors[4];
-}
+// ------------------------------------------------------------------------------------
+//                                      PRIVATE API
+// ------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include <stm-hal/hal-spi.hpp>
 #include <system/system-freertos.hpp>
 #include <complementary-filter/complementary-filter.hpp>
+#include <imu/board-imu.hpp>
 
 static TaskHandle_t s_task_handler;
 static SemaphoreHandle_t s_wait_tx_finish;
@@ -72,6 +73,7 @@ static constexpr LSM6DS::Config s_imu_config =
 
 static LSM6DS s_imu(s_imu_config);
 static ComplementaryFilter s_complementary_filter;
+static IMU_data s_imu_data;
 
 static void s_imu_thread(void*)
 {
@@ -106,6 +108,10 @@ static void s_imu_thread(void*)
         s_complementary_filter.get_roll_pitch(roll_pitch);
         s_imu_roll_pitch.produce(roll_pitch);
 
+        std::memcpy(s_imu_data.accel, accel,        ACCEL_SIZE * sizeof(float));
+        std::memcpy(s_imu_data.gyro,  gyro,         ACCEL_SIZE * sizeof(float));
+        std::memcpy(s_imu_data.roll,  roll_pitch,   ROLL_SIZE  * sizeof(float));
+
         vTaskDelay(5);
     }
 }
@@ -128,4 +134,9 @@ void task_imu_init()
     hal_spi_init(SPI_TYPE_IMU_FLASH, s_spi_end_callback, nullptr);
 
     s_complementary_filter.init();
+}
+
+IMU_data task_get_imu_data()
+{
+    return s_imu_data;
 }

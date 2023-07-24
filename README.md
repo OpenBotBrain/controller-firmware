@@ -64,27 +64,74 @@ Hey! welcome to this repo.
 
 ### ***Usage***
 
+Example task for blinking LEDs.
+
+```cpp
+#include <hardware/hardware-manager.hpp>
+
+static HardwareManager s_manager;
+static Led *s_led;
+
+static bool s_led_on = false;
+
+void task_blink_thread(void*)
+{
+    s_led = s_manager.get_led();
+    s_manager.init();
+
+    for ( ;; )
+    {
+        s_led->set_led_1(s_led_on);
+        s_led->set_led_2(!s_led_on);
+        s_led->set_led_3(s_led_on);
+
+        s_led_on = !s_led_on;
+        s_manager.update();
+
+        vTaskDelay(250);
+    }
+}
+```
+
+Hardware Manager Config.
+
+```cpp
+struct Hardware_Config
+{
+    uint16_t neoled_update_interval;
+    uint16_t led_update_interval;
+    uint16_t imu_update_interval;
+};
+
+Hardware_Config example_config
+{
+    .neoled_update_interval = 40,
+    .led_update_interval = 250,
+    .imu_update_interval = 5,
+}
+```
+
 ### ***Actuators***
 
-Actuator interfaces.
+Actuator interface.
 
 ```cpp
 class Actuator
 {
     public:
 
-        Actuator(void) {};
-
         virtual void init(void) = 0;
 
         virtual void update(void) = 0;
 };
+```
 
+Lego Motor interface.
+
+```cpp
 class LegoMotor
 {
     public:
-
-        LegoMotor(void) {};
 
         virtual void forward(int32_t rotation) = 0;
 
@@ -116,17 +163,7 @@ class LegoMotor
 
         virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) = 0;
 };
-
 ```
-
-#### *Neoled*
-
-
-#### *EV3 Large Motor*
-
-#### *EV3 Medium Motor*
-
-#### *NXT Motor*
 
 ### ***Devices***
 
@@ -137,7 +174,18 @@ class Device
 {
     public:
 
-        Device(void) {};
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
+};
+```
+
+Lego Device interface.
+
+```cpp
+class LegoDevice
+{
+    public:
 
         virtual void init(void) = 0;
 
@@ -164,8 +212,21 @@ class Sensor
 };
 ```
 
-#### *Inertial Measurement Unit (IMU)*
+Lego Sensor interface.
 
-#### *EV3 Colour Sensor*
+```cpp
+class LegoSensor
+{
+    public:
 
-#### *EV3 Sound Sensor*
+        virtual void init(void) = 0;
+
+        virtual void update(void) = 0;
+
+        virtual float fetch_sample(void) = 0;
+
+        virtual void set_mode(uint8_t mode) = 0;
+
+        virtual uint8_t get_mode(void) = 0;
+};
+```

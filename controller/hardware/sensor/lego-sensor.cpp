@@ -4,9 +4,9 @@
 //                                      PUBLIC API
 // ------------------------------------------------------------------------------------
 
-Lego_Sensor_Type get_lego_sensor_type(InputPort *port)
+Lego_Sensor_Type get_lego_sensor_type(InputPort* port)
 {
-    if (port);
+    (void) port;
 
-    return UNDEFINED_LEGO_SENSOR;
+    return Lego_Sensor_Type::UNDEFINED_LEGO_SENSOR;
 }

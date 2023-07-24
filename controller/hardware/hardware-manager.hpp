@@ -1,81 +1,85 @@
 #pragma once
 
 #include <actuator/hardware-actuator.hpp>
+#include <actuator/lego-motor.hpp>
+#include <led/board-neoled.hpp>
+#include <led/board-led.hpp>
 #include <sensor/hardware-sensor.hpp>
+#include <sensor/lego-sensor.hpp>
+#include <imu/board-imu.hpp>
+#include <battery/board-battery.hpp>
 #include <mutex>
 
-static constexpr uint16_t ACTUATOR_COUNT = 5;
-static constexpr uint16_t SENSOR_COUNT   = 5;
+static constexpr uint16_t PORT_COUNT = 4;
 
-enum Acuator_Type
+enum class Lego_Motor_Port
 {
     ACTUATOR_A = 0,
     ACTUATOR_B,
     ACTUATOR_C,
-    ACTUATOR_D,
-    NEOLED
+    ACTUATOR_D
 };
 
-enum Sensor_Type
+enum class Lego_Sensor_Port
 {
     SENSOR_1 = 0,
     SENSOR_2,
     SENSOR_3,
-    SENSOR_4,
-    IMU
+    SENSOR_4
+};
+
+struct Hardware_Config
+{
+    uint16_t neoled_update_interval;
+    uint16_t led_update_interval;
+    uint16_t imu_update_interval;
 };
 
 class HardwareManager
 {
     public:
 
-        HardwareManager(void) {};
+        HardwareManager() {};
 
-        void init(void);
+        void init();
 
-        void update(void);
+        void update();
 
-        Actuator *get_actuator(Acuator_Type actuator);
+        Hardware_Config get_hardware_config();
 
-        Actuator *get_actuator_a(void);
+        LegoMotor* get_lego_motor(Lego_Motor_Port actuator);
 
-        Actuator *get_actuator_b(void);
+        LegoSensor* get_lego_sensor(Lego_Sensor_Port sensor);
 
-        Actuator *get_actuator_c(void);
+        Neoled& get_neoled();
 
-        Actuator *get_actuator_d(void);
+        Led& get_led();
 
-        Actuator *get_neoled(void);
-
-        Sensor *get_sensor(Sensor_Type sensor);
-
-        Sensor *get_sensor_1(void);
-
-        Sensor *get_sensor_2(void);
-
-        Sensor *get_sensor_3(void);
-
-        Sensor *get_sensor_4(void);
-
-        Sensor *get_imu(void);
+        IMU& get_imu();
 
     private:
 
-        std::array<Actuator* , ACTUATOR_COUNT> m_actuators =
+        Hardware_Config m_hardware_config;
+
+        std::array<LegoMotor*, PORT_COUNT> m_lego_motors =
         {
-            nullptr,
             nullptr,
             nullptr,
             nullptr,
             nullptr
         };
 
-        std::array<Sensor* , ACTUATOR_COUNT> m_sensors =
+        std::array<LegoSensor*, PORT_COUNT> m_lego_sensors =
         {
-            nullptr,
             nullptr,
             nullptr,
             nullptr,
             nullptr
         };
+
+        Neoled m_neoled;
+
+        Led m_led;
+
+        IMU m_imu;
 };
