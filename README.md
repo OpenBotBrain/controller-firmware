@@ -165,6 +165,11 @@ class LegoMotor
 };
 ```
 
+Current Actuators
+
+- `NeoLED`
+- `LEDs`
+
 ### ***Devices***
 
 Device interface.
@@ -226,3 +231,8 @@ class LegoSensor
         virtual uint8_t get_mode() = 0;
 };
 ```
+
+Current Sensors:
+
+- `IMU`
+- `Buttons`

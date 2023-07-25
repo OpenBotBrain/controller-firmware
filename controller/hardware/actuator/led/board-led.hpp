@@ -3,17 +3,30 @@
 #include <actuator/hardware-actuator.hpp>
 #include <cstdint>
 
-class Led : public Actuator
+static constexpr uint8_t LED_COUNT = 3;
+
+enum class LED_Type
+{
+    MIDDLE = 0,
+    TOP,
+    BOTTOM,
+};
+
+class LED : public Actuator
 {
     public:
 
-        Led() {};
+        LED() {};
 
         virtual void init() override;
 
         virtual void update() override;
 
         void reset();
+
+        void set_led_state(LED_Type, bool state);
+
+        bool get_led_state(LED_Type);
 
         void set_led_1(bool state);
 
@@ -23,9 +36,8 @@ class Led : public Actuator
 
     private:
 
-        bool m_state_led_1;
-
-        bool m_state_led_2;
-
-        bool m_state_led_3;
+        bool m_led_states[LED_COUNT] =
+        {
+            false, false, false
+        };
 };

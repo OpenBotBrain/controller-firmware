@@ -137,6 +137,7 @@ driver_include_paths := \
 	-I$(device_path)/i2c \
 	-I$(device_path)/uart \
 	-I$(sensor_path)/battery \
+	-I$(sensor_path)/button \
 	-I$(sensor_path)/colour \
 	-I$(sensor_path)/imu \
 	-I$(sensor_path)/light \
@@ -151,6 +152,7 @@ all_source_path += \
 	$(device_path)/i2c/ \
 	$(device_path)/uart/ \
 	$(sensor_path)/battery \
+	$(sensor_path)/button \
 	$(sensor_path)/colour/ \
 	$(sensor_path)/imu/ \
 	$(sensor_path)/light/ \
@@ -195,6 +197,7 @@ CXXSRC+=nxt-touch-sensor.cpp
 # misc
 CXXSRC+=board-imu.cpp
 CXXSRC+=board-battery.cpp
+CXXSRC+=board-buttons.cpp
 
 # ------------------------------------------------------------------------------------------
 # stm-hal low level config files APP - Source and Include
