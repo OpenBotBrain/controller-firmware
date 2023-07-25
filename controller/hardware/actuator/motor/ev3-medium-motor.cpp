@@ -208,10 +208,8 @@ uint32_t EV3MediumMotor::get_motor_speed(void)
  * @param rotation amount of rotation of the motor.
  * @param immediate_return should we immediately return to program after telling the motor to run?
 */
-void EV3MediumMotor::drive_motor(float speed, int32_t rotation, bool immediate_return)
+void EV3MediumMotor::drive_motor(float speed, int32_t rotation)
 {
-    if (immediate_return);
-
     if (speed);
 
     if (rotation);

@@ -120,9 +120,9 @@ class Actuator
 {
     public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
+        virtual void update() = 0;
 };
 ```
 
@@ -137,31 +137,31 @@ class LegoMotor
 
         virtual void backward(int32_t rotation) = 0;
 
-        virtual void stop(void) = 0;
+        virtual void stop() = 0;
 
         virtual void start_sync(LegoMotor *motor) = 0;
 
-        virtual void end_sync(void) = 0;
+        virtual void end_sync() = 0;
 
-        virtual bool is_stalled(void) = 0;
+        virtual bool is_stalled() = 0;
 
-        virtual int32_t get_tacho_count(void) = 0;
+        virtual int32_t get_tacho_count() = 0;
 
         virtual void set_motor_pwm(uint8_t motor_pwm) = 0;
 
-        virtual uint8_t get_motor_pwm(void) = 0;
+        virtual uint8_t get_motor_pwm() = 0;
 
         virtual void set_motor_encoder(uint8_t motor_encoder) = 0;
 
-        virtual uint8_t get_motor_encoder(void) = 0;
+        virtual uint8_t get_motor_encoder() = 0;
 
         virtual void set_motor_speed(uint32_t motor_speed) = 0;
 
-        virtual uint32_t get_motor_speed(void) = 0;
+        virtual uint32_t get_motor_speed() = 0;
 
     private:
 
-        virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) = 0;
+        virtual void drive_motor(float speed, int32_t rotation) = 0;
 };
 ```
 
@@ -174,9 +174,9 @@ class Device
 {
     public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
+        virtual void update() = 0;
 };
 ```
 
@@ -187,9 +187,9 @@ class LegoDevice
 {
     public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
+        virtual void update() = 0;
 };
 ```
 
@@ -204,11 +204,9 @@ class Sensor
 {
     public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
-
-        virtual float fetch_sample(void) = 0;
+        virtual void update() = 0;
 };
 ```
 
@@ -219,14 +217,12 @@ class LegoSensor
 {
     public:
 
-        virtual void init(void) = 0;
+        virtual void init() = 0;
 
-        virtual void update(void) = 0;
-
-        virtual float fetch_sample(void) = 0;
+        virtual void update() = 0;
 
         virtual void set_mode(uint8_t mode) = 0;
 
-        virtual uint8_t get_mode(void) = 0;
+        virtual uint8_t get_mode() = 0;
 };
 ```

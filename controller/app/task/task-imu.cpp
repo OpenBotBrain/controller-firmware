@@ -73,7 +73,7 @@ static constexpr LSM6DS::Config s_imu_config =
 
 static LSM6DS s_imu(s_imu_config);
 static ComplementaryFilter s_complementary_filter;
-static IMU_data s_imu_data;
+static IMU_Data s_imu_data;
 
 static void s_imu_thread(void*)
 {
@@ -136,7 +136,7 @@ void task_imu_init()
     s_complementary_filter.init();
 }
 
-IMU_data task_get_imu_data()
+IMU_Data task_get_imu_data()
 {
     return s_imu_data;
 }
