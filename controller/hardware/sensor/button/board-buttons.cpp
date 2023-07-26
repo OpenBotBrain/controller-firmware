@@ -6,14 +6,6 @@
 // ------------------------------------------------------------------------------------
 
 /**
- * Init the board buttons
-*/
-void Buttons::init()
-{
-
-}
-
-/**
  * Update the board buttons.
 */
 void Buttons::update()

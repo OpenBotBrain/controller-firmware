@@ -42,7 +42,7 @@ static void s_hardware_manager_thread(void*)
     s_imu.init();
     s_buttons.init();
 
-    s_neoled.set_enable(s_rgb_on);
+    s_neoled.set_state(s_rgb_on);
 
     for ( ;; )
     {

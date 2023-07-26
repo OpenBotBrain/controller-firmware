@@ -8,11 +8,11 @@
 #include <gscope/gscope.hpp>
 #include <gscope/gscope.hpp>
 
-// IN-PI554FCH - https://www.inolux-corp.com/datasheet/SMDLED/Addressable%20LED/IN-PI554FCH.pdf
-
 // ------------------------------------------------------------------------------------
 //                                      SYSTEM API
 // ------------------------------------------------------------------------------------
+
+// IN-PI554FCH - https://www.inolux-corp.com/datasheet/SMDLED/Addressable%20LED/IN-PI554FCH.pdf
 
 static bool s_sending_data = false;
 
@@ -32,7 +32,7 @@ static void s_timer_transfer_finish_callback(void*)
 /**
  * Init Neoled.
  *
- * Calls system_neoled_init()
+ * Sets the timer on off periods and sets callback.
 */
 void NeoLED::init()
 {
@@ -62,11 +62,13 @@ void NeoLED::update()
 }
 
 /**
- * Turn the RGB LED on or off.
+ * Set the state of the NeoLED.
+ *
+ * @param state
 */
-void NeoLED::set_enable(bool enable)
+void NeoLED::set_state(bool state)
 {
-    m_rgb_on = enable;
+    m_rgb_on = state;
 }
 
 /**

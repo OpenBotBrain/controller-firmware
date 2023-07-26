@@ -18,7 +18,7 @@ class Buttons : public Sensor
 
         Buttons() {};
 
-        virtual void init() override;
+        virtual void init() override {};
 
         virtual void update() override;
 

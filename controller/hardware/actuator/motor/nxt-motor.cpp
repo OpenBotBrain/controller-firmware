@@ -186,7 +186,6 @@ uint32_t NXTMotor::get_motor_speed(void)
  *
  * @param speed float value containing speed of motor.
  * @param rotation amount of rotation of the motor.
- * @param immediate_return should we immediately return to program after telling the motor to run?
 */
 void NXTMotor::drive_motor(float speed, int32_t rotation)
 {

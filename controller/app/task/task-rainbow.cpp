@@ -29,7 +29,7 @@ static void s_rainbow_thread(void*)
             s_rgb_led.set_colour(colours[i]);
 
             // Set on state of RGB LED.
-            s_rgb_led.set_enable(s_led_on);
+            s_rgb_led.set_state(s_led_on);
 
             // Update RGB LED.
             s_rgb_led.update();

@@ -44,9 +44,9 @@ float EV3ColourSensor::fetch_sample()
  *
  * @param sensor_mode
 */
-void EV3ColourSensor::set_mode(uint8_t sensor_mode)
+void EV3ColourSensor::set_mode(uint8_t mode)
 {
-    m_sensor_mode = static_cast<EV3_Colour_Sensor_Mode>(sensor_mode);
+    m_sensor_mode = static_cast<EV3_Colour_Sensor_Mode>(mode);
 }
 
 /**

@@ -8,11 +8,13 @@
 /**
  * Init the LEDs.
  *
- * Sets all of the states to false.
+ * Resets all led pins.
 */
 void LED::init()
 {
-
+    hal_gpio_reset_pin(LED1_IO);
+    hal_gpio_reset_pin(LED2_IO);
+    hal_gpio_reset_pin(LED3_IO);
 }
 
 /**
@@ -66,7 +68,7 @@ bool LED::get_led_state(LED_Type led_type)
 /**
  * Set state of LED 1.
  *
- * @param bool state
+ * @param bool state of LED
 */
 void LED::set_led_1(bool state)
 {
@@ -76,7 +78,7 @@ void LED::set_led_1(bool state)
 /**
  * Set state of LED 2.
  *
- * @param bool state
+ * @param bool state of LED
 */
 void LED::set_led_2(bool state)
 {
@@ -86,7 +88,7 @@ void LED::set_led_2(bool state)
 /**
  * Set state of LED 3.
  *
- * @param bool state
+ * @param bool state of LED
 */
 void LED::set_led_3(bool state)
 {

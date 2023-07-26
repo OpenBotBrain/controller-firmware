@@ -24,9 +24,13 @@ class EV3ColourSensor : public LegoSensor
 
         float fetch_sample();
 
-        void set_mode(uint8_t sensor_mode);
+        virtual void init() override {};
 
-        uint8_t get_mode();
+        virtual void update() override {};
+
+        virtual void set_mode(uint8_t mode) override;
+
+        virtual uint8_t get_mode() override;
 
     private:
 

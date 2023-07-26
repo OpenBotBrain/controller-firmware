@@ -59,7 +59,7 @@ class NeoLED : public Actuator
 
         virtual void update() override;
 
-        void set_enable(bool enable);
+        void set_state(bool state);
 
         void set_brightness(NeoLED_Brightness brightness);
 
