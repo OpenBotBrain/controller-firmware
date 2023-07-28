@@ -14,7 +14,7 @@
 NXTTouchSensor::NXTTouchSensor(InputPort* port)
 {
     m_port = port;
-    m_sensor_mode = NXT_TOUCH_SENSOR_TOUCH;
+    m_sensor_mode = NXT_Touch_Sensor_Mode::TOUCH;
 }
 
 /**

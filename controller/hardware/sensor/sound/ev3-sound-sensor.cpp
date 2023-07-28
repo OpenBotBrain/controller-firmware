@@ -14,7 +14,7 @@
 EV3SoundSensor::EV3SoundSensor(InputPort* port)
 {
     m_port = port;
-    m_sensor_mode = EV3_SOUND_SENSOR_DB;
+    m_sensor_mode = EV3_Sound_Sensor_Mode::DB;
 }
 
 /**
@@ -34,7 +34,7 @@ EV3SoundSensor::EV3SoundSensor(InputPort* port, EV3_Sound_Sensor_Mode sensor_mod
  *
  * @param *sample pointer to float value that stores the sample.
 */
-float EV3SoundSensor::fetch_sample()
+float EV3SoundSensor::fetch_sound_sample()
 {
     return 1.0f;
 }

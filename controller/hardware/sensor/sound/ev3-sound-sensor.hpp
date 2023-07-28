@@ -11,11 +11,11 @@
  * - EV3_SOUND_SENSOR_DB: db mode.
  * - EV3_SOUND_SENSOR_DBA: dba mode, closer to human perception.
 */
-enum EV3_Sound_Sensor_Mode
+enum class EV3_Sound_Sensor_Mode
 {
-    EV3_SOUND_SENSOR_UNDEFINED = 0,
-    EV3_SOUND_SENSOR_DB,
-    EV3_SOUND_SENSOR_DBA
+    UNDEFINED = 0,
+    DB,
+    DBA
 };
 
 class EV3SoundSensor : public LegoSensor
@@ -26,11 +26,15 @@ class EV3SoundSensor : public LegoSensor
 
         EV3SoundSensor(InputPort* port, EV3_Sound_Sensor_Mode sensor_mode);
 
-        float fetch_sample();
+        virtual void init() override {};
 
-        void set_mode(uint8_t sensor_mode);
+        virtual void update() override {};
 
-        uint8_t get_mode();
+        virtual void set_mode(uint8_t sensor_mode) override;
+
+        virtual uint8_t get_mode() override;
+
+        float fetch_sound_sample();
 
     private:
 
