@@ -14,9 +14,9 @@
 //  Medium Motor reaction time is much faster than Large Motor due to smaller motor
 //  and smaller gearbox.
 
-#define MAX_MOTOR_SPEED     1000
-#define DEFAULT_MOTOR_SPEED 500
-#define MIN_MOTOR_SPEED     0
+static constexpr uint16_t MAX_MOTOR_SPEED      = 1000;
+static constexpr uint16_t DEFAULT_MOTOR_SPEED  = 500;
+static constexpr uint16_t MIN_MOTOR_SPEED      = 0;
 
 enum class Lego_Motor_Type
 {
