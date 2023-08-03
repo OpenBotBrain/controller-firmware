@@ -119,6 +119,7 @@ CXXSRC+=task-power-supply.cpp
 CXXSRC+=task-rainbow.cpp
 CXXSRC+=task-update.cpp
 CXXSRC+=task-hardware-manager.cpp
+CXXSRC+=task-memory-game.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
@@ -376,7 +377,7 @@ c_compiler_options := $(cdefs) $(common_flags) $(board_include_paths)
 cpp_compiler_options := $(cdefs) $(common_flags) $(board_include_paths) -fno-rtti -std=c++17 -fno-threadsafe-statics
 linker_options := -Wl,-static $(common_flags) -Wl,--gc-sections,-T$(linker_source_file) -Wl,--print-memory-usage
 dependency_options = -MT $@ -MMD -MP -MF $(dependency_dir)/$*.Td
-ld_lib := -lc -lnosys -lm $(custom_libs)
+ld_lib := -lc -lnosys -lm -lstdc++ $(custom_libs)
 
 # ------------------------------------------------------------------------------------------
 TIME_DIFF_MS := $$(($$(date +%s) - $(TIME_START)))

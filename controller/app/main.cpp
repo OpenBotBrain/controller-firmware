@@ -10,12 +10,15 @@
 #include <task/task-rainbow.hpp>
 #include <task/task-hardware-manager.hpp>
 #include <task/task-update.hpp>
+#include <task/task-memory-game.hpp>
 
 int main(void)
 {
     board_rev_init();               // Init board revision, IOs and clock configuration
 
-    task_hardware_manager_init();   // Init hardware manager task.
+    task_memory_game_init();        // Init memory game.
+
+    // task_hardware_manager_init();   // Init hardware manager task.
 
     // task_rainbow_init();            // Init rainbow task.
 

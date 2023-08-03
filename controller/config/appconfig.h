@@ -17,6 +17,9 @@
 #define PRI_HARDWARE_MAN                    1
 #define SIZE_HARDWARE_MAN                   256
 
+#define PRI_MEM_GAME                        1
+#define SIZE_MEM_GAME                       256
+
 #define PRI_GSCOPE                          2
 #define SIZE_GSCOPE                         256
 

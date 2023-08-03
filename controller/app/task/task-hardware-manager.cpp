@@ -6,7 +6,7 @@
 #include <stm-hal/hal-tim.hpp>
 #include <gscope/gscope-debug.hpp>
 
-static const TickType_t s_tick_delay = 5;
+static const TickType_t S_TICK_DELAY = 5;
 static const float s_roll_threshold = 25.0f;
 
 static TaskHandle_t s_task_handler;
@@ -23,7 +23,7 @@ static NeoLED_Colour s_colour = NEO_WHITE;
 static IMU_Data s_imu_out;
 
 /**
- * Hardware manager task.
+ * Hardware manager task thread.
  *
  * The colour of the RGB LED changes depending on roll pitch from imu.
 */
@@ -85,7 +85,7 @@ static void s_hardware_manager_thread(void*)
             s_led.update();
         }
 
-        vTaskDelay(s_tick_delay);
+        vTaskDelay(S_TICK_DELAY);
     }
 }
 
