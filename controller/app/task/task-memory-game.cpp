@@ -3,10 +3,12 @@
 #include <stm-hal/hal-gpio.hpp>
 #include <hardware/hardware-manager.hpp>
 #include <map>
+#include <cstdlib>
+#include <ctime>
 
 static const TickType_t S_TICK_DELAY = 5;
 static const TickType_t S_LED_SHOW_TIME = 1000;
-static const TickType_t S_BUTTON_BOUNCE_TIME = 200;
+static const TickType_t S_BUTTON_BOUNCE_TIME = 100;
 static TaskHandle_t s_task_handler;
 
 static HardwareManager s_hardware_manager;
@@ -14,17 +16,17 @@ static NeoLED s_neoled;
 static LED s_led;
 static Buttons s_buttons;
 
-static const uint8_t S_MEMORY_PATTERN_LENGTH = 3;
-static LED_Type s_led_order[S_MEMORY_PATTERN_LENGTH] =
+static const uint8_t S_LEDS_LENGTH = 3;
+static LED_Type s_leds[S_LEDS_LENGTH] =
 {
     LED_Type::TOP,
     LED_Type::MIDDLE,
     LED_Type::BOTTOM
 };
-static NeoLED_Colour s_colour;
 
-static std::map<LED_Type, Button_Type> s_led_button_map;
+static NeoLED_Colour s_colour;
 static bool s_user_correct = true;
+static uint8_t s_random_number = 0;
 
 static bool s_get_user_guess(LED_Type led_type)
 {
@@ -41,30 +43,24 @@ static bool s_get_user_guess(LED_Type led_type)
                 return true;
             }
             button_pressed = true;
-            s_neoled.set_colour(NEO_YELLOW);
-            s_neoled.update();
             vTaskDelay(S_BUTTON_BOUNCE_TIME);
         }
-        else if (s_buttons.is_pressed(Button_Type::MIDDLE))
+        if (s_buttons.is_pressed(Button_Type::MIDDLE))
         {
             if (led_type == LED_Type::MIDDLE)
             {
                 return true;
             }
             button_pressed = true;
-            s_neoled.set_colour(NEO_TEAL);
-            s_neoled.update();
             vTaskDelay(S_BUTTON_BOUNCE_TIME);
         }
-        else if (s_buttons.is_pressed(Button_Type::BOTTOM))
+        if (s_buttons.is_pressed(Button_Type::BOTTOM))
         {
             if (led_type == LED_Type::BOTTOM)
             {
                 return true;
             }
             button_pressed = true;
-            s_neoled.set_colour(NEO_PURPLE);
-            s_neoled.update();
             vTaskDelay(S_BUTTON_BOUNCE_TIME);
         }
 
@@ -84,9 +80,7 @@ static bool s_get_user_guess(LED_Type led_type)
 */
 static void s_memory_game_thread(void*)
 {
-    s_led_button_map[LED_Type::TOP] = Button_Type::TOP;
-    s_led_button_map[LED_Type::MIDDLE] = Button_Type::MIDDLE;
-    s_led_button_map[LED_Type::BOTTOM] = Button_Type::BOTTOM;
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     s_hardware_manager.init();
     s_neoled = s_hardware_manager.get_neoled();
@@ -100,32 +94,21 @@ static void s_memory_game_thread(void*)
 
     for ( ;; )
     {
+        // Reset loop
         s_neoled.set_colour(NEO_BLACK);
         s_neoled.update();
         s_led.reset();
 
+        // Generate random number between 1 and 3
+        s_random_number = std::rand() % 3;
         // Show the pattern
-        for (uint8_t i = 0; i < S_MEMORY_PATTERN_LENGTH; i++)
-        {
-            s_led.set_led_state(s_led_order[i], true);
-            s_led.update();
-            vTaskDelay(S_LED_SHOW_TIME);
-            s_led.set_led_state(s_led_order[i], false);
-            s_led.update();
-        }
+        s_led.set_led_state(s_leds[s_random_number], true);
+        s_led.update();
+        vTaskDelay(S_LED_SHOW_TIME);
+        s_led.set_led_state(s_leds[s_random_number], false);
+        s_led.update();
 
-        // User recreates the pattern with the buttons.
-        for (uint8_t i = 0; i < S_MEMORY_PATTERN_LENGTH; i++)
-        {
-            s_neoled.set_colour(NEO_BLACK);
-            s_neoled.update();
-            bool guess_correct = s_get_user_guess(s_led_order[i]);
-
-            if (!guess_correct)
-            {
-                s_user_correct = false;
-            }
-        }
+        s_user_correct = s_get_user_guess(s_leds[s_random_number]);
 
         // Shine RED or GREEN on NeoLED based on user win or lose.
         s_colour = (s_user_correct) ? NEO_GREEN : NEO_RED;
