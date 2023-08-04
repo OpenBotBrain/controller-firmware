@@ -119,6 +119,7 @@ CXXSRC+=task-power-supply.cpp
 CXXSRC+=task-rainbow.cpp
 CXXSRC+=task-update.cpp
 CXXSRC+=task-hardware-manager.cpp
+CXXSRC+=task-random.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
@@ -215,6 +216,7 @@ CXXSRC+=hal-spi.cpp
 CXXSRC+=hal-tim.cpp
 CXXSRC+=hal-uart.cpp
 CXXSRC+=hal-usb.cpp
+CXXSRC+=hal-rng.cpp
 
 # STM-Hal - USB
 CSRC+=usbd_conf.c
