@@ -16,12 +16,20 @@ static NeoLED s_neoled;
 static LED s_led;
 static Buttons s_buttons;
 
-static const uint8_t S_LEDS_LENGTH = 3;
-static LED_Type s_leds[S_LEDS_LENGTH] =
+static const uint8_t S_LED_COUNT = 3;
+static LED_Type s_led_types[S_LED_COUNT] =
 {
     LED_Type::TOP,
     LED_Type::MIDDLE,
     LED_Type::BOTTOM
+};
+
+static const uint8_t S_BUTTON_COUNT = 3;
+static Button_Type s_button_types[S_BUTTON_COUNT] =
+{
+    Button_Type::TOP,
+    Button_Type::MIDDLE,
+    Button_Type::BOTTOM
 };
 
 static NeoLED_Colour s_colour;
@@ -29,7 +37,7 @@ static bool s_user_correct = true;
 static uint8_t s_random_number = 0;
 static uint32_t s_user_wins = 0;
 
-static bool s_get_user_guess(LED_Type led_type)
+static bool s_get_user_press(LED_Type led_type)
 {
     bool button_pressed = false;
 
@@ -37,32 +45,17 @@ static bool s_get_user_guess(LED_Type led_type)
     {
         s_buttons.update();
 
-        if (s_buttons.is_pressed(Button_Type::TOP))
+        for (uint8_t i = 0; i < S_BUTTON_COUNT; i++)
         {
-            if (led_type == LED_Type::TOP)
+            if (s_buttons.is_pressed(s_button_types[i]))
             {
-                return true;
+                if (led_type == s_led_types[i])
+                {
+                    return true;
+                }
+                button_pressed = true;
+                vTaskDelay(S_BUTTON_BOUNCE_TIME);
             }
-            button_pressed = true;
-            vTaskDelay(S_BUTTON_BOUNCE_TIME);
-        }
-        if (s_buttons.is_pressed(Button_Type::MIDDLE))
-        {
-            if (led_type == LED_Type::MIDDLE)
-            {
-                return true;
-            }
-            button_pressed = true;
-            vTaskDelay(S_BUTTON_BOUNCE_TIME);
-        }
-        if (s_buttons.is_pressed(Button_Type::BOTTOM))
-        {
-            if (led_type == LED_Type::BOTTOM)
-            {
-                return true;
-            }
-            button_pressed = true;
-            vTaskDelay(S_BUTTON_BOUNCE_TIME);
         }
 
         if (button_pressed)
@@ -107,13 +100,13 @@ static void s_memory_game_thread(void*)
             // Generate random number between 1 and 3
             s_random_number = std::rand() % 3;
             // Show the pattern
-            s_led.set_led_state(s_leds[s_random_number], true);
+            s_led.set_led_state(s_led_types[s_random_number], true);
             s_led.update();
             vTaskDelay(S_LED_SHOW_TIME);
-            s_led.set_led_state(s_leds[s_random_number], false);
+            s_led.set_led_state(s_led_types[s_random_number], false);
             s_led.update();
 
-            s_user_correct = s_get_user_guess(s_leds[s_random_number]);
+            s_user_correct = s_get_user_press(s_led_types[s_random_number]);
             round_count++;
         }
 
