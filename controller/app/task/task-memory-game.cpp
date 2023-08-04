@@ -27,6 +27,7 @@ static LED_Type s_leds[S_LEDS_LENGTH] =
 static NeoLED_Colour s_colour;
 static bool s_user_correct = true;
 static uint8_t s_random_number = 0;
+static uint32_t s_user_wins = 0;
 
 static bool s_get_user_guess(LED_Type led_type)
 {
@@ -99,19 +100,34 @@ static void s_memory_game_thread(void*)
         s_neoled.update();
         s_led.reset();
 
-        // Generate random number between 1 and 3
-        s_random_number = std::rand() % 3;
-        // Show the pattern
-        s_led.set_led_state(s_leds[s_random_number], true);
-        s_led.update();
-        vTaskDelay(S_LED_SHOW_TIME);
-        s_led.set_led_state(s_leds[s_random_number], false);
-        s_led.update();
+        s_user_correct = true;
+        uint32_t round_count = 0;
+        while (round_count < s_user_wins + 1 && s_user_correct)
+        {
+            // Generate random number between 1 and 3
+            s_random_number = std::rand() % 3;
+            // Show the pattern
+            s_led.set_led_state(s_leds[s_random_number], true);
+            s_led.update();
+            vTaskDelay(S_LED_SHOW_TIME);
+            s_led.set_led_state(s_leds[s_random_number], false);
+            s_led.update();
 
-        s_user_correct = s_get_user_guess(s_leds[s_random_number]);
+            s_user_correct = s_get_user_guess(s_leds[s_random_number]);
+            round_count++;
+        }
 
         // Shine RED or GREEN on NeoLED based on user win or lose.
-        s_colour = (s_user_correct) ? NEO_GREEN : NEO_RED;
+        if (s_user_correct)
+        {
+            s_colour = NEO_GREEN;
+            s_user_wins++;
+        }
+        else
+        {
+            s_colour = NEO_RED;
+        }
+
         s_neoled.set_brightness(NEO_BRI_1);
         s_neoled.set_colour(s_colour);
         s_neoled.update();
