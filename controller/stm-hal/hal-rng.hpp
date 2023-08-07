@@ -2,6 +2,12 @@
 
 #include <cstdint>
 
+enum class RNG_Status
+{
+    ENABLED,
+    DISABLED
+};
+
 void hal_rng_start();
 
 void hal_rng_stop();
