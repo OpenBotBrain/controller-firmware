@@ -120,6 +120,7 @@ CXXSRC+=task-rainbow.cpp
 CXXSRC+=task-update.cpp
 CXXSRC+=task-hardware-manager.cpp
 CXXSRC+=task-memory-game.cpp
+CXXSRC+=task-random.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp
@@ -216,6 +217,7 @@ CXXSRC+=hal-spi.cpp
 CXXSRC+=hal-tim.cpp
 CXXSRC+=hal-uart.cpp
 CXXSRC+=hal-usb.cpp
+CXXSRC+=hal-rng.cpp
 
 # STM-Hal - USB
 CSRC+=usbd_conf.c
@@ -262,6 +264,8 @@ CSRC+=stm32l4xx_hal_tim.c
 CSRC+=stm32l4xx_hal_tim_ex.c
 CSRC+=stm32l4xx_hal_pcd.c
 CSRC+=stm32l4xx_hal_pcd_ex.c
+CSRC+=stm32l4xx_hal_rng.c
+CSRC+=stm32l4xx_hal_rng_ex.c
 CSRC+=stm32l4xx_ll_usb.c
 
 # ------------------------------------------------------------------------------------------

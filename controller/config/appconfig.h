@@ -11,6 +11,9 @@
 #define PRI_BLINKY                          1
 #define SIZE_BLINKY                         128
 
+#define PRI_RANDOM                          1
+#define SIZE_RANDOM                         128
+
 #define PRI_RAINBOW                         1
 #define SIZE_RAINBOW                        128
 

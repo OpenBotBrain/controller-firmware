@@ -11,12 +11,15 @@
 #include <task/task-hardware-manager.hpp>
 #include <task/task-update.hpp>
 #include <task/task-memory-game.hpp>
+#include <task/task-random.hpp>
 
 int main(void)
 {
     board_rev_init();               // Init board revision, IOs and clock configuration
 
     task_memory_game_init();        // Init memory game.
+
+    // task_random_init();             // Init random task.
 
     // task_hardware_manager_init();   // Init hardware manager task.
 
@@ -30,7 +33,7 @@ int main(void)
 
     task_ports_init();              // Init main task ports (motor pids, and regular work)
 
-    task_display_init();         // Init main display task
+    task_display_init();            // Init main display task
 
     task_imu_init();                // Init Inertial measurement unit task
 
