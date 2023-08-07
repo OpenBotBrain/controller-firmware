@@ -2,7 +2,7 @@
 #include <system/system-freertos.hpp>
 #include <stm-hal/hal-gpio.hpp>
 #include <hardware/hardware-manager.hpp>
-#include <map>
+#include <stm-hal/hal-rng.hpp>
 #include <cstdlib>
 #include <ctime>
 
@@ -74,7 +74,8 @@ static bool s_get_user_press(LED_Type led_type)
 */
 static void s_memory_game_thread(void*)
 {
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    uint32_t seed = hal_rng_get_once();
+    std::srand(seed);
 
     s_hardware_manager.init();
     s_neoled = s_hardware_manager.get_neoled();
