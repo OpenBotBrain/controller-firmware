@@ -85,3 +85,13 @@ uint32_t hal_rng_get_once()
 
     return random_number;
 }
+
+/**
+ * Retruns the current status of RNG getter, whether it is disabled or enabled.
+ *
+ * @return rng status
+*/
+RNG_Status hal_rng_get_status()
+{
+    return s_rng_status;
+}
