@@ -90,3 +90,8 @@ void system_status_update()
     float bat_charge = s_batery_conversion.get_charge();
     s_bat_charge.produce(&bat_charge);
 }
+
+float system_get_vbat_voltage()
+{
+    return s_rail_voltage[ADC_TYPE_VBAT];
+}

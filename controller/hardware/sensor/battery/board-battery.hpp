@@ -2,6 +2,9 @@
 
 #include <cstdint>
 #include <sensor/hardware-sensor.hpp>
+#include <system/system-battery.hpp>
+
+static constexpr float BATTERY_VOLTAGE = 3.3f;
 
 class Battery : public Sensor
 {
@@ -13,13 +16,19 @@ class Battery : public Sensor
 
         virtual void update() override;
 
-        bool battery_connected();
+        bool connected();
 
-        float battery_voltage();
+        float voltage();
+
+        float charge();
 
     private:
 
-        bool m_battery_connected;
+        bool m_battery_init = false;
 
-        float m_battery_voltage;
+        bool m_battery_connected = false;
+
+        float m_battery_voltage = 0.0f;
+
+        BatteryConversion m_battery_conversion;
 };
