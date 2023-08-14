@@ -10,15 +10,12 @@
 #include <task/task-rainbow.hpp>
 #include <task/task-hardware-manager.hpp>
 #include <task/task-update.hpp>
-#include <task/task-random.hpp>
 
 int main(void)
 {
     board_rev_init();               // Init board revision, IOs and clock configuration
 
-    task_random_init();             // Init random task.
-
-    //task_hardware_manager_init();   // Init hardware manager task.
+    task_hardware_manager_init();   // Init hardware manager task.
 
     // task_rainbow_init();            // Init rainbow task.
 
