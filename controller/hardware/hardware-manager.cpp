@@ -10,10 +10,16 @@
 void HardwareManager::init()
 {
     NeoLED m_neoled;
+    //m_neoled.init();
 
     LED m_led;
+    //m_led.init();
 
     IMU m_imu;
+    //m_imu.init();
+
+    Battery m_battery;
+    //m_battery.init();
 
     m_hardware_config = Hardware_Config
     {
@@ -21,7 +27,16 @@ void HardwareManager::init()
         .led_update_interval = 250,
         .imu_update_interval = 5,
         .button_update_interval = 5,
+        .battery_update_interval = 10000,
     };
+
+    // Do not init motors or sensors if battery is not connected.
+    if (!m_battery.is_connected())
+    {
+        return;
+    }
+
+    // Motor & Sensor init
 }
 
 /**
@@ -29,7 +44,16 @@ void HardwareManager::init()
 */
 void HardwareManager::update()
 {
+    // TODO: updates ()
     // will update all devices within the hardware manager.
+
+    // Do not update motors or sensors if battery is not connected.
+    if (!m_battery.is_connected())
+    {
+        return;
+    }
+
+    // Motor update & Sensor update
 }
 
 /**
@@ -49,6 +73,12 @@ Hardware_Config HardwareManager::get_hardware_config()
 */
 LegoMotor* HardwareManager::get_lego_motor(Lego_Motor_Port actuator_type)
 {
+    // Do not allow use of Motor if battery is not connected.
+    if (!m_battery.is_connected())
+    {
+        return nullptr;
+    }
+
     uint8_t actuator = static_cast<uint8_t>(actuator_type);
     return m_lego_motors[actuator];
 }
@@ -60,6 +90,12 @@ LegoMotor* HardwareManager::get_lego_motor(Lego_Motor_Port actuator_type)
 */
 LegoSensor* HardwareManager::get_lego_sensor(Lego_Sensor_Port sensor_type)
 {
+    // Do not allow use of Sensor if battery is not connected.
+    if (!m_battery.is_connected())
+    {
+        return nullptr;
+    }
+
     uint8_t sensor = static_cast<uint8_t>(sensor_type);
     return m_lego_sensors[sensor];
 }
@@ -102,6 +138,16 @@ IMU& HardwareManager::get_imu()
 Buttons& HardwareManager::get_buttons()
 {
     return m_buttons;
+}
+
+/**
+ * Returns a reference to Battery.
+ *
+ * @return Battery&
+*/
+Battery& HardwareManager::get_battery()
+{
+    return m_battery;
 }
 
 // ------------------------------------------------------------------------------------

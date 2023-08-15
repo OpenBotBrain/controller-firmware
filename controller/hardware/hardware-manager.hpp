@@ -35,6 +35,7 @@ struct Hardware_Config
     uint16_t led_update_interval;
     uint16_t imu_update_interval;
     uint16_t button_update_interval;
+    uint16_t battery_update_interval;
 };
 
 class HardwareManager
@@ -60,6 +61,8 @@ class HardwareManager
         IMU& get_imu();
 
         Buttons& get_buttons();
+
+        Battery& get_battery();
 
     private:
 
@@ -88,4 +91,6 @@ class HardwareManager
         IMU m_imu;
 
         Buttons m_buttons;
+
+        Battery m_battery;
 };

@@ -20,6 +20,7 @@ class BatteryConversion
         float estimate_charge(float voltage);
 
     private:
+
         static constexpr float POLE_Z = 0.95f;
 
         static constexpr uint8_t LOOKUP_TABLE_SIZE = 21;
