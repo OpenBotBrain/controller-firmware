@@ -2,7 +2,7 @@
 #include <stm-hal/hal-tim.hpp>
 #include <stm-hal/hal-gpio.hpp>
 #include <gscope/gscope.hpp>
-#include <system/system-battery.hpp>
+#include <battery/board-battery.hpp>
 
 enum AdcSampleType
 {
@@ -17,7 +17,7 @@ enum AdcSampleType
 static uint16_t s_raw_adc[ADC_TYPE_TOTAL];
 static float s_rail_voltage[ADC_TYPE_TOTAL];
 static uint32_t s_timestamp;
-static BatteryConversion s_batery_conversion;
+static BatteryConversion s_battery_conversion;
 
 GScopeChannel(s_voltage_debug, "board_voltage", float, ADC_TYPE_TOTAL)
 GScopeChannel(s_bat_charge, "battery_charge", float, 1)
@@ -86,8 +86,8 @@ void system_status_update()
         s_voltage_debug.produce(s_rail_voltage);
     }
 
-    s_batery_conversion.update_new_value(s_rail_voltage[ADC_TYPE_VBAT]);
-    float bat_charge = s_batery_conversion.get_charge();
+    s_battery_conversion.update(s_rail_voltage[ADC_TYPE_VBAT]);
+    float bat_charge = s_battery_conversion.get_charge();
     s_bat_charge.produce(&bat_charge);
 }
 
