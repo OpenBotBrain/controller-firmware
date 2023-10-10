@@ -1,6 +1,10 @@
 name: build-firmware
 run-name: ${{ github.actor }} is working to improve the firmware.
-on: [push]
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   build-firmware-image:
     runs-on: ubuntu-latest
