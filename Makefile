@@ -141,6 +141,7 @@ driver_include_paths := \
 	-I$(device_path)/i2c \
 	-I$(device_path)/uart \
 	-I$(sensor_path)/battery \
+	-I$(sensor_path)/button \
 	-I$(sensor_path)/colour \
 	-I$(sensor_path)/imu \
 	-I$(sensor_path)/light \
@@ -155,6 +156,7 @@ all_source_path += \
 	$(device_path)/i2c/ \
 	$(device_path)/uart/ \
 	$(sensor_path)/battery \
+	$(sensor_path)/button \
 	$(sensor_path)/colour/ \
 	$(sensor_path)/imu/ \
 	$(sensor_path)/light/ \
@@ -199,6 +201,7 @@ CXXSRC+=nxt-touch-sensor.cpp
 # misc
 CXXSRC+=board-imu.cpp
 CXXSRC+=board-battery.cpp
+CXXSRC+=board-buttons.cpp
 
 # ------------------------------------------------------------------------------------------
 # stm-hal low level config files APP - Source and Include
@@ -216,6 +219,7 @@ CXXSRC+=hal-spi.cpp
 CXXSRC+=hal-tim.cpp
 CXXSRC+=hal-uart.cpp
 CXXSRC+=hal-usb.cpp
+CXXSRC+=hal-rng.cpp
 
 # STM-Hal - USB
 CSRC+=usbd_conf.c
@@ -262,6 +266,8 @@ CSRC+=stm32l4xx_hal_tim.c
 CSRC+=stm32l4xx_hal_tim_ex.c
 CSRC+=stm32l4xx_hal_pcd.c
 CSRC+=stm32l4xx_hal_pcd_ex.c
+CSRC+=stm32l4xx_hal_rng.c
+CSRC+=stm32l4xx_hal_rng_ex.c
 CSRC+=stm32l4xx_ll_usb.c
 
 # ------------------------------------------------------------------------------------------

@@ -10,17 +10,17 @@ static const TickType_t s_tick_delay = 5;
 static const float s_roll_threshold = 25.0f;
 
 static TaskHandle_t s_task_handler;
-static bool s_led_on = false;
 static bool s_rgb_on = true;
 
 static HardwareManager s_manager;
 static Hardware_Config s_hardware_config;
-static Neoled s_neoled;
-static Led s_led;
+static NeoLED s_neoled;
+static LED s_led;
 static IMU s_imu;
+static Buttons s_buttons;
 
-static Neoled_Colour s_colour = NEO_WHITE;
-static IMU_data s_imu_out;
+static NeoLED_Colour s_colour = NEO_WHITE;
+static IMU_Data s_imu_out;
 
 /**
  * Hardware manager task.
@@ -35,14 +35,16 @@ static void s_hardware_manager_thread(void*)
     s_neoled = s_manager.get_neoled();
     s_led = s_manager.get_led();
     s_imu = s_manager.get_imu();
+    s_buttons = s_manager.get_buttons();
 
     s_neoled.init();
     s_led.init();
     s_imu.init();
+    s_buttons.init();
 
-    s_neoled.set_enable(s_rgb_on);
+    s_neoled.set_state(s_rgb_on);
 
-    for ( int i = 0 ;; i++ )
+    for ( ;; )
     {
         s_imu.update();
         s_imu_out = s_imu.get_imu_data();
@@ -61,19 +63,26 @@ static void s_hardware_manager_thread(void*)
             s_neoled.update();
         }
 
+        static uint32_t s_button_timestamp;
+
+        if ((now - s_button_timestamp) >= s_hardware_config.button_update_interval)
+        {
+            s_button_timestamp = now;
+
+            s_buttons.update();
+        }
+
         static uint32_t s_led_timestamp;
 
         if ((now - s_led_timestamp) >= s_hardware_config.led_update_interval)
         {
             s_led_timestamp = now;
 
-            s_led.set_led_2(!s_led_on);                            // top led
-            s_led.set_led_1((s_imu_out.roll[0] > -s_roll_threshold));   // middle led
-            s_led.set_led_3((s_imu_out.roll[0] < s_roll_threshold));    // bottom led
+            s_led.set_led_state(LED_Type::TOP,    s_buttons.is_pressed(Button_Type::TOP));
+            s_led.set_led_state(LED_Type::MIDDLE, s_buttons.is_pressed(Button_Type::MIDDLE));
+            s_led.set_led_state(LED_Type::BOTTOM, s_buttons.is_pressed(Button_Type::BOTTOM));
 
-            s_led_on = !s_led_on;
             s_led.update();
-            i = 0;
         }
 
         vTaskDelay(s_tick_delay);

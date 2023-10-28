@@ -6,9 +6,9 @@
 
 static TaskHandle_t s_task_handler;
 static bool s_led_on = true;
-static Neoled s_rgb_led;
+static NeoLED s_rgb_led;
 
-static Neoled_Colour colours[6] =
+static NeoLED_Colour colours[6] =
 {
     NEO_RED, NEO_GREEN, NEO_BLUE,
     NEO_YELLOW, NEO_PURPLE, NEO_TEAL,
@@ -29,7 +29,7 @@ static void s_rainbow_thread(void*)
             s_rgb_led.set_colour(colours[i]);
 
             // Set on state of RGB LED.
-            s_rgb_led.set_enable(s_led_on);
+            s_rgb_led.set_state(s_led_on);
 
             // Update RGB LED.
             s_rgb_led.update();

@@ -41,7 +41,7 @@ class EV3LargeMotor : public LegoMotor
 
     private:
 
-        virtual void drive_motor(float speed, int32_t rotation, bool immediate_return) override;
+        virtual void drive_motor(float speed, int32_t rotation) override;
 
     private:
 

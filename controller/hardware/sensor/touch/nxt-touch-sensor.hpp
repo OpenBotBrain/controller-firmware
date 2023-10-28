@@ -10,10 +10,10 @@
  * - NXT_TOUCH_SENSOR_UNDEFINED: undefined mode.
  * - NXT_TOUCH_SENSOR_TOUCH: regular touch mode.
 */
-enum NXT_Touch_Sensor_Mode
+enum class NXT_Touch_Sensor_Mode
 {
-    NXT_TOUCH_SENSOR_UNDEFINED = 0,
-    NXT_TOUCH_SENSOR_TOUCH
+    UNDEFINED = 0,
+    TOUCH
 };
 
 class NXTTouchSensor : public LegoSensor
@@ -24,11 +24,15 @@ class NXTTouchSensor : public LegoSensor
 
         NXTTouchSensor(InputPort* port, NXT_Touch_Sensor_Mode sensor_mode);
 
+        virtual void init() override {};
+
+        virtual void update() override {};
+
+        virtual void set_mode(uint8_t sensor_mode) override;
+
+        virtual uint8_t get_mode() override;
+
         float fetch_sample();
-
-        void set_mode(uint8_t sensor_mode);
-
-        uint8_t get_mode();
 
     private:
 

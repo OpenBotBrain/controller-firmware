@@ -14,7 +14,7 @@
 EV3TouchSensor::EV3TouchSensor(InputPort* port)
 {
     m_port = port;
-    m_sensor_mode = EV3_TOUCH_SENSOR_TOUCH;
+    m_sensor_mode = EV3_Touch_Sensor_Mode::TOUCH;
 }
 
 /**

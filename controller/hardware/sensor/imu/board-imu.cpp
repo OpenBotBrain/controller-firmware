@@ -10,7 +10,7 @@
 */
 void IMU::init()
 {
-    m_imu_data = IMU_data
+    m_imu_data = IMU_Data
     {
         .accel = { 0.0f, 0.0f, 0.0f },
         .gyro  = { 0.0f, 0.0f, 0.0f },
@@ -31,7 +31,7 @@ void IMU::update()
  *
  * @return IMU_data
 */
-IMU_data IMU::get_imu_data()
+IMU_Data IMU::get_imu_data()
 {
     return m_imu_data;
 }

@@ -30,7 +30,7 @@ NXTMotor::NXTMotor(OutputPort* port, TimerType motor_pwm, TimerType motor_encode
 */
 void NXTMotor::forward(int32_t rotation)
 {
-    drive_motor(0.0f, rotation, false);
+    drive_motor(0.0f, rotation);
 
     return;
 }
@@ -42,7 +42,7 @@ void NXTMotor::forward(int32_t rotation)
 */
 void NXTMotor::backward(int32_t rotation)
 {
-    drive_motor(0.0f, -rotation, false);
+    drive_motor(0.0f, -rotation);
 
     return;
 }
@@ -186,12 +186,9 @@ uint32_t NXTMotor::get_motor_speed(void)
  *
  * @param speed float value containing speed of motor.
  * @param rotation amount of rotation of the motor.
- * @param immediate_return should we immediately return to program after telling the motor to run?
 */
-void NXTMotor::drive_motor(float speed, int32_t rotation, bool immediate_return)
+void NXTMotor::drive_motor(float speed, int32_t rotation)
 {
-    if (immediate_return);
-
     if (speed);
 
     if (rotation);

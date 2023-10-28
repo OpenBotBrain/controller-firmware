@@ -44,7 +44,7 @@ void EV3LargeMotor::forward(int32_t rotation)
     }
 
     float speed = m_motor_speed / 1000;
-    drive_motor(speed, rotation, false);
+    drive_motor(speed, rotation);
 }
 
 /**
@@ -66,7 +66,7 @@ void EV3LargeMotor::backward(int32_t rotation)
     }
 
     float speed = m_motor_speed / 1000;
-    drive_motor(-speed, -rotation, false);
+    drive_motor(-speed, -rotation);
 }
 
 /**
@@ -213,12 +213,9 @@ uint32_t EV3LargeMotor::get_motor_speed(void)
  *
  * @param speed float value containing speed of motor.
  * @param rotation amount of rotation of the motor.
- * @param immediate_return should we immediately return to program after telling the motor to run?
 */
-void EV3LargeMotor::drive_motor(float speed, int32_t rotation, bool immediate_return)
+void EV3LargeMotor::drive_motor(float speed, int32_t rotation)
 {
-    if (immediate_return);
-
     if (!m_synced)
     {
         m_port->set_pwm_duty(speed);

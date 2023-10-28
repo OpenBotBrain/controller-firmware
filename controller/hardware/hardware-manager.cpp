@@ -9,9 +9,9 @@
 */
 void HardwareManager::init()
 {
-    Neoled m_neoled;
+    NeoLED m_neoled;
 
-    Led m_led;
+    LED m_led;
 
     IMU m_imu;
 
@@ -20,6 +20,7 @@ void HardwareManager::init()
         .neoled_update_interval = 10,
         .led_update_interval = 250,
         .imu_update_interval = 5,
+        .button_update_interval = 5,
     };
 }
 
@@ -64,33 +65,43 @@ LegoSensor* HardwareManager::get_lego_sensor(Lego_Sensor_Port sensor_type)
 }
 
 /**
- * Returns a reference to a Neoled.
+ * Returns a reference to Neoled.
  *
  * @return Neoled&
 */
-Neoled& HardwareManager::get_neoled()
+NeoLED& HardwareManager::get_neoled()
 {
     return m_neoled;
 }
 
 /**
- * Returns a reference to a Led.
+ * Returns a reference to Led.
  *
  * @return Led&
 */
-Led& HardwareManager::get_led()
+LED& HardwareManager::get_led()
 {
     return m_led;
 }
 
 /**
- * Returns a reference to a IMU.
+ * Returns a reference to IMU.
  *
  * @return IMU&
 */
 IMU& HardwareManager::get_imu()
 {
     return m_imu;
+}
+
+/**
+ * Returns a reference to Buttons.
+ *
+ * @return IMU&
+*/
+Buttons& HardwareManager::get_buttons()
+{
+    return m_buttons;
 }
 
 // ------------------------------------------------------------------------------------

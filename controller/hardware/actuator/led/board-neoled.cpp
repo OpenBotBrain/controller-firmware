@@ -8,11 +8,11 @@
 #include <gscope/gscope.hpp>
 #include <gscope/gscope.hpp>
 
-// IN-PI554FCH - https://www.inolux-corp.com/datasheet/SMDLED/Addressable%20LED/IN-PI554FCH.pdf
-
 // ------------------------------------------------------------------------------------
 //                                      SYSTEM API
 // ------------------------------------------------------------------------------------
+
+// IN-PI554FCH - https://www.inolux-corp.com/datasheet/SMDLED/Addressable%20LED/IN-PI554FCH.pdf
 
 static bool s_sending_data = false;
 
@@ -32,9 +32,9 @@ static void s_timer_transfer_finish_callback(void*)
 /**
  * Init Neoled.
  *
- * Calls system_neoled_init()
+ * Sets the timer on off periods and sets callback.
 */
-void Neoled::init()
+void NeoLED::init()
 {
     uint32_t timer_cnt_frequency = hal_tim_neoled_init(s_timer_transfer_finish_callback,  nullptr);
     m_rgb_timer_on_off_periods[0] = timer_cnt_frequency * 0.0000003f;   // 0
@@ -46,7 +46,7 @@ void Neoled::init()
  *
  * If the colour has changed then it will load the new RGB values into the LED.
 */
-void Neoled::update()
+void NeoLED::update()
 {
     uint32_t now = hal_timer_32_ms();
 
@@ -62,11 +62,13 @@ void Neoled::update()
 }
 
 /**
- * Turn the RGB LED on or off.
+ * Set the state of the NeoLED.
+ *
+ * @param state
 */
-void Neoled::set_enable(bool enable)
+void NeoLED::set_state(bool state)
 {
-    m_rgb_on = enable;
+    m_rgb_on = state;
 }
 
 /**
@@ -74,7 +76,7 @@ void Neoled::set_enable(bool enable)
  *
  * @param brightness Neoled_Brightness enum value.
 */
-void Neoled::set_brightness(Neoled_Brightness brightness)
+void NeoLED::set_brightness(NeoLED_Brightness brightness)
 {
     m_rgb_brightness = brightness;
 }
@@ -84,7 +86,7 @@ void Neoled::set_brightness(Neoled_Brightness brightness)
  *
  * @return Neoled Brightness
 */
-Neoled_Brightness Neoled::get_brightness(void)
+NeoLED_Brightness NeoLED::get_brightness(void)
 {
     return m_rgb_brightness;
 }
@@ -96,7 +98,7 @@ Neoled_Brightness Neoled::get_brightness(void)
  * @param g Green (0 - 255)
  * @param b Blue (0 - 255)
 */
-void Neoled::set_rgb(uint8_t r, uint8_t g, uint8_t b)
+void NeoLED::set_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
     m_rgb_colour.red = r;
     m_rgb_colour.green = g;
@@ -108,7 +110,7 @@ void Neoled::set_rgb(uint8_t r, uint8_t g, uint8_t b)
  *
  * @param colour Neoled_Colour struct that colour is being changed to.
 */
-void Neoled::set_colour(Neoled_Colour colour)
+void NeoLED::set_colour(NeoLED_Colour colour)
 {
     m_rgb_colour = colour;
 }
@@ -118,7 +120,7 @@ void Neoled::set_colour(Neoled_Colour colour)
  *
  * @return Neoled Colour
 */
-Neoled_Colour Neoled::get_colour(void)
+NeoLED_Colour NeoLED::get_colour(void)
 {
     return m_rgb_colour;
 }
@@ -130,7 +132,7 @@ Neoled_Colour Neoled::get_colour(void)
 /**
  * Loads the colours into DMA to be transferred to the RGB LED.
 */
-void Neoled::load_rgb()
+void NeoLED::load_rgb()
 {
     if (s_sending_data)
     {
@@ -158,7 +160,7 @@ void Neoled::load_rgb()
  *
  * @return bool
 */
-bool Neoled::colour_changed()
+bool NeoLED::colour_changed()
 {
     return !(
         m_rgb_colour.red == m_last_colour.red &&

@@ -8,6 +8,7 @@
 #include <sensor/lego-sensor.hpp>
 #include <imu/board-imu.hpp>
 #include <battery/board-battery.hpp>
+#include <button/board-buttons.hpp>
 #include <mutex>
 
 static constexpr uint16_t PORT_COUNT = 4;
@@ -33,6 +34,7 @@ struct Hardware_Config
     uint16_t neoled_update_interval;
     uint16_t led_update_interval;
     uint16_t imu_update_interval;
+    uint16_t button_update_interval;
 };
 
 class HardwareManager
@@ -51,11 +53,13 @@ class HardwareManager
 
         LegoSensor* get_lego_sensor(Lego_Sensor_Port sensor);
 
-        Neoled& get_neoled();
+        NeoLED& get_neoled();
 
-        Led& get_led();
+        LED& get_led();
 
         IMU& get_imu();
+
+        Buttons& get_buttons();
 
     private:
 
@@ -77,9 +81,11 @@ class HardwareManager
             nullptr
         };
 
-        Neoled m_neoled;
+        NeoLED m_neoled;
 
-        Led m_led;
+        LED m_led;
 
         IMU m_imu;
+
+        Buttons m_buttons;
 };
