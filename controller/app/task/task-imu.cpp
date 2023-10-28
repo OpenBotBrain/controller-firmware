@@ -107,7 +107,6 @@ static void s_imu_thread(void*)
         s_gyro_integrated.produce(s_complementary_filter.get_integrated_gyro_rad());
         s_gyro_omega.produce(s_complementary_filter.get_angular_speed_rad_s());
 
-        float roll_pitch[2];
         s_complementary_filter.get_roll_pitch(roll_pitch);
         s_imu_roll_pitch.produce(roll_pitch);
 
