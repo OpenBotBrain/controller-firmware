@@ -6,7 +6,7 @@ TIME_START := $(shell date +%s)
 # ------------------------------- Arm Toolchain Path -------------------------------------
 ifndef TOOLCHAIN_ROOT # Only set the TOOLCHAIN_ROOT if there is no previous definition from outside.
 	ifeq ($(OS),Windows_NT)
-		TOOLCHAIN_ROOT:=C:/TOOLCHAIN/9-2019-q4-mayor # This path is so hardcoded that it hurts
+		TOOLCHAIN_ROOT:=C:/TOOLCHAIN/9-2019-q4-mayor
 	endif
 endif
 

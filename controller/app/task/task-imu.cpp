@@ -79,6 +79,7 @@ static void s_imu_thread(void*)
 {
     static float accel[LSM6DS::TOTAL_AXIS];
     static float gyro[LSM6DS::TOTAL_AXIS];
+    static float roll_pitch[2];
     static uint32_t s_timestamp_us;
 
     s_imu.init();
@@ -89,6 +90,7 @@ static void s_imu_thread(void*)
         uint32_t elapse = now - s_timestamp_us;
         s_timestamp_us = now;
 
+        // Regular update to the IMU
         s_imu.update();
 
         s_imu.get_acceleration(accel);
@@ -98,6 +100,7 @@ static void s_imu_thread(void*)
         s_accelerometer.produce(accel);
         s_gyro.produce(gyro);
 
+        // Update the complementary filter
         s_complementary_filter.update(accel, gyro, static_cast<float>(elapse) * 1e-6);
 
         // Produce some output of the complementary filter
