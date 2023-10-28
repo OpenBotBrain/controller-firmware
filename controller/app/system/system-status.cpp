@@ -18,6 +18,7 @@ static uint16_t s_raw_adc[ADC_TYPE_TOTAL];
 static float s_rail_voltage[ADC_TYPE_TOTAL];
 static uint32_t s_timestamp;
 static BatteryConversion s_batery_conversion;
+static uint32_t s_start_timestamp = 0;
 
 GScopeChannel(s_voltage_debug, "board_voltage", float, ADC_TYPE_TOTAL)
 GScopeChannel(s_bat_charge, "battery_charge", float, 1)
@@ -59,8 +60,18 @@ void system_status_enable(bool enable)
     }
 }
 
+static void s_system_power_enable_update()
+{
+    static bool s_enable = false;
+    if (!s_enable && (hal_timer_32_ms() - s_start_timestamp) >= 500)
+    {
+        s_enable = true;
+        hal_gpio_reset_pin(POWER_SUPPLY_IO);
+    }
+}
 void system_status_init()
 {
+    s_start_timestamp = hal_timer_32_ms();
     hal_adc_init_channel(ADC_CHANNEL_TYPE_3V3_SENSE, s_3v3_sample, nullptr);
     hal_adc_init_channel(ADC_CHANNEL_TYPE_5V_SENSE, s_5v_sample, nullptr);
     hal_adc_init_channel(ADC_CHANNEL_TYPE_9V_SENSE, s_9v_sample, nullptr);
@@ -89,4 +100,6 @@ void system_status_update()
     s_batery_conversion.update_new_value(s_rail_voltage[ADC_TYPE_VBAT]);
     float bat_charge = s_batery_conversion.get_charge();
     s_bat_charge.produce(&bat_charge);
+
+    s_system_power_enable_update();
 }
