@@ -4,10 +4,14 @@ PROJECT_DIR := $(CURDIR)
 TIME_START := $(shell date +%s)
 
 # ------------------------------- Arm Toolchain Path -------------------------------------
-ifeq ($(OS),Windows_NT)
-	TOOLCHAIN_ROOT:=C:/TOOLCHAIN/9-2019-q4-mayor
-else
-	TOOLCHAIN_ROOT:=/opt/arm-toolchain/gcc-arm-none-eabi-9-2019-q4-major
+ifndef TOOLCHAIN_ROOT # Only set the TOOLCHAIN_ROOT if there is no previous definition from outside.
+	ifeq ($(OS),Windows_NT)
+		TOOLCHAIN_ROOT:=C:/TOOLCHAIN/9-2019-q4-mayor
+	endif
+endif
+
+ifdef TOOLCHAIN_ROOT
+	TOOLCHAIN_BIN:=$(TOOLCHAIN_ROOT)/bin/
 endif
 
 # ----------------------------- Dependencies stuff ----------------------------------------
@@ -40,14 +44,14 @@ GIT_DEF += -DBUILD_DEVELOPER=\"'$(BUILD_DEVELOPER)'\"
 GIT_DEF += -DBUILD_BRANCH=\"'$(GIT_BRANCH)'\"
 GIT_DEF += -DBUILD_VERSION=\"'$(BUILD_VERSION)'\"
 
-CC := $(TOOLCHAIN_ROOT)/bin/arm-none-eabi-gcc
-CXX := $(TOOLCHAIN_ROOT)/bin/arm-none-eabi-g++
-LD := $(TOOLCHAIN_ROOT)/bin/arm-none-eabi-gcc
-OBJCOPY := $(TOOLCHAIN_ROOT)/bin/arm-none-eabi-objcopy
-AS := $(TOOLCHAIN_ROOT)/bin/arm-none-eabi-as
-AR := $(TOOLCHAIN_ROOT)/bin/arm-none-eabiar
-GDB := $(TOOLCHAIN_ROOT)/bin/arm-none-eabi-gdb
-SIZE := $(TOOLCHAIN_ROOT)/bin/arm-none-eabi-size --format=bekeley
+CC := $(TOOLCHAIN_BIN)arm-none-eabi-gcc
+CXX := $(TOOLCHAIN_BIN)arm-none-eabi-g++
+LD := $(TOOLCHAIN_BIN)arm-none-eabi-gcc
+OBJCOPY := $(TOOLCHAIN_BIN)arm-none-eabi-objcopy
+AS := $(TOOLCHAIN_BIN)arm-none-eabi-as
+AR := $(TOOLCHAIN_BIN)arm-none-eabiar
+GDB := $(TOOLCHAIN_BIN)arm-none-eabi-gdb
+SIZE := $(TOOLCHAIN_BIN)arm-none-eabi-size --format=bekeley
 
 # ------------------------------ Main Aplication --------------------------------------------
 root_folder_path := $(PROJECT_DIR)/controller

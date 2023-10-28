@@ -1,0 +1,22 @@
+name: build-firmware
+run-name: ${{ github.actor }} is working to improve the firmware.
+on:
+  - push
+  - pull_request
+
+jobs:
+  build-firmware-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up repository
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        run: sudo apt-get install gcc-arm-none-eabi
+      - name: Build the firmware
+        run: make
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: openbotbrain_firmware
+          path: result/openbotbrain_binary/
+          if-no-files-found: error # 'warn' or 'ignore' are also available

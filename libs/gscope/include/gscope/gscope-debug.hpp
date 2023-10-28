@@ -15,4 +15,5 @@ bool GSDebug(const char* p_string, ...);
 
 #include <stdbool.h>
 bool GSDebug(const char* p_string, ...);
+
 #endif
