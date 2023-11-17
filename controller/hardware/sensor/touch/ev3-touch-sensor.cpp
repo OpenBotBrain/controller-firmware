@@ -1,4 +1,5 @@
 #include <touch/ev3-touch-sensor.hpp>
+#include <hardware/hardware-config.hpp>
 
 // ------------------------------------------------------------------------------------
 //                                      PUBLIC API
@@ -7,14 +8,14 @@
 /**
  * Create an instance of EV3 Touch Sensor.
  *
- * sensor mode is defaulted to DB when one is not given.
+ * sensor mode is defaulted to UNDEFINED when one is not given.
  *
  * @param *port pointer to Input port.
 */
 EV3TouchSensor::EV3TouchSensor(InputPort* port)
 {
     m_port = port;
-    m_sensor_mode = EV3_Touch_Sensor_Mode::TOUCH;
+    m_sensor_mode = EV3_Touch_Sensor_Mode::UNDEFINED;
 }
 
 /**
@@ -30,6 +31,26 @@ EV3TouchSensor::EV3TouchSensor(InputPort* port, EV3_Touch_Sensor_Mode sensor_mod
 }
 
 /**
+ * Initialise the EV3 Touch Sensor.
+ *
+ * Init the port that the Sensor is using. Set the EV3 Sensor Mode to TOUCH.
+*/
+void EV3TouchSensor::init()
+{
+    m_port->init();
+    m_sensor_mode = EV3_Touch_Sensor_Mode::TOUCH;
+}
+
+/**
+ * Update the EV3 Touch Sensor.
+*/
+void EV3TouchSensor::update()
+{
+    float voltage = m_port->get_voltage_v(InputPort::PinID::PIN1);
+    m_pressed = (voltage >= IN1_TOUCH_HIGH);
+}
+
+/**
  * Fetch a sample from the EV3 Touch Sensor.
  *
  * Either 0.0f for off, 1.0f for on.
@@ -38,7 +59,7 @@ EV3TouchSensor::EV3TouchSensor(InputPort* port, EV3_Touch_Sensor_Mode sensor_mod
 */
 float EV3TouchSensor::fetch_sample()
 {
-    return 1.0f;
+    return (float)m_pressed;
 }
 
 /**

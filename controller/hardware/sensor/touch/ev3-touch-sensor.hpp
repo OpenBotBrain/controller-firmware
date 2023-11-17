@@ -24,9 +24,9 @@ class EV3TouchSensor : public LegoSensor
 
         EV3TouchSensor(InputPort* port, EV3_Touch_Sensor_Mode sensor_mode);
 
-        virtual void init() override {};
+        virtual void init() override;
 
-        virtual void update() override {};
+        virtual void update() override;
 
         virtual void set_mode(uint8_t sensor_mode) override;
 
@@ -39,4 +39,6 @@ class EV3TouchSensor : public LegoSensor
         InputPort* m_port;
 
         EV3_Touch_Sensor_Mode m_sensor_mode;
+
+        bool m_pressed = false;
 };

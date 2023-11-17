@@ -65,21 +65,9 @@ class HardwareManager
 
         Hardware_Config m_hardware_config;
 
-        std::array<LegoMotor*, PORT_COUNT> m_lego_motors =
-        {
-            nullptr,
-            nullptr,
-            nullptr,
-            nullptr
-        };
+        LegoMotor* m_lego_motors[PORT_COUNT];
 
-        std::array<LegoSensor*, PORT_COUNT> m_lego_sensors =
-        {
-            nullptr,
-            nullptr,
-            nullptr,
-            nullptr
-        };
+        LegoSensor* m_lego_sensors[PORT_COUNT];
 
         NeoLED m_neoled;
 
