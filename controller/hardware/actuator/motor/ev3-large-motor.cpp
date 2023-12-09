@@ -43,7 +43,7 @@ void EV3LargeMotor::forward(int32_t rotation)
         return;
     }
 
-    float speed = m_motor_speed / 1000;
+    float speed = m_motor_speed / 1000.0;
     drive_motor(speed, rotation);
 }
 
@@ -65,7 +65,7 @@ void EV3LargeMotor::backward(int32_t rotation)
         return;
     }
 
-    float speed = m_motor_speed / 1000;
+    float speed = m_motor_speed / 1000.0;
     drive_motor(-speed, -rotation);
 }
 
