@@ -51,8 +51,8 @@ void NXTTouchSensor::init()
  */
 void NXTTouchSensor::update()
 {
-    float voltage = m_input_port->get_voltage_v(InputPort::PinID::PIN1);
-    m_pressed = (voltage <= 1.0f);
+    m_voltage = m_input_port->get_voltage_v(InputPort::PinID::PIN1);
+    m_pressed = (m_voltage <= 1.0f);
 }
 
 /**
@@ -64,7 +64,17 @@ void NXTTouchSensor::update()
  */
 float NXTTouchSensor::fetch_sample()
 {
-    return (float)m_pressed;
+    return m_voltage;
+}
+
+/**
+ * Fetch whether the button is being pressed down.
+ *
+ * @return is the button pressed?
+*/
+bool NXTTouchSensor::is_pressed()
+{
+    return m_pressed;
 }
 
 /**

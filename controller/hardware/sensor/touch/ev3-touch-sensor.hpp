@@ -36,6 +36,8 @@ class EV3TouchSensor : public LegoSensor
 
         float fetch_sample();
 
+        bool is_pressed();
+
     private:
 
         Lego_Sensor_Port m_sensor_port;
@@ -47,4 +49,6 @@ class EV3TouchSensor : public LegoSensor
         EV3_Touch_Sensor_Mode m_sensor_mode;
 
         bool m_pressed = false;
+
+        float m_voltage = 0.0f;
 };

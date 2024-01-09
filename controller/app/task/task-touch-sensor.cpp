@@ -38,9 +38,9 @@ static void s_touch_sensor_thread(void *)
         {
             s_led_timestamp = now;
 
-            s_led.set_led_state(LED_Type::TOP, s_nxt_touch_sensor.fetch_sample() >= 1.0f);
-            s_led.set_led_state(LED_Type::MIDDLE, s_ev3_touch_sensor.fetch_sample() >= 1.0f);
-            s_led.set_led_state(LED_Type::BOTTOM, !s_led.get_led_state(LED_Type::BOTTOM));
+            s_led.set_led_state(LED_Type::TOP, s_nxt_touch_sensor.is_pressed());
+            s_led.set_led_state(LED_Type::MIDDLE, s_ev3_touch_sensor.is_pressed());
+            s_led.set_led_state(LED_Type::BOTTOM, s_ev3_touch_sensor.fetch_sample() >= 1.0f);
 
             s_led.update();
         }

@@ -51,8 +51,8 @@ void EV3TouchSensor::init()
  */
 void EV3TouchSensor::update()
 {
-    float voltage = m_input_port->get_voltage_v(InputPort::PinID::PIN1);
-    m_pressed = (voltage <= 9.0f);
+    m_voltage = m_input_port->get_voltage_v(InputPort::PinID::PIN1);
+    m_pressed = (m_voltage >= 0.4f);
 }
 
 /**
@@ -64,7 +64,17 @@ void EV3TouchSensor::update()
  */
 float EV3TouchSensor::fetch_sample()
 {
-    return (float)m_pressed;
+    return m_voltage;
+}
+
+/**
+ * Fetch whether the button is being pressed down.
+ *
+ * @return is the button pressed?
+*/
+bool EV3TouchSensor::is_pressed()
+{
+    return m_pressed;
 }
 
 /**
