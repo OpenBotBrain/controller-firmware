@@ -123,6 +123,7 @@ CXXSRC+=task-power-supply.cpp
 CXXSRC+=task-rainbow.cpp
 CXXSRC+=task-update.cpp
 CXXSRC+=task-hardware-manager.cpp
+CXXSRC+=task-touch-sensor.cpp
 
 # Config Folder
 CXXSRC+=board-rev.cpp

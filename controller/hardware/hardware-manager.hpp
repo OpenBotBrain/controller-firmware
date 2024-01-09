@@ -35,6 +35,8 @@ struct Hardware_Config
     uint16_t led_update_interval;
     uint16_t imu_update_interval;
     uint16_t button_update_interval;
+    uint16_t sensor_update_interval;
+    uint16_t actuator_update_interval;
 };
 
 class HardwareManager

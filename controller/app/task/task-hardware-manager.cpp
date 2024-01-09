@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <stm-hal/hal-tim.hpp>
 #include <gscope/gscope-debug.hpp>
+#include <touch/ev3-touch-sensor.hpp>
+#include <module/module-input.hpp>
 
 static const TickType_t s_tick_delay = 5;
 static const float s_roll_threshold = 25.0f;
@@ -95,7 +97,7 @@ static void s_hardware_manager_thread(void*)
 
 void task_hardware_manager_init()
 {
-    // Create rainbow task
+    // Create hardware manager task
     static StaticTask_t s_task_buffer;
     static StackType_t s_stack[SIZE_HARDWARE_MAN];
 

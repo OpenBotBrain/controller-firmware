@@ -9,13 +9,16 @@
 #include <task/task-power-supply.hpp>
 #include <task/task-rainbow.hpp>
 #include <task/task-hardware-manager.hpp>
+#include <task/task-touch-sensor.hpp>
 #include <task/task-update.hpp>
 
 int main(void)
 {
     board_rev_init();               // Init board revision, IOs and clock configuration
 
-    task_hardware_manager_init();   // Init hardware manager task.
+    task_touch_sensor_init();
+
+    //task_hardware_manager_init();   // Init hardware manager task.
 
     // task_rainbow_init();            // Init rainbow task.
 

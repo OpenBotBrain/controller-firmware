@@ -21,6 +21,8 @@ void HardwareManager::init()
         .led_update_interval = 250,
         .imu_update_interval = 5,
         .button_update_interval = 5,
+        .sensor_update_interval = 5,
+        .actuator_update_interval = 5,
     };
 }
 

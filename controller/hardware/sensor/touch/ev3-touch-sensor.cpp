@@ -11,11 +11,13 @@
  * sensor mode is defaulted to UNDEFINED when one is not given.
  *
  * @param *port pointer to Input port.
-*/
-EV3TouchSensor::EV3TouchSensor(InputPort* port)
+ */
+EV3TouchSensor::EV3TouchSensor(Lego_Sensor_Port sensor_port)
 {
-    m_port = port;
+    m_sensor_port = sensor_port;
     m_sensor_mode = EV3_Touch_Sensor_Mode::UNDEFINED;
+
+    m_input_port = &module_port_get_input_port((uint8_t)sensor_port);
 }
 
 /**
@@ -23,31 +25,34 @@ EV3TouchSensor::EV3TouchSensor(InputPort* port)
  *
  * @param *port pointer to Input port.
  * @param sensor_mode set the sensor mode here.
-*/
-EV3TouchSensor::EV3TouchSensor(InputPort* port, EV3_Touch_Sensor_Mode sensor_mode)
+ */
+EV3TouchSensor::EV3TouchSensor(Lego_Sensor_Port sensor_port, EV3_Touch_Sensor_Mode sensor_mode)
 {
-    m_port = port;
+    m_sensor_port = sensor_port;
     m_sensor_mode = sensor_mode;
+
+    m_input_port = &module_port_get_input_port((uint8_t)sensor_port);
 }
 
 /**
  * Initialise the EV3 Touch Sensor.
  *
  * Init the port that the Sensor is using. Set the EV3 Sensor Mode to TOUCH.
-*/
+ */
 void EV3TouchSensor::init()
 {
-    m_port->init();
+    m_input_port->init();
+    m_input_port->set_mode(InputPort::Mode::INPUT);
     m_sensor_mode = EV3_Touch_Sensor_Mode::TOUCH;
 }
 
 /**
  * Update the EV3 Touch Sensor.
-*/
+ */
 void EV3TouchSensor::update()
 {
-    float voltage = m_port->get_voltage_v(InputPort::PinID::PIN1);
-    m_pressed = (voltage >= IN1_TOUCH_HIGH);
+    float voltage = m_input_port->get_voltage_v(InputPort::PinID::PIN1);
+    m_pressed = (voltage <= 9.0f);
 }
 
 /**
@@ -56,7 +61,7 @@ void EV3TouchSensor::update()
  * Either 0.0f for off, 1.0f for on.
  *
  * @param *sample pointer to float value that stores the sample.
-*/
+ */
 float EV3TouchSensor::fetch_sample()
 {
     return (float)m_pressed;
@@ -66,7 +71,7 @@ float EV3TouchSensor::fetch_sample()
  * Set the sensor mode of the EV3 Touch Sensor.
  *
  * @param sensor_mode
-*/
+ */
 void EV3TouchSensor::set_mode(uint8_t sensor_mode)
 {
     m_sensor_mode = static_cast<EV3_Touch_Sensor_Mode>(sensor_mode);
@@ -76,7 +81,7 @@ void EV3TouchSensor::set_mode(uint8_t sensor_mode)
  * Get the sensor mode of the EV3 Touch Sensor.
  *
  * @return sensor_mode
-*/
+ */
 uint8_t EV3TouchSensor::get_mode()
 {
     return static_cast<int8_t>(m_sensor_mode);

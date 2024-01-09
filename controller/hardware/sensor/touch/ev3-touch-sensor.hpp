@@ -2,6 +2,8 @@
 
 #include <sensor/lego-sensor.hpp>
 #include <module/module-input.hpp>
+#include <module/module-ports.hpp>
+#include <hardware/hardware-manager.hpp>
 #include <cstdint>
 
 /**
@@ -20,9 +22,9 @@ class EV3TouchSensor : public LegoSensor
 {
     public:
 
-        EV3TouchSensor(InputPort* port);
+        EV3TouchSensor(Lego_Sensor_Port sensor_port);
 
-        EV3TouchSensor(InputPort* port, EV3_Touch_Sensor_Mode sensor_mode);
+        EV3TouchSensor(Lego_Sensor_Port sensor_port, EV3_Touch_Sensor_Mode sensor_mode);
 
         virtual void init() override;
 
@@ -36,7 +38,11 @@ class EV3TouchSensor : public LegoSensor
 
     private:
 
-        InputPort* m_port;
+        Lego_Sensor_Port m_sensor_port;
+
+        InputPort* m_input_port;
+
+        InputPort::Config m_port_config;
 
         EV3_Touch_Sensor_Mode m_sensor_mode;
 
